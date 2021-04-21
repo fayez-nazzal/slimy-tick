@@ -2,11 +2,12 @@ const { gql } = require("apollo-server");
 
 module.exports = gql`
   type Todo {
+    id: String!
     body: String!
     checked: Boolean!
     created: String!
     remind: String
-    repeat: [String]
+    repeat: String
     priority: String!
     due: String
   }

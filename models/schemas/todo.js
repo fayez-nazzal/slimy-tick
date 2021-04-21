@@ -5,7 +5,7 @@ const todoSchema = new Schema({
   checked: Boolean,
   created: String,
   remind: String,
-  repeat: [String],
+  repeat: String,
   priority: {
     type: String,
     required: true,

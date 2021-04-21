@@ -5,7 +5,7 @@ const { UserInputError } = require("apollo-server-errors");
 const userResolvers = require("./user");
 const User = require("../../models/user");
 const checkAuth = require("../../utils/checkAuth");
-const user = require("../../models/user");
+const { uuid } = require("uuidv4");
 
 module.exports = {
   Query: {
@@ -35,6 +35,7 @@ module.exports = {
 
       // no error thrown -> user authenticated
       const newGroup = {
+        id: uuid(),
         name,
         todos: [],
         created: new Date().toISOString(),
@@ -62,6 +63,7 @@ module.exports = {
       }
       // no error thrown -> user authenticated
       const newTodo = {
+        id: uuid(),
         checked: false,
         body,
         priority,

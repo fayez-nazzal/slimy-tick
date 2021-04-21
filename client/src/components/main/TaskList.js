@@ -23,8 +23,8 @@ export default TaskList
 
 const useStyles = makeStyles(theme => ({
   root: {
-    width: "100vw",
-    maxWidth: "100vw",
+    width: "100%",
+    maxWidth: "100%",
     backgroundColor: theme.palette.background.paper,
   },
 }))

@@ -28,6 +28,7 @@ export const QUERY_TODOS_IN_GROUP = gql`
 export const CREATE_TODO = gql`
   mutation createTodo($groupName: String!, $body: String!, $priority: Int!) {
     createTodo(groupName: $groupName, body: $body, priority: $priority) {
+      id
       checked
       body
       priority
@@ -50,10 +51,12 @@ export const REGISTER_USER = gql`
       password: $password
       confirmPassword: $confirmPassword
     ) {
+      id
       email
       token
       created
       groups {
+        id
         name
         todos {
           body
@@ -71,8 +74,10 @@ export const LOGIN_USER = gql`
       token
       created
       groups {
+        id
         name
         todos {
+          id
           body
           priority
         }

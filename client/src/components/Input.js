@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react"
-import { Editor, EditorState, CompositeDecorator } from "draft-js"
+import { Editor, EditorState, CompositeDecorator, ContentState } from "draft-js"
 import {
   makeStyles,
   createMuiTheme,
@@ -16,8 +16,15 @@ import PlayArrowIcon from "@material-ui/icons/PlayArrowSharp"
 import { CREATE_TODO, LOGIN_USER } from "../apollo/queries"
 import { useMutation } from "@apollo/client"
 import { addTodo, login as globalLogin } from "../redux/user"
-import { navigate } from "gatsby"
 import { useDispatch, useSelector } from "react-redux"
+import {
+  DUE_DATE_REGEX,
+  DUE_TIME_REGEX,
+  REMIND_REGEX,
+  REPEAT_REGEX,
+} from "../data/regex"
+import DraftStrategyComponent from "./DraftStrategyComponent"
+import { toggleDuePicker } from "../redux/app"
 
 const theme = createMuiTheme({
   palette: {
@@ -27,20 +34,36 @@ const theme = createMuiTheme({
   },
 })
 
+const removeSymbolicPartsFromText = text => {
+  return text.replace(" ! ", "").replace(" !! ", "").replace(" !!! ", "")
+}
+
+let disableEditorBlur = false
+
 const Input = () => {
   const dispatch = useDispatch()
+  const currentGroup = useSelector(
+    state => state.user.userData.groups[state.user.groupIndex]
+  )
   const [focus, setFocus] = useState(false)
   const [values, setValues] = useState({
-    groupName: "group 1",
-    body: "new Todo",
+    groupName: currentGroup.name,
+    body: "",
     priority: 4,
   })
-  const priority = useRef("")
+  const editorRef = useRef(null)
+
   const classes = useStyles({ focus })
   const [createTodo, { loading }] = useMutation(CREATE_TODO, {
     update(proxy, { data: { createTodo: newTodo } }) {
-      console.log(newTodo)
       dispatch(addTodo(newTodo))
+      const emptyState = EditorState.push(
+        editorState,
+        ContentState.createFromText(""),
+        "remove-range"
+      )
+      setEditorState(emptyState)
+      setValues(prev => ({ ...prev, body: "" }))
     },
     onError(err) {
       console.log(JSON.stringify(err, null, 2))
@@ -62,6 +85,23 @@ const Input = () => {
         {
           strategy: handleMediumStrategy,
           component: props => <PrioritySpan {...props} medium />,
+        },
+        {
+          strategy: remindStrategy,
+          component: props => <DraftStrategyComponent {...props} remind />,
+        },
+        {
+          strategy: repeatStrategy,
+          component: props => <DraftStrategyComponent {...props} repeat />,
+        },
+        ,
+        {
+          strategy: dueDateStrategy,
+          component: props => <DraftStrategyComponent {...props} due />,
+        },
+        {
+          strategy: dueTimeStrategy,
+          component: props => <DraftStrategyComponent {...props} due />,
         },
       ])
     )
@@ -85,13 +125,58 @@ const Input = () => {
     findMatches("!", contentBlock, callback, contentState)
   }
 
+  function remindStrategy(contentBlock, callback, contentState) {
+    findWithRegex(REMIND_REGEX, contentBlock, callback)
+  }
+
+  function repeatStrategy(contentBlock, callback, contentState) {
+    findWithRegex(REPEAT_REGEX, contentBlock, callback)
+  }
+
+  function dueDateStrategy(contentBlock, callback, contentState) {
+    findWithRegex(DUE_DATE_REGEX, contentBlock, callback)
+  }
+
+  function dueTimeStrategy(contentBlock, callback, contentState) {
+    findWithRegex(DUE_TIME_REGEX, contentBlock, callback)
+  }
+
+  function findWithRegex(regex, contentBlock, callback) {
+    const text = contentBlock.getText()
+    let match = text.match(regex)
+    console.log(match)
+    match = match ? match.filter(Boolean) : []
+    console.log("filter ")
+    console.log(match)
+    match.length &&
+      callback(
+        text.lastIndexOf(match[0]),
+        text.lastIndexOf(match[0]) + match[0].length
+      )
+  }
+
   function findMatches(type, contentBlock, callback, contentState) {
-    console.log(contentState.getEntityMap())
     const text = contentBlock.getText()
     const textIndex = text.lastIndexOf(type)
 
     textIndex > -1 && callback(textIndex, textIndex + type.length)
-    priority.current = type
+    setValues(values => ({ ...values, priority: type.length }))
+  }
+
+  const onDraftChange = state => {
+    setEditorState(state)
+    const newContent = removeSymbolicPartsFromText(
+      state.getCurrentContent().getPlainText("\u0001")
+    )
+    newContent !== values.body &&
+      setValues(values => ({ ...values, body: newContent }))
+  }
+
+  const handleDueClicked = e => {
+    dispatch(toggleDuePicker())
+    setTimeout(() => {
+      disableEditorBlur = false
+    }, 1)
   }
 
   return (
@@ -100,25 +185,48 @@ const Input = () => {
         <div className={clsx([classes.editorContainer])}>
           <Editor
             placeholder="Type your task here"
+            ref={editorRef}
             editorState={editorState}
-            onChange={setEditorState}
+            onChange={onDraftChange}
             onFocus={() => setFocus(true)}
-            onBlur={() => setFocus(false)}
+            onBlur={() => {
+              setTimeout(() => {
+                if (disableEditorBlur) return
+                setFocus(false)
+              })
+            }}
             handleReturn={() => false}
           />
         </div>
         <IconButton
           size="small"
           className={classes.submitButton}
-          onClick={createTodo}
+          onMouseDown={createTodo}
         >
           <PlayArrowIcon color="primary" className={classes.playIcon} />
         </IconButton>
         <div className={clsx([classes.rowFlex, classes.tools])}>
-          <AlarmIcon color="primary" />
-          <UpdateIcon color="primary" />
-          <PriorityHighIcon color="primary" />
-          <DateRangeIcon color="primary" />
+          <IconButton size="small">
+            <AlarmIcon color="primary" />
+          </IconButton>
+          <IconButton size="small">
+            <UpdateIcon color="primary" />
+          </IconButton>
+          <IconButton size="small">
+            <PriorityHighIcon color="primary" />
+          </IconButton>
+          <IconButton
+            size="small"
+            onMouseEnter={() => {
+              disableEditorBlur = true
+            }}
+            onMouseLeave={() => {
+              disableEditorBlur = false
+            }}
+            onClick={handleDueClicked}
+          >
+            <DateRangeIcon color="primary" />
+          </IconButton>
         </div>
       </div>
     </MuiThemeProvider>
@@ -152,7 +260,6 @@ const useStyles = makeStyles(theme => ({
     margin: theme.spacing(1, "auto"),
     marginBottom: theme.spacing(2.25),
     width: "90%",
-    height: props => (props.focus ? "3.8rem" : "2.4rem"),
     transition: "all 0.3s",
   },
   rowFlex: {
@@ -163,8 +270,11 @@ const useStyles = makeStyles(theme => ({
     backgroundColor: "white",
     margin: theme.spacing(0, "auto"),
     padding: theme.spacing(0.8, 1),
+    paddingBottom: props =>
+      props.focus ? theme.spacing(4.8) : theme.spacing(0.8),
+    paddingRight: theme.spacing(5),
     width: "100%",
-    height: "100%",
+    minHeight: "2.4rem",
     fontSize: "18px",
     transition: "all 0.3s",
     border: "1px solid #cfcfcf",

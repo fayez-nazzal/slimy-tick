@@ -1,8 +1,8 @@
 module.exports = {
   siteMetadata: {
     title: `Slimy Tick`,
-    description: `Manage your time in a modern way.`,
-    author: `@fayez-nazza;`,
+    description: `A modern App to help you Manage your time.`,
+    author: `@fayez-nazzal`,
   },
   plugins: [
     `gatsby-plugin-react-helmet`,
@@ -19,13 +19,13 @@ module.exports = {
     {
       resolve: `gatsby-plugin-manifest`,
       options: {
-        name: `gatsby-starter-default`,
-        short_name: `starter`,
+        name: `Slimy Tick`,
+        short_name: `Slimy Tick`,
         start_url: `/`,
-        background_color: `#663399`,
-        theme_color: `#663399`,
+        background_color: `#2dc065`,
+        theme_color: `#bedc9b`,
         display: `minimal-ui`,
-        icon: `src/images/background.jpg`,
+        icon: `src/images/icon.png`,
       },
     },
     {

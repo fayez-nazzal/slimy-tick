@@ -12,7 +12,7 @@ import { drawerWidth } from "../../data/globals"
 import Sidebar from "./Sidebar"
 import Content from "./Content"
 import TaskList from "./TaskList"
-
+import DateTimePicker from "../DateTimePicker"
 const baseTheme = createMuiTheme()
 
 const Layout = ({ children }) => {
@@ -55,6 +55,7 @@ const Layout = ({ children }) => {
         <Sidebar open={drawerOpen} toggle={toggleDrawer} />
         <Content drawerOpen={drawerOpen}>
           <TaskList />
+          <DateTimePicker />
         </Content>
       </div>
     </ThemeProvider>
