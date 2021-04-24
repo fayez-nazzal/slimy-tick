@@ -9,7 +9,7 @@ import {
   makeStyles,
   MuiThemeProvider,
 } from "@material-ui/core/styles"
-import { useMediaQuery } from "@material-ui/core/styles"
+import useMediaQuery from "@material-ui/core/useMediaQuery"
 import Button from "@material-ui/core/Button"
 import ButtonGroup from "@material-ui/core/ButtonGroup"
 import AddIcon from "@material-ui/icons/Add"

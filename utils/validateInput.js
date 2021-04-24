@@ -1,5 +1,7 @@
 module.exports = (email, password, confirmPassword) => {
   const errors = {};
+  email = email.trim();
+  const isRegisterValidaton = !!confirmPassword;
 
   if (email.trim() === "") {
     errors.email = "Email must not be empty";
@@ -12,6 +14,8 @@ module.exports = (email, password, confirmPassword) => {
 
   if (password === "") {
     errors.password = "Pasword must not be empty";
+  } else if (isRegisterValidaton && password.length < 6) {
+    errors.password = "Pasword must have 6 or more characters";
   }
 
   if (confirmPassword !== false && password !== confirmPassword) {

@@ -2,8 +2,8 @@ import React from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import Typography from "@material-ui/core/Typography"
 
-const ErrorTypography = ({ children }) => {
-  const classes = useStyles()
+const ErrorTypography = props => {
+  const classes = useStyles(props)
   return (
     <Typography
       color="error"
@@ -11,7 +11,11 @@ const ErrorTypography = ({ children }) => {
       display="block"
       className={classes.error}
     >
-      {children}
+      {props.error && (
+        <>
+          {"\u2022 "} {props.error}
+        </>
+      )}
     </Typography>
   )
 }
@@ -28,7 +32,7 @@ const useStyles = makeStyles({
   },
   error: {
     whiteSpace: "pre",
-    height: "16px",
-    fontSize: "16px !important",
+    height: props => (props.lg ? "20px" : "18px"),
+    fontSize: props => (props.lg ? "18px !important" : "16px !important"),
   },
 })

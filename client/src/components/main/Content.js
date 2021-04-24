@@ -3,7 +3,7 @@ import { makeStyles } from "@material-ui/core/styles"
 import clsx from "clsx"
 import PriorityTabs from "../PriorityTabs"
 import Input from "../Input"
-import { useMediaQuery } from "@material-ui/core/styles"
+import useMediaQuery from "@material-ui/core/useMediaQuery"
 
 const Content = ({ children, drawerOpen }) => {
   const sm = useMediaQuery(theme => theme.breakpoints.up("sm"))

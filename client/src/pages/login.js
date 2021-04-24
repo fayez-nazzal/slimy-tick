@@ -48,6 +48,7 @@ const LoginPage = () => {
           Fill your account info
         </Typography>
         <form onSubmit={onSubmit}>
+          <ErrorTypography lg error={errors.general} />
           <TextField
             id="email-input"
             name="email"
@@ -61,7 +62,7 @@ const LoginPage = () => {
             inputProps={{ "aria-label": "email" }}
             fullWidth
           />
-          <ErrorTypography>{errors.email}</ErrorTypography>
+          <ErrorTypography error={errors.email} />
           <TextField
             id="password-input"
             name="password"
@@ -76,7 +77,7 @@ const LoginPage = () => {
             inputProps={{ "aria-label": "password" }}
             fullWidth
           />
-          <ErrorTypography>{errors.password}</ErrorTypography>
+          <ErrorTypography error={errors.password} />
           <Button
             variant="outlined"
             color="primary"

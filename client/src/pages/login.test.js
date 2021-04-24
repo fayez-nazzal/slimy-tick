@@ -1,58 +1,24 @@
 import React from "react"
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react"
+import {
+  cleanup,
+  fireEvent,
+  render,
+  waitFor,
+  screen,
+} from "@testing-library/react"
 import Login from "./login"
 import WrapRootElement from "../wrap-root-element"
 import { MockedProvider } from "@apollo/client/testing"
-import { LOGIN_USER } from "../apollo/queries"
-import { UserInputError } from "apollo-server-core"
+import lgoinMocks from "../../__mocks__/login-mocks"
 
-describe("input elements", () => {
+describe("login input elements", () => {
   let loginPage
-  const mocks = [
-    {
-      request: {
-        query: LOGIN_USER,
-        variables: {
-          email: "",
-          password: "",
-        },
-      },
-      result: {
-        errors: [
-          new UserInputError("Error", {
-            errors: {
-              email: "Email must not be empty",
-              password: "Password must not be empty",
-            },
-          }),
-        ],
-      },
-    },
-    {
-      request: {
-        query: LOGIN_USER,
-        variables: {
-          email: "wrong@email..com",
-          password: "",
-        },
-      },
-      result: {
-        errors: [
-          new UserInputError("Error", {
-            errors: {
-              email: "Email not valid",
-            },
-          }),
-        ],
-      },
-    },
-  ]
 
   beforeEach(() => {
     loginPage = render(
       <WrapRootElement
         element={
-          <MockedProvider mocks={mocks} addTypename={false}>
+          <MockedProvider mocks={lgoinMocks} addTypename={false}>
             <Login />
           </MockedProvider>
         }
@@ -118,5 +84,62 @@ describe("input elements", () => {
     )
 
     expect(emailError).toBeTruthy()
+  })
+
+  it("incorrect password error", async () => {
+    const emailInput = loginPage.getByLabelText("email")
+    const passwordInput = loginPage.getByLabelText("password")
+
+    fireEvent.change(emailInput, {
+      target: {
+        value: "correct@email.com",
+      },
+    })
+
+    fireEvent.change(passwordInput, {
+      target: {
+        value: "incorrect password",
+      },
+    })
+
+    const loginButton = loginPage.getByTestId("login-button")
+
+    fireEvent.click(loginButton)
+
+    const error = await waitFor(() => loginPage.getByText(/wrong credentials/i))
+
+    expect(error).toBeTruthy()
+  })
+
+  it("login successfuly when correct info provided", async () => {
+    Object.defineProperty(window, "___navigate", { value: jest.fn() })
+    const emailInput = loginPage.getByLabelText("email")
+    const passwordInput = loginPage.getByLabelText("password")
+
+    fireEvent.change(emailInput, {
+      target: {
+        value: "correct@email.com",
+      },
+    })
+
+    fireEvent.change(passwordInput, {
+      target: {
+        value: "valid password",
+      },
+    })
+
+    const loginButton = loginPage.getByTestId("login-button")
+
+    fireEvent.click(loginButton)
+
+    const notValidError = await waitFor(() =>
+      screen.queryAllByText(/not valid/i)
+    )
+    const emptyError = await waitFor(() =>
+      screen.queryAllByAltText(/must not be empty/i)
+    )
+
+    expect(notValidError.length).toBe(0)
+    expect(emptyError.length).toBe(0)
   })
 })

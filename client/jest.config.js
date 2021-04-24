@@ -14,4 +14,13 @@ module.exports = {
   testURL: `http://localhost`,
   setupFiles: [`<rootDir>/loadershim.js`],
   setupFilesAfterEnv: ["<rootDir>/setup-test-env.js"],
+  reporters: [
+    "default",
+    [
+      "./node_modules/jest-html-reporter",
+      {
+        pageTitle: "Test Report",
+      },
+    ],
+  ],
 }

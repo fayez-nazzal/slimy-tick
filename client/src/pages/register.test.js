@@ -1,79 +1,24 @@
 import React from "react"
-import { cleanup, fireEvent, render, waitFor } from "@testing-library/react"
+import {
+  cleanup,
+  fireEvent,
+  render,
+  waitFor,
+  screen,
+} from "@testing-library/react"
 import RegisterPage from "./register"
 import WrapRootElement from "../wrap-root-element"
 import { MockedProvider } from "@apollo/client/testing"
-import { REGISTER_USER } from "../apollo/queries"
-import { UserInputError } from "apollo-server-core"
+import registerMocks from "../../__mocks__/register-mocks"
 
 describe("register input elements", () => {
   let registerPage
-  const mocks = [
-    {
-      request: {
-        query: REGISTER_USER,
-        variables: {
-          email: "",
-          password: "",
-          confirmPassword: "",
-        },
-      },
-      result: {
-        errors: [
-          new UserInputError("Error", {
-            errors: {
-              email: "Email must not be empty",
-              password: "Password must not be empty",
-            },
-          }),
-        ],
-      },
-    },
-    {
-      request: {
-        query: REGISTER_USER,
-        variables: {
-          email: "wrong@email..com",
-          password: "",
-          confirmPassword: "",
-        },
-      },
-      result: {
-        errors: [
-          new UserInputError("Error", {
-            errors: {
-              email: "Email not valid",
-            },
-          }),
-        ],
-      },
-    },
-    {
-      request: {
-        query: REGISTER_USER,
-        variables: {
-          email: "correct@email.com",
-          password: "123",
-          confirmPassword: "321",
-        },
-      },
-      result: {
-        errors: [
-          new UserInputError("Error", {
-            errors: {
-              confirmPassword: "Passwords must match",
-            },
-          }),
-        ],
-      },
-    },
-  ]
 
   beforeEach(() => {
     registerPage = render(
       <WrapRootElement
         element={
-          <MockedProvider mocks={mocks} addTypename={false}>
+          <MockedProvider mocks={registerMocks} addTypename={false}>
             <RegisterPage />
           </MockedProvider>
         }
@@ -154,13 +99,13 @@ describe("register input elements", () => {
 
     fireEvent.change(passwordInput, {
       target: {
-        value: "123",
+        value: "valid password",
       },
     })
 
     fireEvent.change(confirmPasswordInput, {
       target: {
-        value: "321",
+        value: "valid.password",
       },
     })
 
@@ -173,5 +118,80 @@ describe("register input elements", () => {
     )
 
     expect(noMatchError).toBeTruthy()
+  })
+
+  it("show error for short passwords", async () => {
+    const emailInput = registerPage.getByLabelText("email")
+    const passwordInput = registerPage.getByLabelText("password")
+    const confirmPasswordInput = registerPage.getByLabelText("confirm password")
+
+    fireEvent.change(emailInput, {
+      target: {
+        value: "correct@email.com",
+      },
+    })
+
+    fireEvent.change(passwordInput, {
+      target: {
+        value: "123",
+      },
+    })
+
+    fireEvent.change(confirmPasswordInput, {
+      target: {
+        value: "123",
+      },
+    })
+
+    const registerButton = registerPage.getByTestId("register-button")
+
+    fireEvent.click(registerButton)
+
+    const lengthError = await waitFor(() =>
+      registerPage.getByText(/Pasword must have 6 or more characters/i)
+    )
+
+    expect(lengthError).toBeTruthy()
+  })
+
+  it("register successfuly when correct info provided", async () => {
+    Object.defineProperty(window, "___navigate", { value: jest.fn() })
+    const emailInput = registerPage.getByLabelText("email")
+    const passwordInput = registerPage.getByLabelText("password")
+    const confirmPasswordInput = registerPage.getByLabelText("confirm password")
+
+    fireEvent.change(emailInput, {
+      target: {
+        value: "correct@email.com",
+      },
+    })
+
+    fireEvent.change(passwordInput, {
+      target: {
+        value: "valid password",
+      },
+    })
+
+    fireEvent.change(confirmPasswordInput, {
+      target: {
+        value: "valid password",
+      },
+    })
+
+    const registerButton = registerPage.getByTestId("register-button")
+
+    fireEvent.click(registerButton)
+
+    const validErrors = await waitFor(() => screen.queryAllByText(/not valid/i))
+    const emptyErrors = await waitFor(() =>
+      screen.queryAllByAltText(/must not be empty/i)
+    )
+    const matchErrors = await waitFor(() =>
+      screen.queryAllByAltText(/must match/i)
+    )
+
+    expect(validErrors.length).toBe(0)
+    expect(emptyErrors.length).toBe(0)
+    expect(matchErrors.length).toBe(0)
   })
 })

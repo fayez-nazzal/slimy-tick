@@ -41,8 +41,9 @@ const FormPageContainer = ({ children }) => {
       </div>
       <StaticImage
         className={"background"}
+        alt="green background"
         quality={100}
-        src="../images/background.jpg"
+        src="../../images/background.jpg"
       />
       <Container maxWidth="sm" className={classes.innerContainer}>
         {children}

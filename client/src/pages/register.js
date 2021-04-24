@@ -2,7 +2,7 @@ import React from "react"
 import Button from "@material-ui/core/Button"
 import TextField from "@material-ui/core/TextField"
 import Typography from "@material-ui/core/Typography"
-import { makeStyles, creat } from "@material-ui/core/styles"
+import { makeStyles } from "@material-ui/core/styles"
 import { REGISTER_USER } from "../apollo/queries"
 import { useMutation } from "@apollo/client"
 import useForm from "../hooks/userForm"
@@ -49,6 +49,7 @@ const LoginPage = () => {
           To have your first productive day
         </Typography>
         <form onSubmit={onSubmit}>
+          <ErrorTypography lg error={errors.general} />
           <TextField
             id="email-input"
             name="email"
@@ -62,7 +63,7 @@ const LoginPage = () => {
             inputProps={{ "aria-label": "email" }}
             fullWidth
           />
-          <ErrorTypography>{errors.email}</ErrorTypography>
+          <ErrorTypography error={errors.email} />
           <TextField
             id="password-input"
             name="password"
@@ -77,7 +78,7 @@ const LoginPage = () => {
             inputProps={{ "aria-label": "password" }}
             fullWidth
           />
-          <ErrorTypography>{errors.password}</ErrorTypography>
+          <ErrorTypography error={errors.password} />
 
           <TextField
             id="confirm-password-input"
@@ -93,7 +94,7 @@ const LoginPage = () => {
             inputProps={{ "aria-label": "confirm password" }}
             fullWidth
           />
-          <ErrorTypography>{errors.confirmPassword}</ErrorTypography>
+          <ErrorTypography error={errors.confirmPassword} />
 
           <Button
             variant="outlined"
