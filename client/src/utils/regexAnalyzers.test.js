@@ -1,4 +1,5 @@
-import { findRepeatOptions } from "./regexAnalyzers"
+import moment from "moment"
+import { findRepeatOptions, findDueOptions } from "./regexAnalyzers"
 
 describe("repeat options", () => {
   describe("minutes", () => {
@@ -162,5 +163,58 @@ describe("testing weekdays", () => {
       "weekdays",
       ["sunday", "friday", "saturday"],
     ])
+  })
+})
+
+describe("due analyzers", () => {
+  describe("dates", () => {
+    it("get the correct date from day month year format", () => {
+      expect(
+        findDueOptions("3rd feb 2025").isSame(
+          moment("03-02-2025", "DD-MM-YYYY")
+        )
+      ).toBeTruthy()
+    })
+
+    it("gets the correct year from two digit", () => {
+      expect(
+        findDueOptions("on 20th jan 25").isSame(
+          moment("20-01-2025", "DD-MM-YYYY")
+        )
+      ).toBeTruthy()
+    })
+
+    it("doesn't get old dates", () => {
+      expect(findDueOptions("on 20th jan 1998")).toBeNull()
+    })
+
+    it("gets tomorrow", () => {
+      expect(
+        findDueOptions("tomorrow").isSame(moment().add(1, "days"), "day")
+      ).toBeTruthy()
+    })
+
+    it("gets after 2 days", () => {
+      expect(
+        findDueOptions("after 2 days").isSame(moment().add(2, "days"), "day")
+      ).toBeTruthy()
+    })
+
+    it("gets after 30 weeks", () => {
+      expect(
+        findDueOptions("after 30 weeks").isSame(
+          moment().add(30, "weeks"),
+          "day"
+        )
+      ).toBeTruthy()
+    })
+
+    it("gets after 2 months", () => {
+      expect(
+        findDueOptions("after 2 months").isSame(
+          moment().add(2, "months", "day")
+        )
+      ).toBeTruthy()
+    })
   })
 })

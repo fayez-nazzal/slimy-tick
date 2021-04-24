@@ -1,3 +1,5 @@
+import { createDateFromStr } from "./datetime"
+import moment from "moment"
 export const findRepeatOptions = repeatStr => {
   const numMinutes = firstValue(repeatStr.match(/\b\d+?(?= ?minutes)/i))
   const numHours =
@@ -98,4 +100,30 @@ const fullWeekdaysName = str => {
     .replace(/wed/, "wedensday")
     .replace(/thu/, "thursday")
     .replace(/fri/, "friday")
+}
+
+export const findDueOptions = str => {
+  const date = createDateFromStr(str)
+  if (date.isValid()) {
+    return date.isAfter() ? date : null
+  } else {
+    const now = moment()
+    const isTomorrow = str.match(/tomorrow/)
+    const nDays = str.match(/\d+ ?(?=days)/i)
+    const nWeeks = str.match(/\d+ ?(?=weeks)/i)
+    const nMonths = str.match(/\d+ ?(?=months)/i)
+    const nYears = str.match(/\d+ ?(?=years)/i)
+
+    return isTomorrow
+      ? now.add(1, "day")
+      : nDays
+      ? now.add(parseInt(nDays[0]), "days")
+      : nWeeks
+      ? now.add(parseInt(nWeeks[0]), "weeks")
+      : nMonths
+      ? now.add(parseInt(nMonths[0]), "months")
+      : nYears
+      ? now.add(parseInt(nYears[0]), "years")
+      : null
+  }
 }
