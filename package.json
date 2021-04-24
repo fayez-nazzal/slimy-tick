@@ -18,7 +18,7 @@
     "uuidv4": "^6.2.7"
   },
   "devDependencies": {
-    "eslint": "^7.24.0",
+    "eslint": "^5.16.0",
     "eslint-config-airbnb-base": "^14.2.1",
     "eslint-plugin-import": "^2.22.1"
   }

@@ -7,7 +7,7 @@ import {
 } from "@material-ui/core/styles"
 import "draft-js/dist/Draft.css"
 import clsx from "clsx"
-import { IconButton } from "@material-ui/core"
+import IconButton from "@material-ui/core/IconButton"
 import AlarmIcon from "@material-ui/icons/AlarmSharp"
 import PriorityHighIcon from "@material-ui/icons/PriorityHighSharp"
 import DateRangeIcon from "@material-ui/icons/DateRangeSharp"
@@ -17,14 +17,10 @@ import { CREATE_TODO, LOGIN_USER } from "../apollo/queries"
 import { useMutation } from "@apollo/client"
 import { addTodo, login as globalLogin } from "../redux/user"
 import { useDispatch, useSelector } from "react-redux"
-import {
-  DUE_DATE_REGEX,
-  DUE_TIME_REGEX,
-  REMIND_REGEX,
-  REPEAT_REGEX,
-} from "../data/regex"
+import { DUE_DATE_REGEX, DUE_TIME_REGEX, REMIND_REGEX } from "../data/regex"
 import DraftStrategyComponent from "./DraftStrategyComponent"
 import { toggleDuePicker } from "../redux/app"
+import { matchRepeat } from "../utils/matchers"
 
 const theme = createMuiTheme({
   palette: {
@@ -129,8 +125,11 @@ const Input = () => {
     findWithRegex(REMIND_REGEX, contentBlock, callback)
   }
 
-  function repeatStrategy(contentBlock, callback, contentState) {
-    findWithRegex(REPEAT_REGEX, contentBlock, callback)
+  function repeatStrategy(contentBlock, callback) {
+    const text = contentBlock.getText()
+    const match = matchRepeat(text)
+    const matchIndex = text.lastIndexOf(match)
+    match && match.length && callback(matchIndex, matchIndex + match.length)
   }
 
   function dueDateStrategy(contentBlock, callback, contentState) {
@@ -144,10 +143,7 @@ const Input = () => {
   function findWithRegex(regex, contentBlock, callback) {
     const text = contentBlock.getText()
     let match = text.match(regex)
-    console.log(match)
     match = match ? match.filter(Boolean) : []
-    console.log("filter ")
-    console.log(match)
     match.length &&
       callback(
         text.lastIndexOf(match[0]),

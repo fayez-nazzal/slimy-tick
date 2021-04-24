@@ -9,7 +9,9 @@ import {
   makeStyles,
   MuiThemeProvider,
 } from "@material-ui/core/styles"
-import { Button, ButtonGroup, useMediaQuery } from "@material-ui/core"
+import { useMediaQuery } from "@material-ui/core/styles"
+import Button from "@material-ui/core/Button"
+import ButtonGroup from "@material-ui/core/ButtonGroup"
 import AddIcon from "@material-ui/icons/Add"
 
 const theme = createMuiTheme({

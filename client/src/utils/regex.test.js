@@ -1,4 +1,4 @@
-import { REPEAT_REGEX } from "./regex"
+import { matchRepeat } from "./matchers"
 
 describe("repeat regex", () => {
   describe("minutes", () => {
@@ -223,9 +223,3 @@ describe("repeat regex", () => {
     )
   })
 })
-
-const matchRepeat = str => {
-  let arr = str.match(REPEAT_REGEX)
-  arr = arr ? arr.filter(Boolean) : arr
-  return arr ? arr[0] : null
-}

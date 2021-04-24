@@ -1,13 +1,14 @@
 import React from "react"
-import { Button, Container, makeStyles } from "@material-ui/core"
+import { makeStyles } from "@material-ui/core/styles"
+import Button from "@material-ui/core/Button"
+import Container from "@material-ui/core/Container"
 import Logo from "../../svg/logo.svg"
 import { StaticImage } from "gatsby-plugin-image"
-import { useLocation } from "@reach/router"
 import { Link } from "gatsby"
 
 const FormPageContainer = ({ children }) => {
   const classes = useStyles()
-  const location = useLocation()
+  const location = window.location
 
   return (
     <Container disableGutters className={classes.container}>

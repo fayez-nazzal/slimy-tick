@@ -2,22 +2,18 @@ import React from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import moment from "moment"
 import Drawer from "@material-ui/core/Drawer"
-import {
-  Box,
-  IconButton,
-  MuiThemeProvider,
-  Typography,
-  createMuiTheme,
-  useMediaQuery,
-  Button,
-} from "@material-ui/core"
+import Typography from "@material-ui/core/Typography"
+import Button from "@material-ui/core/Button"
+import IconButton from "@material-ui/core/IconButton"
+import Box from "@material-ui/core/Box"
+import useMediaQuery from "@material-ui/core/useMediaQuery"
+import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
 import { drawerWidth } from "../../data/globals"
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft"
 import ChevronRightIcon from "@material-ui/icons/ChevronRight"
 import AddBoxSharpIcon from "@material-ui/icons/AddBoxSharp"
 import { useDispatch, useSelector } from "react-redux"
 import AccountBoxSharpIcon from "@material-ui/icons/AccountBoxSharp"
-import { navigate } from "gatsby-link"
 import { setGroupIndex } from "../../redux/user"
 
 const theme = createMuiTheme({

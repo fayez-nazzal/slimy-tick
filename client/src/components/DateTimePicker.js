@@ -2,7 +2,11 @@ import React, { Fragment, useState } from "react"
 import { DateTimePicker } from "@material-ui/pickers"
 import { useDispatch, useSelector } from "react-redux"
 import { toggleDuePicker } from "../redux/app"
-import { createMuiTheme, makeStyles, ThemeProvider } from "@material-ui/core"
+import {
+  createMuiTheme,
+  makeStyles,
+  ThemeProvider,
+} from "@material-ui/core/styles"
 
 const theme = createMuiTheme({
   palette: {

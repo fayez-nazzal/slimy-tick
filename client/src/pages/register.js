@@ -1,11 +1,8 @@
 import React from "react"
-import {
-  Button,
-  makeStyles,
-  Typography,
-  createMuiTheme,
-  TextField,
-} from "@material-ui/core"
+import Button from "@material-ui/core/Button"
+import TextField from "@material-ui/core/TextField"
+import Typography from "@material-ui/core/Typography"
+import { makeStyles, creat } from "@material-ui/core/styles"
 import { REGISTER_USER } from "../apollo/queries"
 import { useMutation } from "@apollo/client"
 import useForm from "../hooks/userForm"
@@ -36,8 +33,8 @@ const LoginPage = () => {
       navigate("/")
     },
     onError(err) {
-      console.log(err.graphQLErrors[0].extensions.exception.errors)
-      setErrors(err.graphQLErrors[0].extensions.exception.errors)
+      console.log(JSON.stringify(err, null, 2))
+      setErrors(err.graphQLErrors[0].extensions.errors)
     },
     variables: values,
   })
@@ -62,6 +59,7 @@ const LoginPage = () => {
             color="primary"
             variant="outlined"
             margin="dense"
+            inputProps={{ "aria-label": "email" }}
             fullWidth
           />
           <ErrorTypography>{errors.email}</ErrorTypography>
@@ -76,6 +74,7 @@ const LoginPage = () => {
             color="primary"
             variant="outlined"
             margin="dense"
+            inputProps={{ "aria-label": "password" }}
             fullWidth
           />
           <ErrorTypography>{errors.password}</ErrorTypography>
@@ -91,6 +90,7 @@ const LoginPage = () => {
             color="primary"
             variant="outlined"
             margin="dense"
+            inputProps={{ "aria-label": "confirm password" }}
             fullWidth
           />
           <ErrorTypography>{errors.confirmPassword}</ErrorTypography>
@@ -101,6 +101,7 @@ const LoginPage = () => {
             type="submit"
             size="large"
             className={classes.button}
+            data-testid="register-button"
           >
             Register
           </Button>

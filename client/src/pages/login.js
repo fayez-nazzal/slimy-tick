@@ -1,5 +1,8 @@
 import React from "react"
-import { Button, makeStyles, Typography, TextField } from "@material-ui/core"
+import Button from "@material-ui/core/Button"
+import TextField from "@material-ui/core/TextField"
+import Typography from "@material-ui/core/Typography"
+import { makeStyles } from "@material-ui/core/styles"
 import { useDispatch } from "react-redux"
 import { LOGIN_USER } from "../apollo/queries"
 import { useMutation } from "@apollo/client"
@@ -30,6 +33,7 @@ const LoginPage = () => {
     },
     onError(err) {
       console.log(JSON.stringify(err, null, 2))
+      setErrors(err.graphQLErrors[0].extensions.errors)
     },
     variables: values,
   })
@@ -54,6 +58,7 @@ const LoginPage = () => {
             color="primary"
             variant="outlined"
             margin="dense"
+            inputProps={{ "aria-label": "email" }}
             fullWidth
           />
           <ErrorTypography>{errors.email}</ErrorTypography>
@@ -68,6 +73,7 @@ const LoginPage = () => {
             color="primary"
             variant="outlined"
             margin="dense"
+            inputProps={{ "aria-label": "password" }}
             fullWidth
           />
           <ErrorTypography>{errors.password}</ErrorTypography>
@@ -76,9 +82,10 @@ const LoginPage = () => {
             color="primary"
             type="submit"
             size="large"
+            data-testid="login-button"
             className={classes.button}
           >
-            Register
+            Login
           </Button>
         </form>
       </FormPageContainer>

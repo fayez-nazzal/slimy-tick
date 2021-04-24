@@ -12,3 +12,5 @@ export const wrapRootElement = ({ element }) => {
     </ReduxProvider>
   )
 }
+
+export default wrapRootElement
