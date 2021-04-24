@@ -10,24 +10,32 @@ import Login from "./login"
 import WrapRootElement from "../wrap-root-element"
 import { MockedProvider } from "@apollo/client/testing"
 import lgoinMocks from "../../__mocks__/login-mocks"
+import renderer from "react-test-renderer"
 
 describe("login input elements", () => {
   let loginPage
+  const component = (
+    <WrapRootElement
+      element={
+        <MockedProvider mocks={lgoinMocks} addTypename={false}>
+          <Login />
+        </MockedProvider>
+      }
+    />
+  )
 
   beforeEach(() => {
-    loginPage = render(
-      <WrapRootElement
-        element={
-          <MockedProvider mocks={lgoinMocks} addTypename={false}>
-            <Login />
-          </MockedProvider>
-        }
-      />
-    )
+    loginPage = render(component)
   })
 
   afterEach(() => {
     cleanup()
+  })
+
+  it("matches the snapshot", () => {
+    const tree = renderer.create(component).toJSON()
+
+    expect(tree).toMatchSnapshot()
   })
 
   it("email input set value correctly", () => {

@@ -10,24 +10,32 @@ import RegisterPage from "./register"
 import WrapRootElement from "../wrap-root-element"
 import { MockedProvider } from "@apollo/client/testing"
 import registerMocks from "../../__mocks__/register-mocks"
+import renderer from "react-test-renderer"
 
 describe("register input elements", () => {
   let registerPage
+  const component = (
+    <WrapRootElement
+      element={
+        <MockedProvider mocks={registerMocks} addTypename={false}>
+          <RegisterPage />
+        </MockedProvider>
+      }
+    />
+  )
 
   beforeEach(() => {
-    registerPage = render(
-      <WrapRootElement
-        element={
-          <MockedProvider mocks={registerMocks} addTypename={false}>
-            <RegisterPage />
-          </MockedProvider>
-        }
-      />
-    )
+    registerPage = render(component)
   })
 
   afterEach(() => {
     cleanup()
+  })
+
+  it("matches the snapshot", () => {
+    const tree = renderer.create(component).toJSON()
+
+    expect(tree).toMatchSnapshot()
   })
 
   it("email input set value correctly", () => {
