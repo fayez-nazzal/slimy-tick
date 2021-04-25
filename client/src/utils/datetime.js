@@ -31,3 +31,16 @@ export const createDateFromStr = str =>
     "Do, MMMM YY",
     "Do MMMM YY",
   ])
+
+export const createTimeFromStr = str =>
+  moment(str, [
+    "H:m",
+    "H:mm",
+    "HH:mm",
+    "h:ma",
+    "h:m a",
+    "h:mma",
+    "h:mm a",
+    "hh:mma",
+    "hh:mm a",
+  ])

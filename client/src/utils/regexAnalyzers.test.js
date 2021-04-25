@@ -1,5 +1,9 @@
 import moment from "moment"
-import { findRepeatOptions, findDueOptions } from "./regexAnalyzers"
+import {
+  findRepeatOptions,
+  findDueDateOptions,
+  findDueTimeOptions,
+} from "./regexAnalyzers"
 
 describe("repeat options", () => {
   describe("minutes", () => {
@@ -170,7 +174,7 @@ describe("due analyzers", () => {
   describe("dates", () => {
     it("get the correct date from day month year format", () => {
       expect(
-        findDueOptions("3rd feb 2025").isSame(
+        findDueDateOptions("3rd feb 2025").isSame(
           moment("03-02-2025", "DD-MM-YYYY")
         )
       ).toBeTruthy()
@@ -178,31 +182,34 @@ describe("due analyzers", () => {
 
     it("gets the correct year from two digit", () => {
       expect(
-        findDueOptions("on 20th jan 25").isSame(
+        findDueDateOptions("on 20th jan 25").isSame(
           moment("20-01-2025", "DD-MM-YYYY")
         )
       ).toBeTruthy()
     })
 
     it("doesn't get old dates", () => {
-      expect(findDueOptions("on 20th jan 1998")).toBeNull()
+      expect(findDueDateOptions("on 20th jan 1998")).toBeNull()
     })
 
     it("gets tomorrow", () => {
       expect(
-        findDueOptions("tomorrow").isSame(moment().add(1, "days"), "day")
+        findDueDateOptions("tomorrow").isSame(moment().add(1, "days"), "day")
       ).toBeTruthy()
     })
 
     it("gets after 2 days", () => {
       expect(
-        findDueOptions("after 2 days").isSame(moment().add(2, "days"), "day")
+        findDueDateOptions("after 2 days").isSame(
+          moment().add(2, "days"),
+          "day"
+        )
       ).toBeTruthy()
     })
 
     it("gets after 30 weeks", () => {
       expect(
-        findDueOptions("after 30 weeks").isSame(
+        findDueDateOptions("after 30 weeks").isSame(
           moment().add(30, "weeks"),
           "day"
         )
@@ -211,9 +218,76 @@ describe("due analyzers", () => {
 
     it("gets after 2 months", () => {
       expect(
-        findDueOptions("after 2 months").isSame(
+        findDueDateOptions("after 2 months").isSame(
           moment().add(2, "months", "day")
         )
+      ).toBeTruthy()
+    })
+  })
+
+  describe("times", () => {
+    it("2:00AM", () => {
+      expect(
+        findDueTimeOptions("at 2:00AM").isSame(
+          moment("02:00", "HH:mm"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("19:59", () => {
+      expect(
+        findDueTimeOptions("at 19:59").isSame(
+          moment("19:59", "HH:mm"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("10:00AM", () => {
+      expect(
+        findDueTimeOptions("at 10:00AM").isSame(
+          moment("10:00", "HH:mm"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("10:00PM", () => {
+      expect(
+        findDueTimeOptions("at 10:00PM").isSame(
+          moment("22:00", "HH:mm"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+  })
+
+  describe("daytimes", () => {
+    it("morning", () => {
+      expect(
+        findDueTimeOptions("morning").isSame(moment("08:00", "HH:mm"), "second")
+      ).toBeTruthy()
+    })
+
+    it("afternoon", () => {
+      expect(
+        findDueTimeOptions("afternoon").isSame(
+          moment("13:00", "HH:mm"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("evening", () => {
+      expect(
+        findDueTimeOptions("evening").isSame(moment("18:00", "HH:mm"), "second")
+      ).toBeTruthy()
+    })
+
+    it("night", () => {
+      expect(
+        findDueTimeOptions("night").isSame(moment("21:00", "HH:mm"), "second")
       ).toBeTruthy()
     })
   })

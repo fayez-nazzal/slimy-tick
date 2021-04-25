@@ -1,4 +1,4 @@
-import { matchRepeat, matchDue } from "./matchers"
+import { matchRepeat, matchDueDate, matchDueTime } from "./matchers"
 
 describe("repeat regex", () => {
   describe("minutes", () => {
@@ -218,82 +218,126 @@ describe("repeat regex", () => {
   })
 })
 
-describe.only("due", () => {
+describe("match due", () => {
   describe("dates", () => {
     it("match format 1", () => {
-      expect(matchDue(">>>january, 5th 25<<")).toBe("january, 5th 25")
+      expect(matchDueDate(">>>january, 5th 25<<")).toBe("january, 5th 25")
     })
 
     it("match format 2", () => {
-      expect(matchDue(">>>3rd jan 25<<")).toBe("3rd jan 25")
+      expect(matchDueDate(">>>3rd jan 25<<")).toBe("3rd jan 25")
     })
 
     it("match MM/DD/YYYY", () => {
-      expect(matchDue(">>>05/22/2025<<")).toBe("05/22/2025")
+      expect(matchDueDate(">>>05/22/2025<<")).toBe("05/22/2025")
     })
 
     it("match MM/DD/YY", () => {
-      expect(matchDue(">>>05/22/25<<")).toBe("05/22/25")
+      expect(matchDueDate(">>>05/22/25<<")).toBe("05/22/25")
     })
 
     it("match DD/MM/YYYY", () => {
-      expect(matchDue(">>>22/05/2025<<")).toBe("22/05/2025")
+      expect(matchDueDate(">>>22/05/2025<<")).toBe("22/05/2025")
     })
 
     it("match DD/MM/YY", () => {
-      expect(matchDue(">>>22/05/25<<")).toBe("22/05/25")
+      expect(matchDueDate(">>>22/05/25<<")).toBe("22/05/25")
     })
 
     it("match MM-DD-YYYY", () => {
-      expect(matchDue(">>>05-22-2025<<")).toBe("05-22-2025")
+      expect(matchDueDate(">>>05-22-2025<<")).toBe("05-22-2025")
     })
 
     it("match MM-DD-YY", () => {
-      expect(matchDue(">>>05-22-25<<")).toBe("05-22-25")
+      expect(matchDueDate(">>>05-22-25<<")).toBe("05-22-25")
     })
 
     it("match DD-MM-YYYY", () => {
-      expect(matchDue(">>>22-05-2025<<")).toBe("22-05-2025")
+      expect(matchDueDate(">>>22-05-2025<<")).toBe("22-05-2025")
     })
 
     it("match DD-MM-YY", () => {
-      expect(matchDue(">>>22-05-25<<")).toBe("22-05-25")
+      expect(matchDueDate(">>>22-05-25<<")).toBe("22-05-25")
     })
 
     it("match MM\\DD\\YYYY", () => {
-      expect(matchDue(">>>05\\22\\2025<<")).toBe("05\\22\\2025")
+      expect(matchDueDate(">>>05\\22\\2025<<")).toBe("05\\22\\2025")
     })
 
     it("match MM\\DD\\YY", () => {
-      expect(matchDue(">>>05\\22\\25<<")).toBe("05\\22\\25")
+      expect(matchDueDate(">>>05\\22\\25<<")).toBe("05\\22\\25")
     })
 
     it("match DD\\MM\\YYYY", () => {
-      expect(matchDue(">>>22\\05\\2025<<")).toBe("22\\05\\2025")
+      expect(matchDueDate(">>>22\\05\\2025<<")).toBe("22\\05\\2025")
     })
 
     it("match DD\\MM\\YY", () => {
-      expect(matchDue(">>>22\\05\\25<<")).toBe("22\\05\\25")
+      expect(matchDueDate(">>>22\\05\\25<<")).toBe("22\\05\\25")
     })
 
     it("match M-D-YYYY", () => {
-      expect(matchDue(">>>5-5-2025<<")).toBe("5-5-2025")
+      expect(matchDueDate(">>>5-5-2025<<")).toBe("5-5-2025")
     })
 
     it("match DD-MM", () => {
-      expect(matchDue(">>>22-05<<")).toBe("22-05")
+      expect(matchDueDate(">>>22-05<<")).toBe("22-05")
     })
 
     it("doesn't match old dates", () => {
-      expect(matchDue(">>>05-22-2019<<")).toBe(null)
+      expect(matchDueDate(">>>05-22-2019<<")).toBe(null)
     })
 
     it("match next sunday", () => {
-      expect(matchDue("next sunday")).toBe("sunday")
+      expect(matchDueDate("next sunday")).toBe("sunday")
     })
 
     it("match tomorrow", () => {
-      expect(matchDue(">> tomorrow <<")).toBe("tomorrow")
+      expect(matchDueDate(">> tomorrow <<")).toBe("tomorrow")
+    })
+  })
+
+  describe("time", () => {
+    it("match 2:00AM", () => {
+      expect(matchDueTime(">>2:00AM<<")).toBe("2:00AM")
+    })
+
+    it("match 12:00 AM", () => {
+      expect(matchDueTime(">>12:00 AM<<")).toBe("12:00 AM")
+    })
+
+    it("not matching 15:80", () => {
+      expect(matchDueTime(">>15:80<<")).toBeNull()
+    })
+
+    it("match 19:59", () => {
+      expect(matchDueTime(">>19:59<<")).toBe("19:59")
+    })
+
+    it("match 23:05", () => {
+      expect(matchDueTime(">>23:05<<")).toBe("23:05")
+    })
+
+    it("match at 23:05 (ignores AM)", () => {
+      expect(matchDueTime(">>at 23:05 AM<<")).toBe("at 23:05")
+    })
+  })
+
+  describe("match daytimes", () => {
+    it("match morning", () => {
+      expect(matchDueTime(">>morning<<")).toBe("morning")
+    })
+
+    it("match afternoon", () => {
+      expect(matchDueTime(">>before afternoon<<")).toBe("before afternoon")
+    })
+
+    it("match before evening", () => {
+      expect(matchDueTime(">>before evening<<")).toBe("before evening")
+    })
+
+    it("match on night", () => {
+      expect(matchDueTime("on night")).toBe("on night")
     })
   })
 })
