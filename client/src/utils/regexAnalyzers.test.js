@@ -206,23 +206,6 @@ describe("due analyzers", () => {
         )
       ).toBeTruthy()
     })
-
-    it("gets after 30 weeks", () => {
-      expect(
-        findDueDateOptions("after 30 weeks").isSame(
-          moment().add(30, "weeks"),
-          "day"
-        )
-      ).toBeTruthy()
-    })
-
-    it("gets after 2 months", () => {
-      expect(
-        findDueDateOptions("after 2 months").isSame(
-          moment().add(2, "months", "day")
-        )
-      ).toBeTruthy()
-    })
   })
 
   describe("times", () => {
@@ -288,6 +271,82 @@ describe("due analyzers", () => {
     it("night", () => {
       expect(
         findDueTimeOptions("night").isSame(moment("21:00", "HH:mm"), "second")
+      ).toBeTruthy()
+    })
+  })
+
+  describe("after days/weeks/months..", () => {
+    it("after 2 days", () => {
+      expect(
+        findDueDateOptions("after 2 days").isSame(
+          moment().add(2, "days"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("after a month", () => {
+      expect(
+        findDueDateOptions("after a month").isSame(
+          moment().add(1, "months"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("after 1 day", () => {
+      expect(
+        findDueDateOptions("after 1 day").isSame(
+          moment().add(1, "day"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("after 4 weeks", () => {
+      expect(
+        findDueDateOptions("after 4 weeks").isSame(
+          moment().add(4, "weeks"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("after 1 week", () => {
+      expect(
+        findDueDateOptions("after 1 week").isSame(
+          moment().add(1, "weeks"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+  })
+
+  describe("after hours/minutes..", () => {
+    it("after an hour", () => {
+      expect(
+        findDueTimeOptions("after an hour").isSame(
+          moment().add(1, "hours"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("after 4 hours", () => {
+      expect(
+        findDueTimeOptions("after 4 hours").isSame(
+          moment().add(4, "hours"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("after 22 minutes", () => {
+      expect(
+        findDueTimeOptions("after 22 minutes").isSame(
+          moment().add(22, "minutes"),
+          "second"
+        )
       ).toBeTruthy()
     })
   })

@@ -109,10 +109,14 @@ export const findDueDateOptions = str => {
   } else {
     const now = moment()
     const isTomorrow = str.match(/tomorrow/)
-    const nDays = str.match(/\d+ ?(?=days)/i)
-    const nWeeks = str.match(/\d+ ?(?=weeks)/i)
-    const nMonths = str.match(/\d+ ?(?=months)/i)
-    const nYears = str.match(/\d+ ?(?=years)/i)
+    let nDays = str.match(/\d+ ?(?=days)/i)
+    nDays = str.match(/(a|1|one)? ?day(?!s)/i) ? [1] : nDays
+    let nWeeks = str.match(/\d+ ?(?=weeks)/i)
+    nWeeks = str.match(/(a|1|one)? ?week(?!s)/i) ? [1] : nWeeks
+    let nMonths = str.match(/\d+ ?(?=months)/i)
+    nMonths = str.match(/(a|1|one)? ?month(?!s)/i) ? [1] : nMonths
+    let nYears = str.match(/\d+ ?(?=years)/i)
+    nYears = str.match(/(a|1|one)? ?year(?!s)/i) ? [1] : nYears
 
     return isTomorrow
       ? now.add(1, "day")
@@ -130,14 +134,17 @@ export const findDueDateOptions = str => {
 
 export const findDueTimeOptions = str => {
   const time = createTimeFromStr(str)
-  if (time.isValid()) {
+  if (!str.includes("after") && time.isValid()) {
     return time
   } else {
     const morning = str.match(/morning/)
     const afternoon = str.match(/afternoon/i)
     const evening = str.match(/evening/i)
     const night = str.match(/night/i)
-
+    let nMinutes = str.match(/\d+ ?(?=minutes)/i)
+    nMinutes = str.match(/(an?|1|one)? ?(minute(?!s))/i) ? [1] : nMinutes
+    let nHours = str.match(/\d+ ?(?=hours)/i)
+    nHours = str.match(/(an?|1|one)? ?(hour(?!s))/i) ? [1] : nHours
     return morning
       ? createTimeFromStr("8:00AM")
       : afternoon
@@ -146,6 +153,10 @@ export const findDueTimeOptions = str => {
       ? createTimeFromStr("6:00PM")
       : night
       ? createTimeFromStr("9:00PM")
+      : nHours
+      ? moment().add(parseInt(nHours[0]), "hours")
+      : nMinutes
+      ? moment().add(parseInt(nMinutes[0]), "minutes")
       : null
   }
 }

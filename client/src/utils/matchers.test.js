@@ -340,4 +340,36 @@ describe("match due", () => {
       expect(matchDueTime("on night")).toBe("on night")
     })
   })
+
+  describe("after days/weeks/months...", () => {
+    it("match after 2 days", () => {
+      expect(matchDueDate(">> after 2 days <<")).toBe("after 2 days")
+    })
+
+    it("match after 1 week", () => {
+      expect(matchDueDate(">> after 1 week <<")).toBe("after 1 week")
+    })
+
+    it("match after month", () => {
+      expect(matchDueDate(">> after month <<")).toBe("after month")
+    })
+
+    it("match after a week", () => {
+      expect(matchDueDate(">> after a week <<")).toBe("after a week")
+    })
+  })
+
+  describe("after minutes/hours", () => {
+    it("match after 2 hours", () => {
+      expect(matchDueTime(">> after 2 hours <<")).toBe("after 2 hours")
+    })
+
+    it("match after an hour", () => {
+      expect(matchDueTime(">> after an hour <<")).toBe("after an hour")
+    })
+
+    it("match after 30 minutes", () => {
+      expect(matchDueTime(">> after 30 minutes <<")).toBe("after 30 minutes")
+    })
+  })
 })
