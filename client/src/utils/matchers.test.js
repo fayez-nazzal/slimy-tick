@@ -1,4 +1,9 @@
-import { matchRepeat, matchDueDate, matchDueTime } from "./matchers"
+import {
+  matchRepeat,
+  matchDueDate,
+  matchDueTime,
+  matchPriorityAndReturnRange,
+} from "./matchers"
 
 describe("repeat regex", () => {
   describe("minutes", () => {
@@ -280,10 +285,6 @@ describe("match due", () => {
       expect(matchDueDate(">>>5-5-2025<<")).toBe("5-5-2025")
     })
 
-    it("match DD-MM", () => {
-      expect(matchDueDate(">>>22-05<<")).toBe("22-05")
-    })
-
     it("doesn't match old dates", () => {
       expect(matchDueDate(">>>05-22-2019<<")).toBe(null)
     })
@@ -370,6 +371,29 @@ describe("match due", () => {
 
     it("match after 30 minutes", () => {
       expect(matchDueTime(">> after 30 minutes <<")).toBe("after 30 minutes")
+    })
+  })
+
+  describe("priorities", () => {
+    it("match medium", () => {
+      expect(matchPriorityAndReturnRange(">>sample task~~! <<")).toEqual([
+        15,
+        16,
+      ])
+    })
+
+    it("match high", () => {
+      expect(matchPriorityAndReturnRange(">> !! <<")).toEqual([3, 5])
+    })
+
+    it("match very high", () => {
+      expect(matchPriorityAndReturnRange(">> !!! <<")).toEqual([3, 6])
+    })
+
+    it("match the last priority (low)", () => {
+      expect(
+        matchPriorityAndReturnRange(">> !!! !! ! !! !!! ! !! ! <<")
+      ).toEqual([24, 25])
     })
   })
 })

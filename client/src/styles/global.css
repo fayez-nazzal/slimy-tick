@@ -18,3 +18,7 @@ body {
   min-width: 100%;
   min-height: 100%;
 }
+
+.public-DraftStyleDefault-block {
+  white-space: pre !important;
+}

@@ -3,7 +3,6 @@ export const createDateFromStr = str =>
   moment(str, [
     "MM-DD-YYYY",
     "DD-MM-YYYY",
-    "DD-MM",
     "MM-DD-YY",
     "DD-MM-YY",
     "MMM, Do  YYYY",

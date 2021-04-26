@@ -2,7 +2,7 @@ import React from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import clsx from "clsx"
 import PriorityTabs from "../PriorityTabs"
-import Input from "../Input"
+import TodoInput from "../TodoInput"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
 
 const Content = ({ children, drawerOpen }) => {
@@ -17,7 +17,7 @@ const Content = ({ children, drawerOpen }) => {
       })}
     >
       <div className={classes.padded}>
-        <Input />
+        <TodoInput />
         {children}
       </div>
       <PriorityTabs />

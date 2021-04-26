@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react"
+import React, { useRef, useState } from "react"
 import { Editor, EditorState, CompositeDecorator, ContentState } from "draft-js"
 import {
   makeStyles,
@@ -13,14 +13,19 @@ import PriorityHighIcon from "@material-ui/icons/PriorityHighSharp"
 import DateRangeIcon from "@material-ui/icons/DateRangeSharp"
 import UpdateIcon from "@material-ui/icons/UpdateSharp"
 import PlayArrowIcon from "@material-ui/icons/PlayArrowSharp"
-import { CREATE_TODO, LOGIN_USER } from "../apollo/queries"
+import { CREATE_TODO } from "../apollo/queries"
 import { useMutation } from "@apollo/client"
-import { addTodo, login as globalLogin } from "../redux/user"
+import { addTodo } from "../redux/user"
 import { useDispatch, useSelector } from "react-redux"
-import { DUE_DATE_REGEX, DUE_TIME_REGEX, REMIND_REGEX } from "../data/regex"
 import DraftStrategyComponent from "./DraftStrategyComponent"
 import { toggleDuePicker } from "../redux/app"
-import { matchRepeat } from "../utils/matchers"
+import {
+  matchDueDate,
+  matchDueTime,
+  matchRepeat,
+  matchRemind,
+  matchPriorityAndReturnRange,
+} from "../utils/matchers"
 
 const theme = createMuiTheme({
   palette: {
@@ -71,92 +76,66 @@ const Input = () => {
     EditorState.createEmpty(
       new CompositeDecorator([
         {
-          strategy: handleVeryHighStrategy,
-          component: props => <PrioritySpan {...props} veryHigh />,
+          strategy: (contentBlock, callback, contentState) => {
+            matchForStrategy(contentBlock, callback, contentState, str =>
+              matchForStrategy(
+                contentBlock,
+                callback,
+                contentState,
+                matchPriorityAndReturnRange,
+                true
+              )
+            )
+          },
+          component: props => <DraftStrategyComponent {...props} priority />,
         },
         {
-          strategy: handleHighStrategy,
-          component: props => <PrioritySpan {...props} high />,
-        },
-        {
-          strategy: handleMediumStrategy,
-          component: props => <PrioritySpan {...props} medium />,
-        },
-        {
-          strategy: remindStrategy,
+          strategy: (contentBlock, callback, contentState) => {
+            matchForStrategy(contentBlock, callback, contentState, matchRemind)
+          },
           component: props => <DraftStrategyComponent {...props} remind />,
         },
         {
-          strategy: repeatStrategy,
+          strategy: (contentBlock, callback, contentState) => {
+            matchForStrategy(contentBlock, callback, contentState, matchRepeat)
+          },
           component: props => <DraftStrategyComponent {...props} repeat />,
         },
         ,
         {
-          strategy: dueDateStrategy,
-          component: props => <DraftStrategyComponent {...props} due />,
+          strategy: (contentBlock, callback, contentState) => {
+            matchForStrategy(contentBlock, callback, contentState, matchDueDate)
+          },
+          component: props => <DraftStrategyComponent {...props} dueDate />,
         },
         {
-          strategy: dueTimeStrategy,
-          component: props => <DraftStrategyComponent {...props} due />,
+          strategy: (contentBlock, callback, contentState) => {
+            matchForStrategy(contentBlock, callback, contentState, matchDueTime)
+          },
+          component: props => <DraftStrategyComponent {...props} dueTime />,
         },
       ])
     )
   )
 
-  function handleVeryHighStrategy(contentBlock, callback, contentState) {
+  const matchForStrategy = (
+    contentBlock,
+    callback,
+    _,
+    matcher,
+    matcherReturnsRange
+  ) => {
     const text = contentBlock.getText()
-    const lastOc = text.lastIndexOf("!!!")
-    text.indexOf("!", lastOc + 3) === -1 &&
-      findMatches("!!!", contentBlock, callback, contentState)
-  }
+    const matchResult = matcher(text)
 
-  function handleHighStrategy(contentBlock, callback, contentState) {
-    const text = contentBlock.getText()
-    const lastOc = text.lastIndexOf("!!")
-    text.indexOf("!", lastOc + 2) === -1 &&
-      findMatches("!!", contentBlock, callback, contentState)
-  }
+    if (matchResult && matcherReturnsRange) {
+      return callback(matchResult[0], matchResult[1])
+    }
 
-  function handleMediumStrategy(contentBlock, callback, contentState) {
-    findMatches("!", contentBlock, callback, contentState)
-  }
-
-  function remindStrategy(contentBlock, callback, contentState) {
-    findWithRegex(REMIND_REGEX, contentBlock, callback)
-  }
-
-  function repeatStrategy(contentBlock, callback) {
-    const text = contentBlock.getText()
-    const match = matchRepeat(text)
-    const matchIndex = text.lastIndexOf(match)
-    match && match.length && callback(matchIndex, matchIndex + match.length)
-  }
-
-  function dueDateStrategy(contentBlock, callback, contentState) {
-    findWithRegex(DUE_DATE_REGEX, contentBlock, callback)
-  }
-
-  function dueTimeStrategy(contentBlock, callback, contentState) {
-    findWithRegex(DUE_TIME_REGEX, contentBlock, callback)
-  }
-
-  function findWithRegex(regex, contentBlock, callback) {
-    const text = contentBlock.getText()
-    let match = text.match(regex)
-    match = match ? match.filter(Boolean) : []
-    match.length &&
-      callback(
-        text.lastIndexOf(match[0]),
-        text.lastIndexOf(match[0]) + match[0].length
-      )
-  }
-
-  function findMatches(type, contentBlock, callback, contentState) {
-    const text = contentBlock.getText()
-    const textIndex = text.lastIndexOf(type)
-
-    textIndex > -1 && callback(textIndex, textIndex + type.length)
-    setValues(values => ({ ...values, priority: type.length }))
+    const matchIndex = text.lastIndexOf(matchResult)
+    matchResult &&
+      matchResult.length &&
+      callback(matchIndex, matchIndex + matchResult.length)
   }
 
   const onDraftChange = state => {
@@ -180,7 +159,7 @@ const Input = () => {
       <div className={clsx([classes.root])}>
         <div className={clsx([classes.editorContainer])}>
           <Editor
-            placeholder="Type your task here"
+            placeholder={"Type your task here \u2713"}
             ref={editorRef}
             editorState={editorState}
             onChange={onDraftChange}
@@ -191,7 +170,7 @@ const Input = () => {
                 setFocus(false)
               })
             }}
-            handleReturn={() => false}
+            handleReturn={() => "handled"}
           />
         </div>
         <IconButton
@@ -231,25 +210,6 @@ const Input = () => {
 
 export default Input
 
-const PrioritySpan = props => {
-  const classes = useStyles()
-
-  return (
-    <span
-      className={clsx([
-        classes.prioritySpan,
-        {
-          [classes.veryHigh]: props.veryHigh,
-          [classes.high]: props.high,
-          [classes.medium]: props.medium,
-        },
-      ])}
-    >
-      {props.children}
-    </span>
-  )
-}
-
 const useStyles = makeStyles(theme => ({
   root: {
     position: "relative",
@@ -257,6 +217,8 @@ const useStyles = makeStyles(theme => ({
     marginBottom: theme.spacing(2.25),
     width: "90%",
     transition: "all 0.3s",
+    overflowX: "hidden",
+    border: "1px solid #c4c4c4",
   },
   rowFlex: {
     flexGrow: 1,
@@ -265,15 +227,17 @@ const useStyles = makeStyles(theme => ({
   editorContainer: {
     backgroundColor: "white",
     margin: theme.spacing(0, "auto"),
+    overflowX: "hidden",
     padding: theme.spacing(0.8, 1),
+    caretColor: "black !important",
+    wordBreak: "keep-all",
     paddingBottom: props =>
       props.focus ? theme.spacing(4.8) : theme.spacing(0.8),
-    paddingRight: theme.spacing(5),
     width: "100%",
-    minHeight: "2.4rem",
+    minHeight: "1.2rem",
     fontSize: "18px",
     transition: "all 0.3s",
-    border: "1px solid #cfcfcf",
+    borderRight: "3rem solid transparent",
   },
   submitButton: {
     zIndex: "1000",
@@ -303,19 +267,5 @@ const useStyles = makeStyles(theme => ({
   },
   activeToolIcon: {
     transition: "all 0.3s",
-  },
-  prioritySpan: {
-    padding: theme.spacing(0.2, 0.2),
-    margin: theme.spacing(0, 0.1),
-    fontWeight: "bolder",
-  },
-  veryHigh: {
-    color: "#ed5f00",
-  },
-  high: {
-    color: "#f48c00",
-  },
-  medium: {
-    color: "#f5b900",
   },
 }))
