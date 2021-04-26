@@ -5,6 +5,11 @@ export const userSlice = createSlice({
   initialState: {
     userData: null,
     groupIndex: null,
+    draftTodoValues: {
+      body: "",
+      priority: 4,
+      groupName: "default",
+    },
   },
   reducers: {
     login: (state, action) => {
@@ -19,6 +24,15 @@ export const userSlice = createSlice({
     setGroupIndex: (state, action) => {
       state.groupIndex = action.payload
     },
+    setDraftTodoBody: (state, action) => {
+      state.draftTodoValues.body = action.payload
+    },
+    setDraftTodoPriority: (state, action) => {
+      state.draftTodoValues.priority = action.payload
+    },
+    setDraftTodoGroup: (state, action) => {
+      state.draftTodoValues.groupName = action.payload.name
+    },
     addTodo: (state, action) => {
       const group = state.userData.groups[state.groupIndex]
       group.todos = [...group.todos, action.payload]
@@ -26,6 +40,14 @@ export const userSlice = createSlice({
   },
 })
 
-export const { login, logout, addTodo, setGroupIndex } = userSlice.actions
+export const {
+  login,
+  logout,
+  addTodo,
+  setGroupIndex,
+  setDraftTodoBody,
+  setDraftTodoPriority,
+  setDraftTodoGroup,
+} = userSlice.actions
 
 export default userSlice.reducer

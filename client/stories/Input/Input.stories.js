@@ -20,7 +20,7 @@ const TodoInputWithUser = () => {
     },
     variables: {
       email: "fayeznazzal98@gmail.com",
-      password: "123",
+      password: "123123",
     },
   })
 

@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react"
+import React, { useRef, useState, useEffect } from "react"
 import { Editor, EditorState, CompositeDecorator, ContentState } from "draft-js"
 import {
   makeStyles,
@@ -15,8 +15,13 @@ import UpdateIcon from "@material-ui/icons/UpdateSharp"
 import PlayArrowIcon from "@material-ui/icons/PlayArrowSharp"
 import { CREATE_TODO } from "../apollo/queries"
 import { useMutation } from "@apollo/client"
-import { addTodo } from "../redux/user"
 import { useDispatch, useSelector } from "react-redux"
+import {
+  addTodo,
+  setDraftTodoBody,
+  setDraftTodoGroup,
+  setDraftTodoPriority,
+} from "../redux/user"
 import DraftStrategyComponent from "./DraftStrategyComponent"
 import { toggleDuePicker } from "../redux/app"
 import {
@@ -26,6 +31,9 @@ import {
   matchRemind,
   matchPriorityAndReturnRange,
 } from "../utils/matchers"
+import { ListItemIcon, MenuItem, Typography } from "@material-ui/core"
+import ListItemText from "@material-ui/core/ListItemText"
+import Menu from "./Menu"
 
 const theme = createMuiTheme({
   palette: {
@@ -35,42 +43,52 @@ const theme = createMuiTheme({
   },
 })
 
-const removeSymbolicPartsFromText = text => {
-  return text.replace(" ! ", "").replace(" !! ", "").replace(" !!! ", "")
-}
-
 let disableEditorBlur = false
 
 const Input = () => {
   const dispatch = useDispatch()
+  const draftTodoValues = useSelector(state => state.user.draftTodoValues)
+
+  useEffect(() => {
+    resetDraftTodo()
+  }, [])
+
   const currentGroup = useSelector(
     state => state.user.userData.groups[state.user.groupIndex]
   )
+
   const [focus, setFocus] = useState(false)
-  const [values, setValues] = useState({
-    groupName: currentGroup.name,
-    body: "",
-    priority: 4,
-  })
   const editorRef = useRef(null)
+  const [anchorEl, setAnchorEl] = useState(false)
 
   const classes = useStyles({ focus })
   const [createTodo, { loading }] = useMutation(CREATE_TODO, {
     update(proxy, { data: { createTodo: newTodo } }) {
       dispatch(addTodo(newTodo))
-      const emptyState = EditorState.push(
-        editorState,
-        ContentState.createFromText(""),
-        "remove-range"
-      )
-      setEditorState(emptyState)
-      setValues(prev => ({ ...prev, body: "" }))
+      clearEditor()
+      resetDraftTodo()
     },
     onError(err) {
       console.log(JSON.stringify(err, null, 2))
     },
-    variables: values,
+    variables: draftTodoValues,
   })
+
+  // sets todo with empty body, low priority and current group the user at (from sidebar)
+  const resetDraftTodo = () => {
+    dispatch(setDraftTodoBody(""))
+    dispatch(setDraftTodoGroup(currentGroup))
+    dispatch(setDraftTodoPriority(4))
+  }
+
+  const clearEditor = () => {
+    const emptyState = EditorState.push(
+      editorState,
+      ContentState.createFromText(""),
+      "remove-range"
+    )
+    setEditorState(emptyState)
+  }
 
   const [editorState, setEditorState] = useState(() =>
     EditorState.createEmpty(
@@ -140,18 +158,34 @@ const Input = () => {
 
   const onDraftChange = state => {
     setEditorState(state)
-    const newContent = removeSymbolicPartsFromText(
-      state.getCurrentContent().getPlainText("\u0001")
-    )
-    newContent !== values.body &&
-      setValues(values => ({ ...values, body: newContent }))
+    const newContent = state.getCurrentContent().getPlainText("\u0001")
+
+    newContent !== draftTodoValues.body &&
+      dispatch(setDraftTodoBody(newContent))
+  }
+
+  const disableEditorBlurTemporarily = () => {
+    setTimeout(() => {
+      disableEditorBlur = false
+    }, 1)
   }
 
   const handleDueClicked = e => {
     dispatch(toggleDuePicker())
-    setTimeout(() => {
+    disableEditorBlurTemporarily()
+  }
+
+  const handlePriorityClicked = e => {
+    disableEditorBlurTemporarily()
+  }
+
+  const keepDraftEvents = {
+    onMouseEnter: () => {
+      disableEditorBlur = true
+    },
+    onMouseLeave: () => {
       disableEditorBlur = false
-    }, 1)
+    },
   }
 
   return (
@@ -176,7 +210,7 @@ const Input = () => {
         <IconButton
           size="small"
           className={classes.submitButton}
-          onMouseDown={createTodo}
+          onClick={createTodo}
         >
           <PlayArrowIcon color="primary" className={classes.playIcon} />
         </IconButton>
@@ -187,17 +221,57 @@ const Input = () => {
           <IconButton size="small">
             <UpdateIcon color="primary" />
           </IconButton>
-          <IconButton size="small">
-            <PriorityHighIcon color="primary" />
+          <IconButton
+            onClick={e => {
+              setAnchorEl(e.currentTarget)
+            }}
+            size="small"
+            {...keepDraftEvents}
+          >
+            <PriorityHighIcon
+              color="primary"
+              className={clsx({
+                "priority-veryhigh": draftTodoValues.priority === 1,
+                "priority-high": draftTodoValues.priority === 2,
+                "priority-medium": draftTodoValues.priority === 3,
+                "priority-low": draftTodoValues.priority === 4,
+              })}
+            />
           </IconButton>
+          <Menu anchorEl={anchorEl} onClose={() => setAnchorEl(false)}>
+            <MenuItem onClick={() => dispatch(setDraftTodoPriority(1))}>
+              <Typography
+                variant="h6"
+                component="p"
+                className="priority-veryhigh"
+              >
+                !!!{" "}
+              </Typography>
+              <ListItemText primary="Very high" />
+            </MenuItem>
+            <MenuItem onClick={() => dispatch(setDraftTodoPriority(2))}>
+              <Typography variant="h6" component="p" className="priority-high">
+                !!{" "}
+              </Typography>
+              <ListItemText primary=" High" />
+            </MenuItem>
+            <MenuItem onClick={() => dispatch(setDraftTodoPriority(3))}>
+              <Typography
+                variant="h6"
+                component="p"
+                className="priority-medium"
+              >
+                !{" "}
+              </Typography>
+              <ListItemText primary="Medium" />
+            </MenuItem>
+            <MenuItem>
+              <ListItemText primary="Low" />
+            </MenuItem>
+          </Menu>
           <IconButton
             size="small"
-            onMouseEnter={() => {
-              disableEditorBlur = true
-            }}
-            onMouseLeave={() => {
-              disableEditorBlur = false
-            }}
+            {...keepDraftEvents}
             onClick={handleDueClicked}
           >
             <DateRangeIcon color="primary" />

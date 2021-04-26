@@ -8,7 +8,6 @@ import IconButton from "@material-ui/core/IconButton"
 import Box from "@material-ui/core/Box"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
 import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
-import { drawerWidth } from "../../data/globals"
 import ChevronLeftIcon from "@material-ui/icons/ChevronLeft"
 import ChevronRightIcon from "@material-ui/icons/ChevronRight"
 import AddBoxSharpIcon from "@material-ui/icons/AddBoxSharp"
@@ -123,7 +122,6 @@ const useStyles = makeStyles({
     display: "flex",
   },
   drawer: {
-    width: drawerWidth,
     flexShrink: 1,
     boxSizing: "border-box",
   },

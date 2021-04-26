@@ -22,3 +22,30 @@ body {
 .public-DraftStyleDefault-block {
   white-space: pre !important;
 }
+
+.priority-veryhigh,
+.priority-high,
+.priority-medium {
+  white-space: pre;
+  word-spacing: -3px;
+}
+
+.priority-veryhigh {
+  color: #ed5f00 !important;
+  fill: #ed5f00 !important;
+}
+
+.priority-high {
+  color: #f48c00 !important;
+  fill: #f48c00 !important;
+}
+
+.priority-medium {
+  color: #f5b900 !important;
+  fill: #f5b900 !important;
+}
+
+.priority-low {
+  color: #7dbc00 !important;
+  fill: #7dbc00 !important;
+}

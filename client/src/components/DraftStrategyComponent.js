@@ -1,7 +1,9 @@
-import React from "react"
+import React, { useEffect } from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import clsx from "clsx"
 import { createMuiTheme } from "@material-ui/core/styles"
+import { setDraftTodoPriority } from "../redux/user"
+import { useDispatch } from "react-redux"
 
 const theme = createMuiTheme({
   palette: {
@@ -15,16 +17,38 @@ const theme = createMuiTheme({
 })
 
 const DraftStrategyComponent = props => {
+  const dispatch = useDispatch()
+
   const classes = useStyles({
     ...props,
     theme,
-    length: props.children[0].props.text.length,
   })
+
+  useEffect(() => {
+    const priorityString = props.children[0].props.text.trim()
+    props.priority &&
+      dispatch(
+        setDraftTodoPriority(
+          priorityString === "!!!" ? 1 : priorityString === "!!" ? 2 : 3
+        )
+      )
+  }, [props.children])
+
+  useEffect(() => {
+    return () => {
+      dispatch(setDraftTodoPriority(4))
+    }
+  }, [])
+
+  const length = props.children[0].props.text.length
 
   return (
     <span
       className={clsx({
         [classes.textColored]: props.priority,
+        "priority-veryhigh": props.priority && length === 3,
+        "priority-high": props.priority && length === 2,
+        "priority-medium": props.priority && length === 1,
         [classes.fullColored]: !props.priority,
       })}
     >
@@ -52,11 +76,5 @@ const useStyles = makeStyles({
     padding: props => props.theme.spacing(0.2, 0.2),
     margin: props => props.theme.spacing(0, 0.1),
     fontWeight: "bolder",
-    color: props =>
-      clsx({
-        "#ed5f00": props.length === 3,
-        "#f48c00": props.length === 2,
-        "#f5b900": props.length === 1,
-      }),
   },
 })

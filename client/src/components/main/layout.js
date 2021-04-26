@@ -8,7 +8,6 @@ import {
   makeStyles,
   ThemeProvider,
 } from "@material-ui/core/styles"
-import { drawerWidth } from "../../data/globals"
 import Sidebar from "./Sidebar"
 import Content from "./Content"
 import TaskList from "./TaskList"
@@ -47,7 +46,6 @@ const Layout = ({ children }) => {
         <CssBaseline />
         <Navbar
           toggleDrawer={toggleDrawer}
-          drawerWidth={drawerWidth}
           drawerOpen={drawerOpen}
           filter={filter}
           setFilter={setFilter}
