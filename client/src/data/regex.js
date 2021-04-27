@@ -13,7 +13,7 @@ const dueDateAfterRegex = /after ?((a|1|one)? ?(day|week|month|year)|\d+ ?(days|
 const dueDateTomorrowRegex = /(due)? ?tomorrow/i
 const dueDateWeekdaysRegex = /(on|before|after|due)? ?((sun(day)?)|(\bmon\b)|(monday)|(tue(sday)?)|(wed(ensday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))/i
 
-const dueTimeRegex = /(on|at|in|before|due)? ?((([1-9]|1[1-2]|0[1-9]|10):[0-5][0-9] ?(AM|PM))|(([0-2][1-3]|1[1-9]|0[0-9]|[0-9]):[0-5][0-9]))/i
+const dueTimeRegex = /(on|at|in|before|due)? ?((([1-9]|1[1-2]|0[1-9]|10):[0-5][0-9] ?(AM|PM))|(([0-2][1-3]|1[0-9]|0[0-9]|[0-9]):[0-5][0-9]))/i
 const dueDayTimeRegex = /(on|before|due)? ?(morning|afternoon|evening|night)/
 const dueTimeAfterRegex = /after ?((an?|1|one)? ?(minute|hour)|\d+ ?(minutes|hours))/i
 

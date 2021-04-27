@@ -315,6 +315,10 @@ describe("match due", () => {
       expect(matchDueTime(">>19:59<<")).toBe("19:59")
     })
 
+    it("match 10:00", () => {
+      expect(matchDueTime(">>10:00<<")).toBe("10:00")
+    })
+
     it("match 23:05", () => {
       expect(matchDueTime(">>23:05<<")).toBe("23:05")
     })
