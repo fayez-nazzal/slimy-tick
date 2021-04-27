@@ -1,6 +1,41 @@
+import React from "react"
 import { action } from "@storybook/addon-actions"
 import "@storybook/addon-console"
+import { withInfo } from "@storybook/addon-info"
+import { withKnobs } from "@storybook/addon-knobs"
+import { useDispatch } from "react-redux"
+import WrapRootElement from "../src/wrap-root-element"
+import { useLayoutEffect } from "react"
+import { LOGIN_USER } from "../src/apollo/queries"
+import { useMutation } from "@apollo/client"
+import { login as globalLogin } from "../src/redux/user"
 import "../src/styles/global.css"
+
+const withProviders = Story => <WrapRootElement element={<Story />} />
+
+const withUser = Story => {
+  const dispatch = useDispatch()
+  const [login, { loading, data }] = useMutation(LOGIN_USER, {
+    update(proxy, { data: { login: userData } }) {
+      dispatch(globalLogin(userData))
+    },
+    onError(err) {
+      console.log(JSON.stringify(err, null, 2))
+    },
+    variables: {
+      email: "fayeznazzal98@gmail.com",
+      password: "123123",
+    },
+  })
+
+  useLayoutEffect(() => {
+    login()
+  }, [])
+
+  return <div>{loading || !data ? "loading" : <Story />}</div>
+}
+
+export const decorators = [withInfo, withKnobs, withUser, withProviders]
 
 // Gatsby's Link overrides:
 // Gatsby Link calls the `enqueue` & `hovering` methods on the global variable ___loader.
