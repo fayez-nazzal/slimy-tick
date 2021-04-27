@@ -265,7 +265,7 @@ const Input = () => {
               </Typography>
               <ListItemText primary="Medium" />
             </MenuItem>
-            <MenuItem>
+            <MenuItem onClick={() => dispatch(setDraftTodoPriority(4))}>
               <ListItemText primary="Low" />
             </MenuItem>
           </Menu>
