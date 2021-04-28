@@ -1,8 +1,23 @@
 import { createSlice } from "@reduxjs/toolkit"
+import { matchPriorityAndReturnRange } from "../utils/matchers"
 import { findDueDateOptions } from "../utils/regexAnalyzers"
 
 const getIsoFromDate = dateStr => {
   return dateStr && findDueDateOptions(dateStr).toISOString()
+}
+
+const replaceRange = (str, start, end, substitute) => {
+  return str.substring(0, start) + substitute + str.substring(end)
+}
+
+const getPriorityStrEquivelent = priority => {
+  return priority === 4
+    ? ""
+    : priority === 3
+    ? "!"
+    : priority === 2
+    ? "!!"
+    : "!!!"
 }
 
 export const userSlice = createSlice({
@@ -36,6 +51,22 @@ export const userSlice = createSlice({
       state.draftTodoValues.body = action.payload
     },
     setDraftTodoPriority: (state, action) => {
+      const newPriority = getPriorityStrEquivelent(action.payload)
+
+      // if old priority regex text exist, replace it to the new priority
+      if (state.draftTodoValues.body) {
+        const todoPriorityRange = matchPriorityAndReturnRange(
+          state.draftTodoValues.body
+        )
+
+        state.draftTodoValues.body = replaceRange(
+          state.draftTodoValues.body,
+          todoPriorityRange[0],
+          todoPriorityRange[1],
+          newPriority
+        )
+      }
+
       state.draftTodoValues.priority = action.payload
     },
     setDraftTodoGroup: (state, action) => {

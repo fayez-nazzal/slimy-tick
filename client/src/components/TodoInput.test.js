@@ -243,43 +243,42 @@ describe("Todo Input element", () => {
     })
   })
 
-  // for next commit
-  //   it("sets priority via regex then via menu (very high => medium)", async () => {
-  //     const event = createEvent.paste(draftInput, {
-  //       clipboardData: {
-  //         types: ["text/plain"],
-  //         getData: () => "!!!",
-  //       },
-  //     })
+  it("sets priority via regex then via menu replaces the regex content", async () => {
+    const event = createEvent.paste(draftInput, {
+      clipboardData: {
+        types: ["text/plain"],
+        getData: () => "!!!",
+      },
+    })
 
-  //     fireEvent(draftInput, event)
+    fireEvent(draftInput, event)
 
-  //     let veryHighPrioritySpan = screen.queryByTestId("draft-priority-1")
-  //     let mediumPrioritySpan = screen.queryByTestId("draft-priority-3")
+    let veryHighPrioritySpan = screen.queryByTestId("draft-priority-1")
+    let mediumPrioritySpan = screen.queryByTestId("draft-priority-3")
 
-  //     await waitFor(() => {
-  //       expect(veryHighPrioritySpan).toBeTruthy()
-  //       expect(mediumPrioritySpan).toBeFalsy()
-  //     })
+    await waitFor(() => {
+      expect(veryHighPrioritySpan).toBeTruthy()
+      expect(mediumPrioritySpan).toBeFalsy()
+    })
 
-  //     const priorityButton = todoInput.getByTestId("priority-button")
+    const priorityButton = todoInput.getByTestId("priority-button")
 
-  //     fireEvent.click(priorityButton)
+    fireEvent.click(priorityButton)
 
-  //     await waitFor(() => {
-  //       const priorityMediumMenuItem = todoInput.getByTestId(
-  //         "menuitem-priority-medium"
-  //       )
+    await waitFor(() => {
+      const priorityMediumMenuItem = todoInput.getByTestId(
+        "menuitem-priority-medium"
+      )
 
-  //       fireEvent.click(priorityMediumMenuItem)
-  //     })
+      fireEvent.click(priorityMediumMenuItem)
+    })
 
-  //     veryHighPrioritySpan = screen.queryByTestId("draft-priority-1")
-  //     mediumPrioritySpan = screen.queryByTestId("draft-priority-3")
+    veryHighPrioritySpan = screen.queryByTestId("draft-priority-1")
+    mediumPrioritySpan = screen.queryByTestId("draft-priority-3")
 
-  //     await waitFor(() => {
-  //       expect(veryHighPrioritySpan).toBeFalsy()
-  //       expect(mediumPrioritySpan).toBeTruthy()
-  //     })
-  //   })
+    await waitFor(() => {
+      expect(veryHighPrioritySpan).toBeFalsy()
+      expect(mediumPrioritySpan).toBeTruthy()
+    })
+  })
 })

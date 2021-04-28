@@ -66,26 +66,7 @@ const Input = () => {
       .getPlainText("\u0001")
 
     if (draftTodoValues.body !== currentDraftText) {
-      const selection = editorState.getSelection()
-      const contentState = editorState.getCurrentContent()
-      const block = contentState.getBlockForKey(selection.getAnchorKey())
-
-      // this is not the best way to replace
-      // but i think it wont impact performance, most todos text is short
-      const replaced = Modifier.replaceText(
-        contentState,
-        new SelectionState({
-          anchorKey: block.getKey(),
-          anchorOffset: 0,
-          focusKey: block.getKey(),
-          focusOffset: currentDraftText.length,
-        }),
-        draftTodoValues.body
-      )
-
-      onDraftChange(
-        EditorState.push(editorState, replaced, "change-block-data")
-      )
+      setDraftBodyText(draftTodoValues.body)
     }
   }, [draftTodoValues.body])
 
@@ -115,6 +96,31 @@ const Input = () => {
     dispatch(setDraftTodoBody(""))
     dispatch(setDraftTodoGroup(currentGroup))
     dispatch(setDraftTodoPriority(4))
+  }
+
+  const setDraftBodyText = newText => {
+    const currentDraftText = editorState
+      .getCurrentContent()
+      .getPlainText("\u0001")
+
+    const selection = editorState.getSelection()
+    const contentState = editorState.getCurrentContent()
+    const block = contentState.getBlockForKey(selection.getAnchorKey())
+
+    // this is not the best way to replace
+    // but i think it wont impact performance, most todos text is short
+    const replaced = Modifier.replaceText(
+      contentState,
+      new SelectionState({
+        anchorKey: block.getKey(),
+        anchorOffset: 0,
+        focusKey: block.getKey(),
+        focusOffset: currentDraftText.length,
+      }),
+      newText
+    )
+
+    onDraftChange(EditorState.push(editorState, replaced, "change-block-data"))
   }
 
   const clearEditor = () => {
