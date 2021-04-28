@@ -52,7 +52,7 @@ const Sidebar = props => {
                 {userData &&
                   userData.email.slice(0, userData.email.indexOf("@"))}
               </Typography>
-              <Typography variant="p" color="textSecondary">
+              <Typography variant="subtitle1" color="textSecondary">
                 {moment(userData && userData.created)
                   .format("DD-MM-YYYY")
                   .toString()}

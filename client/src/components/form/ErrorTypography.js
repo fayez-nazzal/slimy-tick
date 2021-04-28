@@ -7,7 +7,7 @@ const ErrorTypography = props => {
   return (
     <Typography
       color="error"
-      variant="p"
+      variant="subtitle1"
       display="block"
       className={classes.error}
     >

@@ -1,12 +1,14 @@
-import React, { Fragment, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { DateTimePicker } from "@material-ui/pickers"
 import { useDispatch, useSelector } from "react-redux"
 import { toggleDuePicker } from "../redux/app"
+import { setDraftTodoDueDateByPicker } from "../redux/user"
 import {
   createMuiTheme,
   makeStyles,
   ThemeProvider,
 } from "@material-ui/core/styles"
+import moment from "moment"
 
 const theme = createMuiTheme({
   palette: {
@@ -19,31 +21,41 @@ const theme = createMuiTheme({
 const BasicDateTimePicker = () => {
   const dispatch = useDispatch()
   const open = useSelector(state => state.app.duePickerOpen)
-  const [selectedDate, handleDateChange] = useState(new Date())
+  const globalDate = useSelector(state => state.user.draftTodoValues.dueISO)
+  const [selectedDate, setSelectedDate] = useState(
+    globalDate ? new Date(globalDate) : new Date()
+  )
+
+  useEffect(() => {
+    if (globalDate) setSelectedDate(new Date(globalDate))
+  }, [globalDate])
 
   const handleCloseClicked = () => {
     dispatch(toggleDuePicker())
   }
 
   const handleAccept = date => {
-    console.log(date)
+    const dateString = date.format("MMM DD, YYYY")
+    dispatch(setDraftTodoDueDateByPicker(dateString))
   }
 
   const renderDay = (day, selectedDate, inCurrentMonth, DayComponent) => {
-    return <CustomDay component={DayComponent}>2</CustomDay>
+    return <CustomDay component={DayComponent} day={day.format("D")} />
   }
 
   return (
     <ThemeProvider theme={theme}>
       <DateTimePicker
-        emptyLabel
         inputVariant="outlined"
         value={selectedDate}
-        onChange={handleDateChange}
+        onChange={setSelectedDate}
         open={open}
         onClose={handleCloseClicked}
         onAccept={handleAccept}
         renderDay={renderDay}
+        rightArrowButtonProps={{
+          "data-testid": "datetimepicker-rightarrow",
+        }}
         color="primary"
         disablePast
       />
@@ -63,6 +75,7 @@ const CustomDay = props => {
     style: {
       backgroundColor: hovered ? "#2dc06590" : "#2dc06535",
     },
+    "data-testid": `day-${props.day}`,
   })
 }
 

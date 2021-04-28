@@ -29,7 +29,6 @@ const Menu = ({ onClose, anchorEl, children, ariaControls }) => {
       anchorEl={anchorEl}
       onClose={onClose}
       onClick={onClose}
-      variant="contained"
       aria-haspopup="true"
       aria-controls={ariaControls}
     >

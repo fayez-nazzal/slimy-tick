@@ -192,6 +192,10 @@ describe("due analyzers", () => {
       expect(findDueDateOptions("on 20th jan 1998")).toBeNull()
     })
 
+    it("doesn't get misleading dates", () => {
+      expect(findDueDateOptions("20-01-3")).toBeNull()
+    })
+
     it("gets tomorrow", () => {
       expect(
         findDueDateOptions("tomorrow").isSame(moment().add(1, "days"), "day")

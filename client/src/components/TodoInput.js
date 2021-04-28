@@ -1,5 +1,12 @@
 import React, { useRef, useState, useEffect } from "react"
-import { Editor, EditorState, CompositeDecorator, ContentState } from "draft-js"
+import {
+  Editor,
+  EditorState,
+  CompositeDecorator,
+  ContentState,
+  Modifier,
+  SelectionState,
+} from "draft-js"
 import {
   makeStyles,
   createMuiTheme,
@@ -52,6 +59,35 @@ const Input = () => {
   useEffect(() => {
     resetDraftTodo()
   }, [])
+
+  useEffect(() => {
+    const currentDraftText = editorState
+      .getCurrentContent()
+      .getPlainText("\u0001")
+
+    if (draftTodoValues.body !== currentDraftText) {
+      const selection = editorState.getSelection()
+      const contentState = editorState.getCurrentContent()
+      const block = contentState.getBlockForKey(selection.getAnchorKey())
+
+      // this is not the best way to replace
+      // but i think it wont impact performance, most todos text is short
+      const replaced = Modifier.replaceText(
+        contentState,
+        new SelectionState({
+          anchorKey: block.getKey(),
+          anchorOffset: 0,
+          focusKey: block.getKey(),
+          focusOffset: currentDraftText.length,
+        }),
+        draftTodoValues.body
+      )
+
+      onDraftChange(
+        EditorState.push(editorState, replaced, "change-block-data")
+      )
+    }
+  }, [draftTodoValues.body])
 
   const currentGroup = useSelector(
     state => state.user.userData.groups[state.user.groupIndex]
@@ -175,10 +211,6 @@ const Input = () => {
     disableEditorBlurTemporarily()
   }
 
-  const handlePriorityClicked = e => {
-    disableEditorBlurTemporarily()
-  }
-
   const keepDraftEvents = {
     onMouseEnter: () => {
       disableEditorBlur = true
@@ -194,6 +226,7 @@ const Input = () => {
         <div className={clsx([classes.editorContainer])}>
           <Editor
             placeholder={"Type your task here \u2713"}
+            ariaLabel="todo input"
             ref={editorRef}
             editorState={editorState}
             onChange={onDraftChange}
@@ -204,6 +237,7 @@ const Input = () => {
                 setFocus(false)
               })
             }}
+            className="draftjs-editir"
             handleReturn={() => "handled"}
           />
         </div>
@@ -225,6 +259,7 @@ const Input = () => {
             onClick={e => {
               setAnchorEl(e.currentTarget)
             }}
+            data-testid="priority-button"
             size="small"
             {...keepDraftEvents}
           >
@@ -242,7 +277,7 @@ const Input = () => {
             <MenuItem onClick={() => dispatch(setDraftTodoPriority(1))}>
               <Typography
                 variant="h6"
-                component="p"
+                component="subtitle1"
                 className="priority-veryhigh"
               >
                 !!!{" "}
@@ -250,15 +285,22 @@ const Input = () => {
               <ListItemText primary="Very high" />
             </MenuItem>
             <MenuItem onClick={() => dispatch(setDraftTodoPriority(2))}>
-              <Typography variant="h6" component="p" className="priority-high">
+              <Typography
+                variant="h6"
+                component="subtitle1"
+                className="priority-high"
+              >
                 !!{" "}
               </Typography>
               <ListItemText primary=" High" />
             </MenuItem>
-            <MenuItem onClick={() => dispatch(setDraftTodoPriority(3))}>
+            <MenuItem
+              data-testid="menuitem-priority-medium"
+              onClick={() => dispatch(setDraftTodoPriority(3))}
+            >
               <Typography
                 variant="h6"
-                component="p"
+                component="subtitle1"
                 className="priority-medium"
               >
                 !{" "}
@@ -273,8 +315,12 @@ const Input = () => {
             size="small"
             {...keepDraftEvents}
             onClick={handleDueClicked}
+            data-testid="due-button"
           >
-            <DateRangeIcon color="primary" />
+            <DateRangeIcon
+              color="primary"
+              className={draftTodoValues.dueDate && classes.dueSet}
+            />
           </IconButton>
         </div>
       </div>
@@ -341,5 +387,8 @@ const useStyles = makeStyles(theme => ({
   },
   activeToolIcon: {
     transition: "all 0.3s",
+  },
+  dueSet: {
+    fill: "#fcd36e",
   },
 }))

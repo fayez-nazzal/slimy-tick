@@ -2,9 +2,8 @@ import React, { useEffect } from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import clsx from "clsx"
 import { createMuiTheme } from "@material-ui/core/styles"
-import { setDraftTodoPriority } from "../redux/user"
+import { setDraftTodoDueDate, setDraftTodoPriority } from "../redux/user"
 import { useDispatch } from "react-redux"
-
 const theme = createMuiTheme({
   palette: {
     primary: {
@@ -25,21 +24,26 @@ const DraftStrategyComponent = props => {
   })
 
   useEffect(() => {
-    const priorityString = props.children[0].props.text.trim()
+    const textContent = props.children[0].props.text.trim()
     props.priority &&
       dispatch(
         setDraftTodoPriority(
-          priorityString === "!!!" ? 1 : priorityString === "!!" ? 2 : 3
+          textContent === "!!!" ? 1 : textContent === "!!" ? 2 : 3
         )
       )
+    props.dueDate && dispatch(setDraftTodoDueDate(textContent))
   }, [props.children])
 
   useEffect(() => {
     return () => {
-      dispatch(setDraftTodoPriority(4))
+      props.priority && dispatch(setDraftTodoPriority(4))
+      props.dueDate && dispatch(setDraftTodoDueDate(null))
     }
   }, [])
 
+  const textContent = props.children[0].props.text.trim()
+  const priority =
+    props.priority && textContent === "!!!" ? 1 : textContent === "!!" ? 2 : 3
   const length = props.children[0].props.text.length
 
   return (
@@ -51,6 +55,13 @@ const DraftStrategyComponent = props => {
         "priority-medium": props.priority && length === 1,
         [classes.fullColored]: !props.priority,
       })}
+      data-testid={
+        props.priority
+          ? `draft-priority-${priority}`
+          : props.dueDate
+          ? "draft-duedate"
+          : ""
+      }
     >
       {props.children}
     </span>

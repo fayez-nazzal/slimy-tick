@@ -1,4 +1,9 @@
 import { createSlice } from "@reduxjs/toolkit"
+import { findDueDateOptions } from "../utils/regexAnalyzers"
+
+const getIsoFromDate = dateStr => {
+  return dateStr && findDueDateOptions(dateStr).toISOString()
+}
 
 export const userSlice = createSlice({
   name: "user",
@@ -8,7 +13,10 @@ export const userSlice = createSlice({
     draftTodoValues: {
       body: "",
       priority: 4,
-      groupName: "default",
+      groupName: null,
+      dueISO: "",
+      dueDate: "",
+      dueTime: "",
     },
   },
   reducers: {
@@ -33,6 +41,18 @@ export const userSlice = createSlice({
     setDraftTodoGroup: (state, action) => {
       state.draftTodoValues.groupName = action.payload.name
     },
+    setDraftTodoDueDate: (state, action) => {
+      state.draftTodoValues.dueDate = action.payload
+      state.draftTodoValues.dueISO = getIsoFromDate(action.payload)
+    },
+    setDraftTodoDueDateByPicker: (state, action) => {
+      const todoBody = state.draftTodoValues.body
+      const todoDueDate = state.draftTodoValues.dueDate
+
+      state.draftTodoValues.dueDate = action.payload
+      state.draftTodoValues.body = todoBody.replace(todoDueDate, action.payload)
+      state.draftTodoValues.dueISO = getIsoFromDate(action.payload)
+    },
     addTodo: (state, action) => {
       const group = state.userData.groups[state.groupIndex]
       group.todos = [...group.todos, action.payload]
@@ -48,6 +68,8 @@ export const {
   setDraftTodoBody,
   setDraftTodoPriority,
   setDraftTodoGroup,
+  setDraftTodoDueDate,
+  setDraftTodoDueDateByPicker,
 } = userSlice.actions
 
 export default userSlice.reducer

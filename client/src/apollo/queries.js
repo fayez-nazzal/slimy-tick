@@ -26,15 +26,31 @@ export const QUERY_TODOS_IN_GROUP = gql`
 `
 
 export const CREATE_TODO = gql`
-  mutation createTodo($groupName: String!, $body: String!, $priority: Int!) {
-    createTodo(groupName: $groupName, body: $body, priority: $priority) {
+  mutation createTodo(
+    $groupName: String!
+    $body: String!
+    $priority: Int!
+    $dueDate: String
+    $dueTime: String
+    $dueISO: String
+  ) {
+    createTodo(
+      groupName: $groupName
+      body: $body
+      priority: $priority
+      dueDate: $dueDate
+      dueTime: $dueTime
+      dueISO: $dueISO
+    ) {
       id
       checked
       body
       priority
       remind
       repeat
-      due
+      dueDate
+      dueISO
+      dueTime
       created
     }
   }

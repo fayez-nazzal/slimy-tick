@@ -7,6 +7,7 @@ import {
 } from "../data/regex"
 import moment from "moment"
 import { createDateFromStr as createTimeFromStr } from "./datetime"
+import { findDueDateOptions } from "./regexAnalyzers"
 export const matchRepeat = str => {
   const match = matchRegexFromArray(str, REPEAT_REGEXES)
 
@@ -15,13 +16,13 @@ export const matchRepeat = str => {
   return result
 }
 
+// works for dates and strings like tomorrow, after 2 months..etc
 export const matchDueDate = str => {
   const match = matchRegexFromArray(str, DUE_DATE_REGEXES)
-
-  const isDate = str.match(/\d+[\-\\\/]\d+/i) // To determine if the str is intended to be a date or not
-  const date = createTimeFromStr(match)
-
-  return !match || (!date && isDate) || (date && date.isBefore(moment()))
+  const date = match && findDueDateOptions(match)
+  console.log("match", match)
+  console.log("date", date)
+  return !match || !date || (date && date.isBefore(moment()))
     ? null
     : match.trim()
 }

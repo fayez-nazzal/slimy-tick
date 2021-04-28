@@ -9,6 +9,7 @@ import { useLayoutEffect } from "react"
 import { LOGIN_USER } from "../src/apollo/queries"
 import { useMutation } from "@apollo/client"
 import { login as globalLogin } from "../src/redux/user"
+import DateTimePicker from "../src/components/DateTimePicker"
 import "../src/styles/global.css"
 
 const withProviders = Story => <WrapRootElement element={<Story />} />
@@ -32,7 +33,12 @@ const withUser = Story => {
     login()
   }, [])
 
-  return <div>{loading || !data ? "loading" : <Story />}</div>
+  return (
+    <div>
+      {loading || !data ? "loading" : <Story />}
+      <DateTimePicker />
+    </div>
+  )
 }
 
 export const decorators = [withInfo, withKnobs, withUser, withProviders]

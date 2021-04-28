@@ -51,6 +51,12 @@ const mocks = [
         login: {
           token: "fake token",
           email: "correct@email.com",
+          groups: [
+            {
+              name: "group 1",
+              todos: [],
+            },
+          ],
         },
       },
     },

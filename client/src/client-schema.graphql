@@ -4,7 +4,9 @@ type Todo {
   remind: String
   repeat: [String]
   priority: String!
-  due: String
+  dueDate: String
+  dueTime: String
+  dueISO: String
 }
 
 type Group {
@@ -34,7 +36,9 @@ type Mutation {
     priority: Int!
     remind: String
     repeat: String
-    due: String
+    dueDate: String
+    dueTime: String
+    dueISO: String
   ): Todo!
   createGroup(name: String!): Group!
   register(email: String!, password: String!, confirmPassword: String!): User!

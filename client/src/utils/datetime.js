@@ -17,6 +17,8 @@ export const createDateFromStr = str =>
     "MMMM, Do, YY",
     "MMMM Do, YY",
     "MMMM Do, YY",
+    "MMM Do",
+    "Do MMM",
     "Do, MMM, YYYY",
     "Do, MMM YYYY",
     "Do MMM YYYY",
