@@ -195,7 +195,7 @@ describe("Todo Input element", () => {
     })
   })
 
-  it("sets due via regex then menu", async () => {
+  it("sets due via regex then menu -> change existing regex", async () => {
     const event = createEvent.paste(draftInput, {
       clipboardData: {
         types: ["text/plain"],

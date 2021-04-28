@@ -81,7 +81,10 @@ export const userSlice = createSlice({
       const todoDueDate = state.draftTodoValues.dueDate
 
       state.draftTodoValues.dueDate = action.payload
-      state.draftTodoValues.body = todoBody.replace(todoDueDate, action.payload)
+      state.draftTodoValues.body =
+        todoBody && todoDueDate
+          ? todoBody.replace(todoDueDate, action.payload)
+          : todoBody
       state.draftTodoValues.dueISO = getIsoFromDate(action.payload)
     },
     addTodo: (state, action) => {
