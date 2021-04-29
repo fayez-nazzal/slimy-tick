@@ -19,6 +19,7 @@ import { LOGIN_USER } from "../apollo/queries"
 import { useMutation } from "@apollo/client"
 import { login as globalLogin } from "../redux/user"
 import DateTimePicker from "./DateTimePicker"
+import moment from "moment"
 
 const WithUser = ({ children }) => {
   const dispatch = useDispatch()
@@ -279,6 +280,23 @@ describe("Todo Input element", () => {
     await waitFor(() => {
       expect(veryHighPrioritySpan).toBeFalsy()
       expect(mediumPrioritySpan).toBeTruthy()
+    })
+  })
+
+  it("sets due time via regex 2:00 AM", async () => {
+    const event = createEvent.paste(draftInput, {
+      clipboardData: {
+        types: ["text/plain"],
+        getData: () => ">>>>>>2:00 AM<<<<<<<",
+      },
+    })
+
+    fireEvent(draftInput, event)
+
+    let dueTimeStrategy = screen.queryByTestId("draft-duetime")
+
+    await waitFor(() => {
+      expect(dueTimeStrategy).toBeTruthy()
     })
   })
 })

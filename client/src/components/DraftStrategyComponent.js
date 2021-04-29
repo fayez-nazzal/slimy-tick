@@ -2,7 +2,11 @@ import React, { useEffect } from "react"
 import { makeStyles } from "@material-ui/core/styles"
 import clsx from "clsx"
 import { createMuiTheme } from "@material-ui/core/styles"
-import { setDraftTodoDueDate, setDraftTodoPriority } from "../redux/user"
+import {
+  setDraftTodoDueDate,
+  setDraftTodoDueTime,
+  setDraftTodoPriority,
+} from "../redux/user"
 import { useDispatch } from "react-redux"
 const theme = createMuiTheme({
   palette: {
@@ -32,13 +36,14 @@ const DraftStrategyComponent = props => {
         )
       )
     props.dueDate && dispatch(setDraftTodoDueDate(textContent))
+    props.dueTime && dispatch(setDraftTodoDueTime(textContent))
   }, [props.children])
 
   useEffect(() => {
     return () => {
       props.priority && dispatch(setDraftTodoPriority(4))
       props.dueDate && dispatch(setDraftTodoDueDate(null))
-      props
+      props.dueTime && dispatch(setDraftTodoDueTime(""))
     }
   }, [])
 
@@ -61,6 +66,8 @@ const DraftStrategyComponent = props => {
           ? `draft-priority-${priority}`
           : props.dueDate
           ? "draft-duedate"
+          : props.dueTime
+          ? "draft-duetime"
           : ""
       }
     >

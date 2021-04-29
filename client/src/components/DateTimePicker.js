@@ -2,13 +2,14 @@ import React, { useEffect, useState } from "react"
 import { DateTimePicker } from "@material-ui/pickers"
 import { useDispatch, useSelector } from "react-redux"
 import { toggleDuePicker } from "../redux/app"
-import { setDraftTodoDueDate } from "../redux/user"
+import { setDraftTodoDueDate, setDraftTodoDueTime } from "../redux/user"
 import {
   createMuiTheme,
   makeStyles,
   ThemeProvider,
 } from "@material-ui/core/styles"
-import { findDueDateOptions } from "../utils/regexAnalyzers"
+import { findDueDateOptions, findDueTimeOptions } from "../utils/regexAnalyzers"
+import moment from "moment"
 
 const theme = createMuiTheme({
   palette: {
@@ -22,14 +23,41 @@ const BasicDateTimePicker = () => {
   const dispatch = useDispatch()
   const open = useSelector(state => state.app.duePickerOpen)
   const globalDueDate = useSelector(state => state.user.draftTodoValues.dueDate)
+  const globalDueTime = useSelector(state => state.user.draftTodoValues.dueTime)
   const [selectedDate, setSelectedDate] = useState(
     globalDueDate ? new Date(globalDueDate) : new Date()
   )
 
   useEffect(() => {
+    const selectedMomentDate = moment(selectedDate)
     if (globalDueDate)
-      setSelectedDate(new Date(findDueDateOptions(globalDueDate).toISOString()))
+      setSelectedDate(
+        new Date(
+          findDueDateOptions(globalDueDate)
+            .set({
+              hour: selectedMomentDate.get("hour"),
+              minute: selectedMomentDate.get("minute"),
+            })
+            .toISOString()
+        )
+      )
   }, [globalDueDate])
+
+  useEffect(() => {
+    const selectedMomentDate = moment(selectedDate)
+    if (globalDueTime)
+      setSelectedDate(
+        new Date(
+          findDueTimeOptions(globalDueTime)
+            .set({
+              year: selectedMomentDate.get("year"),
+              month: selectedMomentDate.get("month"),
+              day: selectedMomentDate.get("day"),
+            })
+            .toISOString()
+        )
+      )
+  }, [globalDueTime])
 
   const handleCloseClicked = () => {
     dispatch(toggleDuePicker())
@@ -37,7 +65,9 @@ const BasicDateTimePicker = () => {
 
   const handleAccept = date => {
     const dateString = date.format("MMM DD, YYYY")
+    const timeString = date.format("hh:mm a")
     dispatch(setDraftTodoDueDate(dateString))
+    dispatch(setDraftTodoDueTime(timeString))
   }
 
   const renderDay = (day, selectedDate, inCurrentMonth, DayComponent) => {
