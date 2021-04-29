@@ -38,6 +38,7 @@ const DraftStrategyComponent = props => {
     return () => {
       props.priority && dispatch(setDraftTodoPriority(4))
       props.dueDate && dispatch(setDraftTodoDueDate(null))
+      props
     }
   }, [])
 

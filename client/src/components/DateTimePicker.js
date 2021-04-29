@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react"
 import { DateTimePicker } from "@material-ui/pickers"
 import { useDispatch, useSelector } from "react-redux"
 import { toggleDuePicker } from "../redux/app"
-import { setDraftTodoDueDateByPicker } from "../redux/user"
+import { setDraftTodoDueDate } from "../redux/user"
 import {
   createMuiTheme,
   makeStyles,
@@ -37,7 +37,7 @@ const BasicDateTimePicker = () => {
 
   const handleAccept = date => {
     const dateString = date.format("MMM DD, YYYY")
-    dispatch(setDraftTodoDueDateByPicker(dateString))
+    dispatch(setDraftTodoDueDate(dateString))
   }
 
   const renderDay = (day, selectedDate, inCurrentMonth, DayComponent) => {

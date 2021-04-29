@@ -1,5 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit"
 import { matchPriorityAndReturnRange } from "../utils/matchers"
+import { findDueDateOptions } from "../utils/regexAnalyzers"
 
 const replaceRange = (str, start, end, substitute) => {
   return str.substring(0, start) + substitute + str.substring(end)
@@ -67,17 +68,22 @@ export const userSlice = createSlice({
       state.draftTodoValues.groupName = action.payload.name
     },
     setDraftTodoDueDate: (state, action) => {
-      state.draftTodoValues.dueDate = action.payload
-    },
-    setDraftTodoDueDateByPicker: (state, action) => {
       const todoBody = state.draftTodoValues.body
       const todoDueDate = state.draftTodoValues.dueDate
 
+      if (
+        !todoBody.includes(action.payload) &&
+        !findDueDateOptions(action.payload).isSame(
+          findDueDateOptions(todoDueDate),
+          "day"
+        )
+      )
+        state.draftTodoValues.body =
+          todoBody && todoDueDate
+            ? todoBody.replace(todoDueDate, action.payload)
+            : todoBody
+
       state.draftTodoValues.dueDate = action.payload
-      state.draftTodoValues.body =
-        todoBody && todoDueDate
-          ? todoBody.replace(todoDueDate, action.payload)
-          : todoBody
     },
     addTodo: (state, action) => {
       const group = state.userData.groups[state.groupIndex]
@@ -95,7 +101,6 @@ export const {
   setDraftTodoPriority,
   setDraftTodoGroup,
   setDraftTodoDueDate,
-  setDraftTodoDueDateByPicker,
 } = userSlice.actions
 
 export default userSlice.reducer
