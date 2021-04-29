@@ -8,7 +8,7 @@ import {
   makeStyles,
   ThemeProvider,
 } from "@material-ui/core/styles"
-import moment from "moment"
+import { findDueDateOptions } from "../utils/regexAnalyzers"
 
 const theme = createMuiTheme({
   palette: {
@@ -21,14 +21,15 @@ const theme = createMuiTheme({
 const BasicDateTimePicker = () => {
   const dispatch = useDispatch()
   const open = useSelector(state => state.app.duePickerOpen)
-  const globalDate = useSelector(state => state.user.draftTodoValues.dueISO)
+  const globalDueDate = useSelector(state => state.user.draftTodoValues.dueDate)
   const [selectedDate, setSelectedDate] = useState(
-    globalDate ? new Date(globalDate) : new Date()
+    globalDueDate ? new Date(globalDueDate) : new Date()
   )
 
   useEffect(() => {
-    if (globalDate) setSelectedDate(new Date(globalDate))
-  }, [globalDate])
+    if (globalDueDate)
+      setSelectedDate(new Date(findDueDateOptions(globalDueDate).toISOString()))
+  }, [globalDueDate])
 
   const handleCloseClicked = () => {
     dispatch(toggleDuePicker())

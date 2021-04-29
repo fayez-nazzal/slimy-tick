@@ -6,7 +6,6 @@ type Todo {
   priority: String!
   dueDate: String
   dueTime: String
-  dueISO: String
 }
 
 type Group {
@@ -38,7 +37,6 @@ type Mutation {
     repeat: String
     dueDate: String
     dueTime: String
-    dueISO: String
   ): Todo!
   createGroup(name: String!): Group!
   register(email: String!, password: String!, confirmPassword: String!): User!

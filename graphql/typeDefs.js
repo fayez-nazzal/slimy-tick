@@ -11,7 +11,6 @@ module.exports = gql`
     priority: String!
     dueDate: String
     dueTime: String
-    dueISO: String
   }
 
   type Group {
@@ -45,7 +44,6 @@ module.exports = gql`
       repeat: String
       dueDate: String
       dueTime: String
-      dueISO: String
     ): Todo!
     createGroup(name: String!): Group!
     editTodo(
@@ -58,7 +56,6 @@ module.exports = gql`
       repeat: [String]
       dueDate: String
       dueTime: String
-      dueISO: String
     ): Todo!
     register(email: String!, password: String!, confirmPassword: String!): User!
     login(email: String!, password: String!): User!

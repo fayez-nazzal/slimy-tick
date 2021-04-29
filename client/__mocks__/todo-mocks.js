@@ -11,7 +11,6 @@ const mocks = [
         priority: 2,
         dueDate: "22-12-2029",
         dueTime: "2:00AM",
-        dueISO: "",
       },
     },
     result: {
@@ -22,7 +21,6 @@ const mocks = [
           priority: 2,
           dueDate: "22-12-2029",
           dueTime: "2:00AM",
-          dueISO: "",
         },
       },
     },

@@ -32,7 +32,6 @@ export const CREATE_TODO = gql`
     $priority: Int!
     $dueDate: String
     $dueTime: String
-    $dueISO: String
   ) {
     createTodo(
       groupName: $groupName
@@ -40,7 +39,6 @@ export const CREATE_TODO = gql`
       priority: $priority
       dueDate: $dueDate
       dueTime: $dueTime
-      dueISO: $dueISO
     ) {
       id
       checked
@@ -49,7 +47,6 @@ export const CREATE_TODO = gql`
       remind
       repeat
       dueDate
-      dueISO
       dueTime
       created
     }

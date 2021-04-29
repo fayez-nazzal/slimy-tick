@@ -12,7 +12,6 @@ const todoSchema = new Schema({
   },
   dueDate: String,
   dueTime: String,
-  dueISO: String,
 });
 
 module.exports = todoSchema;

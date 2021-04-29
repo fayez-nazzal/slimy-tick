@@ -53,7 +53,7 @@ module.exports = {
     async createTodo(
       _,
       // eslint-disable-next-line object-curly-newline
-      { groupName, body, priority, remind, repeat, dueDate, dueTime, dueISO },
+      { groupName, body, priority, remind, repeat, dueDate, dueTime },
       context
     ) {
       const { email } = checkAuth(context);
@@ -71,7 +71,6 @@ module.exports = {
         repeat,
         dueDate,
         dueTime,
-        dueISO,
         created: new Date().toISOString(),
       };
 
@@ -98,7 +97,6 @@ module.exports = {
         repeat,
         dueDate,
         dueTime,
-        dueISO,
       },
       context
     ) {
@@ -121,7 +119,6 @@ module.exports = {
       todo.repeat = repeat ? repeat : todo.repeat;
       todo.dueDate = dueDate ? dueDate : todo.dueDate;
       todo.dueTime = dueTime ? dueTime : todo.dueTime;
-      todo.dueISO = dueISO ? dueISO : todo.dueISO;
 
       await usr.save();
 
