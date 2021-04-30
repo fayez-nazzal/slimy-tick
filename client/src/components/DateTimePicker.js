@@ -54,12 +54,11 @@ const BasicDateTimePicker = props => {
   }, [todoDueTime])
 
   const handleOkButton = () => {
+    console.log(selectedDate)
     const dateString = selectedDate.format("MMM DD, YYYY")
     const timeString = selectedDate.format("hh:mm a")
-    setTimeout(() => {
-      dispatch(setDraftTodoDueDate(dateString))
-      dispatch(setDraftTodoDueTime(timeString))
-    }, 100)
+    dispatch(setDraftTodoDueDate(dateString))
+    dispatch(setDraftTodoDueTime(timeString))
     props.onClose()
   }
 
@@ -73,7 +72,7 @@ const BasicDateTimePicker = props => {
 
   const getDate = () => {
     const todoMomentDate = findDueDateOptions(todoDueDate) || moment()
-    const todoMomentTime = findDueDateOptions(todoDueTime) || moment()
+    const todoMomentTime = findDueTimeOptions(todoDueTime) || moment()
 
     return todoMomentDate.set({
       hour: todoMomentTime.get("hour"),
