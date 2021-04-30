@@ -2,16 +2,10 @@ import { createSlice } from "@reduxjs/toolkit"
 
 export const appSlice = createSlice({
   name: "app",
-  initialState: {
-    duePickerOpen: false,
-  },
-  reducers: {
-    toggleDuePicker: state => {
-      state.duePickerOpen = !state.duePickerOpen
-    },
-  },
+  initialState: {},
+  reducers: {},
 })
 
-export const { toggleDuePicker } = appSlice.actions
+export const {} = appSlice.actions
 
 export default appSlice.reducer

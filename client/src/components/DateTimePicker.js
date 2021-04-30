@@ -1,7 +1,6 @@
 import React, { useEffect, useState } from "react"
 import { DateTimePicker } from "@material-ui/pickers"
 import { useDispatch, useSelector } from "react-redux"
-import { toggleDuePicker } from "../redux/app"
 import { setDraftTodoDueDate, setDraftTodoDueTime } from "../redux/user"
 import {
   createMuiTheme,
@@ -10,6 +9,7 @@ import {
 } from "@material-ui/core/styles"
 import { findDueDateOptions, findDueTimeOptions } from "../utils/regexAnalyzers"
 import moment from "moment"
+import { Button, Popover } from "@material-ui/core"
 
 const theme = createMuiTheme({
   palette: {
@@ -19,55 +19,66 @@ const theme = createMuiTheme({
   },
 })
 
-const BasicDateTimePicker = () => {
+const BasicDateTimePicker = props => {
   const dispatch = useDispatch()
-  const open = useSelector(state => state.app.duePickerOpen)
-  const globalDueDate = useSelector(state => state.user.draftTodoValues.dueDate)
-  const globalDueTime = useSelector(state => state.user.draftTodoValues.dueTime)
-  const [selectedDate, setSelectedDate] = useState(
-    globalDueDate ? new Date(globalDueDate) : new Date()
-  )
+  const classes = useStyles()
+  const todoDueDate = useSelector(state => state.user.draftTodoValues.dueDate)
+  const todoDueTime = useSelector(state => state.user.draftTodoValues.dueTime)
+  const [selectedDate, setSelectedDate] = useState()
 
   useEffect(() => {
     const selectedMomentDate = moment(selectedDate)
-    if (globalDueDate)
+    if (todoDueDate)
       setSelectedDate(
-        new Date(
-          findDueDateOptions(globalDueDate)
-            .set({
-              hour: selectedMomentDate.get("hour"),
-              minute: selectedMomentDate.get("minute"),
-            })
-            .toISOString()
-        )
+        findDueDateOptions(todoDueDate)
+          .set({
+            hour: selectedMomentDate.get("hour"),
+            minute: selectedMomentDate.get("minute"),
+          })
+          .toISOString()
       )
-  }, [globalDueDate])
+  }, [todoDueDate])
 
   useEffect(() => {
     const selectedMomentDate = moment(selectedDate)
-    if (globalDueTime)
+    if (todoDueTime)
       setSelectedDate(
-        new Date(
-          findDueTimeOptions(globalDueTime)
-            .set({
-              year: selectedMomentDate.get("year"),
-              month: selectedMomentDate.get("month"),
-              day: selectedMomentDate.get("day"),
-            })
-            .toISOString()
-        )
+        findDueTimeOptions(todoDueTime)
+          .set({
+            year: selectedMomentDate.get("year"),
+            month: selectedMomentDate.get("month"),
+            day: selectedMomentDate.get("day"),
+          })
+          .toISOString()
       )
-  }, [globalDueTime])
+  }, [todoDueTime])
 
-  const handleCloseClicked = () => {
-    dispatch(toggleDuePicker())
+  const handleOkButton = () => {
+    const dateString = selectedDate.format("MMM DD, YYYY")
+    const timeString = selectedDate.format("hh:mm a")
+    setTimeout(() => {
+      dispatch(setDraftTodoDueDate(dateString))
+      dispatch(setDraftTodoDueTime(timeString))
+    }, 100)
+    props.onClose()
   }
 
   const handleAccept = date => {
-    const dateString = date.format("MMM DD, YYYY")
-    const timeString = date.format("hh:mm a")
-    dispatch(setDraftTodoDueDate(dateString))
-    dispatch(setDraftTodoDueTime(timeString))
+    setSelectedDate(date)
+  }
+
+  const handleOnEnter = () => {
+    setSelectedDate(getDate())
+  }
+
+  const getDate = () => {
+    const todoMomentDate = findDueDateOptions(todoDueDate) || moment()
+    const todoMomentTime = findDueDateOptions(todoDueTime) || moment()
+
+    return todoMomentDate.set({
+      hour: todoMomentTime.get("hour"),
+      minute: todoMomentTime.get("minute"),
+    })
   }
 
   const renderDay = (day, selectedDate, inCurrentMonth, DayComponent) => {
@@ -76,20 +87,55 @@ const BasicDateTimePicker = () => {
 
   return (
     <ThemeProvider theme={theme}>
-      <DateTimePicker
-        inputVariant="outlined"
-        value={selectedDate}
-        onChange={setSelectedDate}
-        open={open}
-        onClose={handleCloseClicked}
-        onAccept={handleAccept}
-        renderDay={renderDay}
-        rightArrowButtonProps={{
-          "data-testid": "datetimepicker-rightarrow",
+      <Popover
+        open={!!props.anchorEl}
+        anchorEl={props.anchorEl}
+        onClose={props.onClose}
+        onEnter={handleOnEnter}
+        elevation={0}
+        getContentAnchorEl={null}
+        anchorOrigin={{
+          vertical: "bottom",
+          horizontal: "left",
         }}
-        color="primary"
-        disablePast
-      />
+        transformOrigin={{
+          vertical: "top",
+          horizontal: "left",
+        }}
+      >
+        <DateTimePicker
+          variant="static"
+          value={selectedDate}
+          onChange={setSelectedDate}
+          onAccept={handleAccept}
+          renderDay={renderDay}
+          rightArrowButtonProps={{
+            "data-testid": "datetimepicker-rightarrow",
+          }}
+          color="primary"
+          disablePast
+          minutesStep={5}
+          autoOk
+        />
+        <div className={classes.flex}>
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={handleOkButton}
+          >
+            Ok
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            className={classes.button}
+            onClick={props.onClose}
+          >
+            Cancel
+          </Button>
+        </div>
+      </Popover>
     </ThemeProvider>
   )
 }
@@ -97,7 +143,6 @@ const BasicDateTimePicker = () => {
 export default BasicDateTimePicker
 
 const CustomDay = props => {
-  const classes = useStyles()
   const [hovered, setHovered] = useState(false)
 
   return React.cloneElement(props.component, {
@@ -111,8 +156,13 @@ const CustomDay = props => {
 }
 
 const useStyles = makeStyles({
-  customDay: {
-    borderRadius: "50%",
-    backgroundColor: "red",
+  flex: {
+    marginTop: "8px",
+    display: "flex",
+    width: "100%",
+    justifyContent: "center",
+  },
+  button: {
+    margin: "0 6px",
   },
 })

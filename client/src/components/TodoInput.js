@@ -41,6 +41,7 @@ import {
 import { ListItemIcon, MenuItem, Typography } from "@material-ui/core"
 import ListItemText from "@material-ui/core/ListItemText"
 import Menu from "./Menu"
+import BasicDateTimePicker from "./DateTimePicker"
 
 const theme = createMuiTheme({
   palette: {
@@ -76,7 +77,8 @@ const Input = () => {
 
   const [focus, setFocus] = useState(false)
   const editorRef = useRef(null)
-  const [anchorEl, setAnchorEl] = useState(false)
+  const [priorityAnchorEl, setPriorityAnchorEl] = useState(false)
+  const [dueAnchorEl, setDueAnchorEl] = useState(false)
 
   const classes = useStyles({ focus })
   const [createTodo, { loading }] = useMutation(CREATE_TODO, {
@@ -213,7 +215,7 @@ const Input = () => {
   }
 
   const handleDueClicked = e => {
-    dispatch(toggleDuePicker())
+    setDueAnchorEl(e.currentTarget)
     disableEditorBlurTemporarily()
   }
 
@@ -263,7 +265,7 @@ const Input = () => {
           </IconButton>
           <IconButton
             onClick={e => {
-              setAnchorEl(e.currentTarget)
+              setPriorityAnchorEl(e.currentTarget)
             }}
             data-testid="priority-button"
             size="small"
@@ -279,7 +281,10 @@ const Input = () => {
               })}
             />
           </IconButton>
-          <Menu anchorEl={anchorEl} onClose={() => setAnchorEl(false)}>
+          <Menu
+            anchorEl={priorityAnchorEl}
+            onClose={() => setPriorityAnchorEl(false)}
+          >
             <MenuItem onClick={() => dispatch(setDraftTodoPriority(1))}>
               <Typography
                 variant="h6"
@@ -328,6 +333,10 @@ const Input = () => {
               className={draftTodoValues.dueDate && classes.dueSet}
             />
           </IconButton>
+          <BasicDateTimePicker
+            anchorEl={dueAnchorEl}
+            onClose={() => setDueAnchorEl(false)}
+          />
         </div>
       </div>
     </MuiThemeProvider>
