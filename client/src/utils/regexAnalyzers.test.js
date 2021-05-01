@@ -22,87 +22,119 @@ describe("repeat options", () => {
     test("120 minutes", () => {
       expect(findRepeatOptions("every 120 minutes")).toEqual(["minutes", 120])
     })
+
+    test("120 minute", () => {
+      expect(findRepeatOptions("every 120 minute")).toEqual(["minutes", 120])
+    })
   })
 
   describe("hours", () => {
+    test("every hour", () => {
+      expect(findRepeatOptions("every hour")).toEqual(["hours", 1])
+    })
+
     test("2 hours)", () => {
       expect(findRepeatOptions("every 2 hours")).toEqual(["hours", 2])
     })
 
-    test("24 hours)", () => {
+    test("23 hours", () => {
+      expect(findRepeatOptions("every 23 hours")).toEqual(["hours", 23])
+    })
+
+    test("24 hours", () => {
       expect(findRepeatOptions("every 24 hours")).toEqual(["hours", 24])
     })
 
-    test("25 hours)", () => {
+    test("25 hours", () => {
       expect(findRepeatOptions("every 25 hours")).toEqual(["hours", 25])
     })
 
-    test("48 hours)", () => {
+    test("48 hours", () => {
       expect(findRepeatOptions("every 48 hours")).toEqual(["hours", 48])
+    })
+
+    test("5 hour", () => {
+      expect(findRepeatOptions("every 5 hour")).toEqual(["hours", 5])
     })
   })
 
   describe("testing days", () => {
-    test("300 days)", () => {
+    test("every day", () => {
+      expect(findRepeatOptions("every day")).toEqual(["days", 1])
+    })
+
+    test("300 days", () => {
       expect(findRepeatOptions("every 300 days")).toEqual(["days", 300])
     })
 
-    test("30a days (wrong))", () => {
+    test("5 day", () => {
+      expect(findRepeatOptions("every 5 day")).toEqual(["days", 5])
+    })
+
+    test("30a days (wrong)", () => {
       expect(findRepeatOptions("every 30a days")).toEqual([null, null])
     })
 
-    test("22 months)", () => {
+    test("every month", () => {
+      expect(findRepeatOptions("every month")).toEqual(["months", 1])
+    })
+
+    test("22 months", () => {
       expect(findRepeatOptions("every 22 months")).toEqual(["months", 22])
+    })
+
+    test("22 month", () => {
+      expect(findRepeatOptions("every 22 month")).toEqual(["months", 22])
     })
   })
 
   describe("testing times", () => {
-    test("time AMPM)", () => {
+    test("time AMPM", () => {
       expect(findRepeatOptions("every 2:59AM")).toEqual(["times", ["2:59AM"]])
     })
 
-    test("time 24h)", () => {
+    test("time 24h", () => {
       expect(findRepeatOptions("every 14:00")).toEqual(["times", ["14:00"]])
     })
 
-    test("time 16:00)", () => {
+    test("time 16:00", () => {
       expect(findRepeatOptions("every 16:00")).toEqual(["times", ["16:00"]])
     })
 
-    test("time 24h but wrong)", () => {
+    test("time 24h but wrong", () => {
       expect(findRepeatOptions("every 24:00")).toEqual([null, null])
     })
 
-    test("time AMPM but wrong)", () => {
+    test("time AMPM but wrong", () => {
       expect(findRepeatOptions("every 2:60PM")).toEqual([null, null])
     })
 
-    test("time AMPM but wrong)", () => {
+    test("time AMPM but wrong", () => {
       expect(findRepeatOptions("every 9:88AM")).toEqual([null, null])
     })
 
-    test("2:00AM and 5:25PM)", () => {
+    test("2:00AM and 5:25PM", () => {
       expect(findRepeatOptions("every 2:00AM and 5:25PM")).toEqual([
         "times",
         ["2:00AM", "5:25PM"],
       ])
     })
 
-    test("2:00AM and 14:00)", () => {
+    test("2:00AM and 14:00", () => {
       expect(findRepeatOptions("every 2:00AM and 14:00")).toEqual([
         "times",
         ["2:00AM", "14:00"],
       ])
     })
 
-    test("2:00AM and 14:00 and 23:58)", () => {
+    test("2:00AM and 14:00 and 23:58", () => {
       expect(findRepeatOptions("every 2:00AM and 14:00 and 23:58")).toEqual([
         "times",
         ["2:00AM", "14:00", "23:58"],
       ])
     })
 
-    test("11:00AM and 16:00 and 28:58)", () => {
+    test("11:00AM and 16:00 and 28:58", () => {
       expect(findRepeatOptions("every 11:00AM and 16:00 and 28:58")).toEqual([
         "times",
         ["11:00AM", "16:00"],
@@ -110,7 +142,7 @@ describe("repeat options", () => {
     })
 
     describe("testing daytimes", () => {
-      test("morning and evening)", () => {
+      test("morning and evening", () => {
         expect(findRepeatOptions("every morning and evening")).toEqual([
           "daytimes",
           ["morning", "evening"],
@@ -155,10 +187,10 @@ describe("testing weekdays", () => {
     ])
   })
 
-  test("sun and tue and wedensday)", () => {
-    expect(findRepeatOptions("every sun and tue and wedensday")).toEqual([
+  test("sun and tue and wednesday)", () => {
+    expect(findRepeatOptions("every sun and tue and wednesday")).toEqual([
       "weekdays",
-      ["sunday", "tuesday", "wedensday"],
+      ["sunday", "tuesday", "wednesday"],
     ])
   })
 
@@ -167,6 +199,18 @@ describe("testing weekdays", () => {
       "weekdays",
       ["sunday", "friday", "saturday"],
     ])
+  })
+
+  test("every week)", () => {
+    expect(findRepeatOptions("every week")).toEqual(["weeks", 1])
+  })
+
+  test("every 2 weeks)", () => {
+    expect(findRepeatOptions("every 2 weeks")).toEqual(["weeks", 2])
+  })
+
+  test("every 2 week)", () => {
+    expect(findRepeatOptions("every 2 week")).toEqual(["weeks", 2])
   })
 })
 

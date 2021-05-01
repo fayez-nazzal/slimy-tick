@@ -1,13 +1,22 @@
 import { createDateFromStr, createTimeFromStr } from "./datetime"
 import moment from "moment"
 export const findRepeatOptions = repeatStr => {
-  const numMinutes = firstValue(repeatStr.match(/\b\d+?(?= ?minutes)/i))
+  const numMinutes = firstValue(repeatStr.match(/\b\d+?(?= ?minute)/i))
   const numHours =
-    firstValue(repeatStr.match(/\d+(?= ?hours)/i)) ||
-    (repeatStr.match(/hour(?!s)/i) && 1)
+    firstValue(repeatStr.match(/\d+(?= ?hour)/i)) ||
+    ((repeatStr.match(/(?!<\d) hour(?!s)/i) ||
+      repeatStr.match(/(one|1) hour/i)) &&
+      1)
+  const numWeeks =
+    firstValue(repeatStr.match(/\d+(?= ?week)/i)) ||
+    ((repeatStr.match(/(?!<\d) week(?!s)/i) ||
+      repeatStr.match(/(one|1) week/i)) &&
+      1)
   const numMonths =
-    firstValue(repeatStr.match(/\d+(?= ?months)/i)) ||
-    (repeatStr.match(/month(?!s)/i) && 1)
+    firstValue(repeatStr.match(/\d+(?= ?month)/i)) ||
+    ((repeatStr.match(/(?!<\d) month(?!s)/i) ||
+      repeatStr.match(/(one|1) month/i)) &&
+      1)
   const numYears =
     firstValue(repeatStr.match(/\d+(?= ?years)/i)) ||
     (repeatStr.match(/year(?!s)/i) && 1)
@@ -30,19 +39,22 @@ export const findRepeatOptions = repeatStr => {
     repeatStr.includes("and") &&
     repeatStr.match(/\b((morning)|(afternoon)|(evening)|(night))\b/gi)
   const weekdays = fullWeekdaysName(repeatStr).match(
-    /((sunday)|(monday)|(tuesday)|(wedensday)|(thursday)|(friday)|(saturday))/gi
+    /((sunday)|(monday)|(tuesday)|(wednesday)|(thursday)|(friday)|(saturday))/gi
   )
   const numDays =
     !weekdays &&
-    (firstValue(repeatStr.match(/\d+(?= ?days)/i)) ||
-      (repeatStr.match(/day(?!s)/i) && 1))
-
+    (firstValue(repeatStr.match(/\d+(?= ?day)/i)) ||
+      ((repeatStr.match(/(?<!\d) day(?!s)/i) ||
+        repeatStr.match(/(1|one) day(s?)/i)) &&
+        1))
   const repeatType = numMinutes
     ? "minutes"
     : numHours
     ? "hours"
     : numDays
     ? "days"
+    : numWeeks
+    ? "weeks"
     : numMonths
     ? "months"
     : numYears
@@ -77,6 +89,7 @@ export const findRepeatOptions = repeatStr => {
         numMinutes ||
         numHours ||
         numDays ||
+        numWeeks ||
         numMonths ||
         numYears ||
         numMornings ||
@@ -97,7 +110,7 @@ const fullWeekdaysName = str => {
     .replace(/sun/, "sunday")
     .replace(/mon/, "monday")
     .replace(/tue/, "tuesday")
-    .replace(/wed/, "wedensday")
+    .replace(/wed/, "wednesday")
     .replace(/thu/, "thursday")
     .replace(/fri/, "friday")
 }

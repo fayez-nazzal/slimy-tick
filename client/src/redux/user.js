@@ -27,6 +27,7 @@ export const userSlice = createSlice({
       groupName: null,
       dueDate: "",
       dueTime: "",
+      repeat: null,
     },
   },
   reducers: {
@@ -103,6 +104,9 @@ export const userSlice = createSlice({
 
       state.draftTodoValues.dueTime = action.payload
     },
+    setDraftTodoRepeat: (state, action) => {
+      state.draftTodoValues.repeat = action.payload
+    },
     addTodo: (state, action) => {
       const group = state.userData.groups[state.groupIndex]
       group.todos = [...group.todos, action.payload]
@@ -120,6 +124,7 @@ export const {
   setDraftTodoGroup,
   setDraftTodoDueDate,
   setDraftTodoDueTime,
+  setDraftTodoRepeat,
 } = userSlice.actions
 
 export default userSlice.reducer

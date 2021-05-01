@@ -6,8 +6,10 @@ import {
   setDraftTodoDueDate,
   setDraftTodoDueTime,
   setDraftTodoPriority,
+  setDraftTodoRepeat,
 } from "../redux/user"
 import { useDispatch } from "react-redux"
+import { findRepeatOptions } from "../utils/regexAnalyzers"
 const theme = createMuiTheme({
   palette: {
     primary: {
@@ -37,6 +39,7 @@ const DraftStrategyComponent = props => {
       )
     props.dueDate && dispatch(setDraftTodoDueDate(textContent))
     props.dueTime && dispatch(setDraftTodoDueTime(textContent))
+    props.repeat && dispatch(setDraftTodoRepeat(findRepeatOptions(textContent)))
   }, [props.children])
 
   useEffect(() => {
@@ -44,6 +47,7 @@ const DraftStrategyComponent = props => {
       props.priority && dispatch(setDraftTodoPriority(4))
       props.dueDate && dispatch(setDraftTodoDueDate(null))
       props.dueTime && dispatch(setDraftTodoDueTime(""))
+      props.repeat && dispatch(setDraftTodoRepeat(null))
     }
   }, [])
 
@@ -68,6 +72,8 @@ const DraftStrategyComponent = props => {
           ? "draft-duedate"
           : props.dueTime
           ? "draft-duetime"
+          : props.repeat
+          ? "draft-repeat"
           : ""
       }
     >

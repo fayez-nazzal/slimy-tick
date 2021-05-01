@@ -1,7 +1,9 @@
 const repeatTimeQuanityRegex = /every (\d* ?minutes?|\d* ?hours?|\d* ?days?|\d* ?months?|\d* ?years?|\d* ?mornings?|\d* ?afternoons?|\d* ?evenings??|\d* ?nights?)/i
-const repeatWeekDaysRegex = /every (((sun(day)?)|(\bmon\b)|(monday)|(tue(sday)?)|(wed(ensday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))( ?and ?)?)+/i
+const repeatWeekDaysRegex = /every (((sun(day)?)|(\bmon\b)|(monday)|(tue(sday)?)|(wed(nesday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))( ?and ?)?)+/i
 const repeatTimeRegex = /every (((([1-9]|1[1-2]|0[1-9]|10):[0-5][0-9] ?(AM|PM))|(([0-2][1-3]|1[0-9]|0[0-9]|[0-9]):[0-5][0-9]))( ?and ?)?)+/i
-const repeatDayTimeRegex = /every ((morning|evening|night|afternoon)( ?and ?)?)+/
+const repeatDayTimeRegex = /every ((morning|evening|night|afternoon)( ?and ?)?)+/i
+const repeatOneWeekRegex = /every( (1|one))? week(?!s)/i
+const repeatWeeksRegex = /every \d+ week(s?)/i
 
 const REMIND_REGEX = /\bremind\b( ?before ?(\d+? ?minutes|\d+ ?hours|\d+ ?days|\d+ ?weeks))?/i
 
@@ -14,7 +16,7 @@ const dueDateFormat5Regex = /(on|before|after|due)? ?((\d{1,2})([\/\\\-])(\d{1,2
 
 const dueDateAfterRegex = /after ?((a|1|one)? ?(day|week|month|year)|\d+ ?(days|weeks|months|years))/i
 const dueDateTomorrowRegex = /(due)? ?tomorrow/i
-const dueDateWeekdaysRegex = /(on|before|after|due)? ?((sun(day)?)|(\bmon\b)|(monday)|(tue(sday)?)|(wed(ensday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))/i
+const dueDateWeekdaysRegex = /(on|before|after|due)? ?((sun(day)?)|(\bmon\b)|(monday)|(tue(sday)?)|(wed(nesday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))/i
 
 const dueTimeRegex = /(on|at|in|before|due)? ?((([1-9]|1[1-2]|0[1-9]|10):[0-5][0-9] ?(AM|PM))|(([0-2][1-3]|1[0-9]|0[0-9]|[0-9]):[0-5][0-9]))/i
 const dueDayTimeRegex = /(on|before|due)? ?(morning|afternoon|evening|night)/
@@ -28,6 +30,8 @@ export const REPEAT_REGEXES = [
   repeatTimeRegex,
   repeatDayTimeRegex,
   repeatWeekDaysRegex,
+  repeatOneWeekRegex,
+  repeatWeeksRegex,
 ]
 
 export const DUE_DATE_REGEXES = [
