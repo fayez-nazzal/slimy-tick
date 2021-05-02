@@ -57,11 +57,6 @@ describe("Testing repeat regexes", () => {
       )
     })
 
-    test("every 15 days", () => {
-      expect(matchRepeat("every 15 days half of the month passes")).toEqual(
-        "every 15 days"
-      )
-    })
     test("every day (between text)", () => {
       expect(matchRepeat("do programmers code every day ??")).toEqual(
         "every day"
@@ -77,7 +72,9 @@ describe("Testing repeat regexes", () => {
     test("everyday", () => {
       expect(matchRepeat(">>>>>>>>>>>>>everyday<<<<<<<<<")).toEqual("everyday")
     })
+  })
 
+  describe("weekds", () => {
     test("every week", () => {
       expect(matchRepeat(">>>>>>>>>>>>>every week<<<<<<<<<")).toEqual(
         "every week"
@@ -96,12 +93,6 @@ describe("Testing repeat regexes", () => {
         "every week"
       )
     })
-
-    test("everymonth", () => {
-      expect(matchRepeat(">>>>>>>>>>>>>everymonth<<<<<<<<<")).toEqual(
-        "everymonth"
-      )
-    })
   })
 
   describe("months", () => {
@@ -115,6 +106,12 @@ describe("Testing repeat regexes", () => {
 
     test("every one month", () => {
       expect(matchRepeat("employess get paid every month")).toBe("every month")
+    })
+
+    test("everymonth", () => {
+      expect(matchRepeat(">>>>>>>>>>>>>everymonth<<<<<<<<<")).toEqual(
+        "everymonth"
+      )
     })
   })
 
@@ -376,11 +373,19 @@ describe("Testing due", () => {
     it("match next week", () => {
       expect(matchDueDate(">> next week <<")).toBe("next week")
     })
+
+    it("match next month", () => {
+      expect(matchDueDate(">> next month <<")).toBe("next month")
+    })
   })
 
   describe("time", () => {
     it("match 2:00AM", () => {
       expect(matchDueTime(">>2:00AM<<")).toBe("2:00AM")
+    })
+
+    it("match next 2:00AM", () => {
+      expect(matchDueTime(">>next 2:00AM<<")).toBe("next 2:00AM")
     })
 
     it("match 12:00 AM", () => {
@@ -427,6 +432,10 @@ describe("Testing due", () => {
 
     it("match on night", () => {
       expect(matchDueTime("on night")).toBe("on night")
+    })
+
+    it("match next night", () => {
+      expect(matchDueTime("next night")).toBe("next night")
     })
 
     it("in night (matches just night)", () => {
