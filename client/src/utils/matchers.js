@@ -1,12 +1,10 @@
 import {
   DUE_DATE_REGEXES,
   DUE_TIME_REGEXES,
-  REMIND_REGEXES,
   REPEAT_REGEXES,
   PRIORITY_REGEX,
 } from "../data/regex"
 import moment from "moment"
-import { createDateFromStr as createTimeFromStr } from "./datetime"
 import { findDueDateOptions } from "./regexAnalyzers"
 export const matchRepeat = str => {
   const match = matchRegexFromArray(str, REPEAT_REGEXES)
@@ -30,13 +28,7 @@ export const matchDueDate = str => {
 export const matchDueTime = str => {
   const match = matchRegexFromArray(str, DUE_TIME_REGEXES)
 
-  return !match ? null : match.trim()
-}
-
-export const matchRemind = str => {
-  const match = matchRegexFromArray(str, REMIND_REGEXES)
-
-  return !match ? null : match.trim()
+  return match && match.trim()
 }
 
 export const matchPriorityAndReturnRange = str => {

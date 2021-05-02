@@ -117,6 +117,24 @@ describe("repeat options", () => {
     })
   })
 
+  describe("years", () => {
+    test("every year", () => {
+      expect(findRepeatOptions("every year")).toEqual(["years", 1])
+    })
+
+    test("every year", () => {
+      expect(findRepeatOptions("every one year")).toEqual(["years", 1])
+    })
+
+    test("every 2 years", () => {
+      expect(findRepeatOptions("every 2 years")).toEqual(["years", 2])
+    })
+
+    test("every 2 year (no s)", () => {
+      expect(findRepeatOptions("every 2 year")).toEqual(["years", 2])
+    })
+  })
+
   describe("times", () => {
     test("every 2:59AM", () => {
       expect(findRepeatOptions("every 2:59AM")).toEqual(["times", ["2:59AM"]])
@@ -463,6 +481,14 @@ describe("due analyzers", () => {
       ).toBeTruthy()
     })
 
+    it("next year", () => {
+      const nextYear = moment().add(1, "years")
+
+      expect(
+        findDueDateOptions("next year").isSame(nextYear, "day")
+      ).toBeTruthy()
+    })
+
     it("tomorrow", () => {
       const tomorrow = moment().add(1, "days")
 
@@ -575,6 +601,22 @@ describe("due analyzers", () => {
       ).toBeTruthy()
     })
 
+    it("after 2 years", () => {
+      const expected = moment().add(2, "years")
+
+      expect(
+        findDueDateOptions("after 2 years").isSame(expected, "day")
+      ).toBeTruthy()
+    })
+
+    it("after one year", () => {
+      const expected = moment().add(1, "years")
+
+      expect(
+        findDueDateOptions("next year").isSame(expected, "day")
+      ).toBeTruthy()
+    })
+
     it("after 1 day", () => {
       expect(
         findDueDateOptions("after 1 day").isSame(
@@ -644,6 +686,15 @@ describe("due analyzers", () => {
       expect(
         findDueTimeOptions("after 22 minutes").isSame(
           moment().add(22, "minutes"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("after one minute", () => {
+      expect(
+        findDueTimeOptions("after one minute").isSame(
+          moment().add(1, "minutes"),
           "second"
         )
       ).toBeTruthy()
