@@ -7,210 +7,375 @@ import {
 
 describe("repeat options", () => {
   describe("minutes", () => {
-    test("30 minutes", () => {
+    test("every 30 minutes", () => {
       expect(findRepeatOptions("every 30 minutes")).toEqual(["minutes", 30])
     })
 
-    test("59 minutes", () => {
+    test("every 59 minutes", () => {
       expect(findRepeatOptions("every 59 minutes")).toEqual(["minutes", 59])
     })
 
-    test("60 minutes", () => {
+    test("every 60 minutes", () => {
       expect(findRepeatOptions("every 60 minutes")).toEqual(["minutes", 60])
     })
 
-    test("120 minutes", () => {
+    test("every 120 minutes", () => {
       expect(findRepeatOptions("every 120 minutes")).toEqual(["minutes", 120])
     })
 
-    test("120 minute", () => {
+    test("every 120 minute", () => {
       expect(findRepeatOptions("every 120 minute")).toEqual(["minutes", 120])
     })
   })
 
   describe("hours", () => {
-    test("every hour", () => {
+    test("every every hour", () => {
       expect(findRepeatOptions("every hour")).toEqual(["hours", 1])
     })
 
-    test("2 hours)", () => {
+    test("every every one hour", () => {
+      expect(findRepeatOptions("every one hour")).toEqual(["hours", 1])
+    })
+
+    test("every 2 hours", () => {
       expect(findRepeatOptions("every 2 hours")).toEqual(["hours", 2])
     })
 
-    test("23 hours", () => {
+    test("every 23 hours", () => {
       expect(findRepeatOptions("every 23 hours")).toEqual(["hours", 23])
     })
 
-    test("24 hours", () => {
+    test("every 23 hours (no space after)", () => {
+      expect(findRepeatOptions("every 23hours")).toEqual(["hours", 23])
+    })
+
+    test("every 24 hours", () => {
       expect(findRepeatOptions("every 24 hours")).toEqual(["hours", 24])
     })
 
-    test("25 hours", () => {
+    test("every 25 hours", () => {
       expect(findRepeatOptions("every 25 hours")).toEqual(["hours", 25])
     })
 
-    test("48 hours", () => {
+    test("every 48 hours", () => {
       expect(findRepeatOptions("every 48 hours")).toEqual(["hours", 48])
     })
 
-    test("5 hour", () => {
+    test("every 5 hour (no s)", () => {
       expect(findRepeatOptions("every 5 hour")).toEqual(["hours", 5])
     })
   })
 
-  describe("testing days", () => {
+  describe("days", () => {
     test("every day", () => {
       expect(findRepeatOptions("every day")).toEqual(["days", 1])
     })
 
-    test("300 days", () => {
+    test("everyday", () => {
+      expect(findRepeatOptions("everyday")).toEqual(["days", 1])
+    })
+
+    test("every 300 days", () => {
       expect(findRepeatOptions("every 300 days")).toEqual(["days", 300])
     })
 
-    test("5 day", () => {
+    test("every 5 day", () => {
       expect(findRepeatOptions("every 5 day")).toEqual(["days", 5])
     })
 
-    test("30a days (wrong)", () => {
+    test("every 30a days (wrong)", () => {
       expect(findRepeatOptions("every 30a days")).toEqual([null, null])
     })
+  })
 
+  describe("weeks", () => {
+    test("every week", () => {
+      expect(findRepeatOptions("every week")).toEqual(["weeks", 1])
+    })
+
+    // this is wrong but a user may type it...
+    test("everyweek", () => {
+      expect(findRepeatOptions("everyweek")).toEqual(["weeks", 1])
+    })
+
+    test("every 2 weeks", () => {
+      expect(findRepeatOptions("every 2 weeks")).toEqual(["weeks", 2])
+    })
+  })
+
+  describe("months", () => {
     test("every month", () => {
       expect(findRepeatOptions("every month")).toEqual(["months", 1])
     })
 
-    test("22 months", () => {
+    test("every 22 months", () => {
       expect(findRepeatOptions("every 22 months")).toEqual(["months", 22])
     })
 
-    test("22 month", () => {
+    test("every 22 month", () => {
       expect(findRepeatOptions("every 22 month")).toEqual(["months", 22])
     })
   })
 
-  describe("testing times", () => {
-    test("time AMPM", () => {
+  describe("times", () => {
+    test("every 2:59AM", () => {
       expect(findRepeatOptions("every 2:59AM")).toEqual(["times", ["2:59AM"]])
     })
 
-    test("time 24h", () => {
+    test("every 5:55 AM", () => {
+      expect(findRepeatOptions("every 5:55 AM")).toEqual(["times", ["5:55 AM"]])
+    })
+
+    test("tievery 14:00e 24h", () => {
       expect(findRepeatOptions("every 14:00")).toEqual(["times", ["14:00"]])
     })
 
-    test("time 16:00", () => {
+    test("every 16:00", () => {
       expect(findRepeatOptions("every 16:00")).toEqual(["times", ["16:00"]])
     })
 
-    test("time 24h but wrong", () => {
+    test("every 24:00", () => {
       expect(findRepeatOptions("every 24:00")).toEqual([null, null])
     })
 
-    test("time AMPM but wrong", () => {
+    test("every 2:60PM (wrong)", () => {
       expect(findRepeatOptions("every 2:60PM")).toEqual([null, null])
     })
 
-    test("time AMPM but wrong", () => {
+    test("every 9:88AM wrong", () => {
       expect(findRepeatOptions("every 9:88AM")).toEqual([null, null])
     })
+  })
 
-    test("2:00AM and 5:25PM", () => {
+  describe("multiple times", () => {
+    test("every 2:00AM and 5:25PM", () => {
       expect(findRepeatOptions("every 2:00AM and 5:25PM")).toEqual([
         "times",
         ["2:00AM", "5:25PM"],
       ])
     })
 
-    test("2:00AM and 14:00", () => {
+    test("every 2:00AM and 14:00", () => {
       expect(findRepeatOptions("every 2:00AM and 14:00")).toEqual([
         "times",
         ["2:00AM", "14:00"],
       ])
     })
 
-    test("2:00AM and 14:00 and 23:58", () => {
+    test("every 5:55 AM and 3:22", () => {
+      expect(findRepeatOptions("every 5:55 AM and 3:22")).toEqual([
+        "times",
+        ["5:55 AM", "3:22"],
+      ])
+    })
+
+    test("every 5:55 AM 3:22", () => {
+      expect(findRepeatOptions("every 5:55 AM 3:22")).toEqual([
+        "times",
+        ["5:55 AM", "3:22"],
+      ])
+    })
+
+    test("every 5:55 AM, 3:22", () => {
+      expect(findRepeatOptions("every 5:55 AM, 3:22")).toEqual([
+        "times",
+        ["5:55 AM", "3:22"],
+      ])
+    })
+
+    test("every 2:00AM and 14:00 and 23:58", () => {
       expect(findRepeatOptions("every 2:00AM and 14:00 and 23:58")).toEqual([
         "times",
         ["2:00AM", "14:00", "23:58"],
       ])
     })
 
-    test("11:00AM and 16:00 and 28:58", () => {
+    test("every 11:00AM and 16:00 and 28:58", () => {
       expect(findRepeatOptions("every 11:00AM and 16:00 and 28:58")).toEqual([
         "times",
         ["11:00AM", "16:00"],
       ])
     })
 
-    describe("testing daytimes", () => {
-      test("morning and evening", () => {
+    describe("daytimes", () => {
+      test("every morning", () => {
+        expect(findRepeatOptions("every morning")).toEqual(["mornings", 1])
+      })
+
+      // user may type this in a hurry..
+      test("everymorning", () => {
+        expect(findRepeatOptions("everymorning")).toEqual(["mornings", 1])
+      })
+
+      test("every afternoon", () => {
+        expect(findRepeatOptions("every afternoon")).toEqual(["afternoons", 1])
+      })
+
+      test("every evening", () => {
+        expect(findRepeatOptions("every evening")).toEqual(["evenings", 1])
+      })
+
+      test("every night", () => {
+        expect(findRepeatOptions("every night")).toEqual(["nights", 1])
+      })
+
+      test("every 5 mornings", () => {
+        expect(findRepeatOptions("every 5 mornings")).toEqual(["mornings", 5])
+      })
+
+      test("every 5 morning", () => {
+        expect(findRepeatOptions("every 5 morning")).toEqual(["mornings", 5])
+      })
+
+      test("every 20 nights", () => {
+        expect(findRepeatOptions("every 20 nights")).toEqual(["nights", 20])
+      })
+    })
+
+    describe("multiple daytimes", () => {
+      test("every morning and evening", () => {
         expect(findRepeatOptions("every morning and evening")).toEqual([
           "daytimes",
           ["morning", "evening"],
         ])
       })
 
-      test("morning)", () => {
-        expect(findRepeatOptions("every morning")).toEqual(["mornings", 1])
+      test("every evening afternoon", () => {
+        expect(findRepeatOptions("every evening afternoon")).toEqual([
+          "daytimes",
+          ["evening", "evening"],
+        ])
       })
 
-      test("5 mornings)", () => {
-        expect(findRepeatOptions("every 5 mornings")).toEqual(["mornings", 5])
-      })
-
-      test("5 morning)", () => {
-        expect(findRepeatOptions("every 5 morning")).toEqual(["mornings", 5])
-      })
-
-      test("20 nights)", () => {
-        expect(findRepeatOptions("every 20 nights")).toEqual(["nights", 20])
+      test("every morning, afternoon, night", () => {
+        expect(findRepeatOptions("every morning, afternoon, night")).toEqual([
+          "daytimes",
+          ["morning", "afternoon", "night"],
+        ])
       })
     })
   })
-})
 
-describe("testing weekdays", () => {
-  test("sunday", () => {
-    expect(findRepeatOptions("every sunday")).toEqual(["weekdays", ["sun"]])
-  })
+  describe("testing weekdays", () => {
+    test("every sunday", () => {
+      expect(findRepeatOptions("every sunday")).toEqual(["weekdays", ["sun"]])
+    })
 
-  test("sunday and friday", () => {
-    expect(findRepeatOptions("every sunday and friday")).toEqual([
-      "weekdays",
-      ["sun", "fri"],
-    ])
-  })
+    test("every sun", () => {
+      expect(findRepeatOptions("every sun")).toEqual(["weekdays", ["sun"]])
+    })
 
-  test("sun and tue", () => {
-    expect(findRepeatOptions("every sun and tue")).toEqual([
-      "weekdays",
-      ["sun", "tue"],
-    ])
-  })
+    test("every monday", () => {
+      expect(findRepeatOptions("every monday")).toEqual(["weekdays", ["mon"]])
+    })
 
-  test("sun and tue and wednesday", () => {
-    expect(findRepeatOptions("every sun and tue and wednesday")).toEqual([
-      "weekdays",
-      ["sun", "tue", "wed"],
-    ])
-  })
+    test("every mon", () => {
+      expect(findRepeatOptions("every mon")).toEqual(["weekdays", ["mon"]])
+    })
 
-  test("sunday and friday and saturday", () => {
-    expect(findRepeatOptions("every sunday and friday and saturday")).toEqual([
-      "weekdays",
-      ["sun", "fri", "sat"],
-    ])
-  })
+    test("every tuesday", () => {
+      expect(findRepeatOptions("every tuesday")).toEqual(["weekdays", ["tue"]])
+    })
 
-  test("every week)", () => {
-    expect(findRepeatOptions("every week")).toEqual(["weeks", 1])
-  })
+    test("every tue", () => {
+      expect(findRepeatOptions("every tue")).toEqual(["weekdays", ["tue"]])
+    })
 
-  test("every 2 weeks)", () => {
-    expect(findRepeatOptions("every 2 weeks")).toEqual(["weeks", 2])
-  })
+    test("every wednesday", () => {
+      expect(findRepeatOptions("every wednesday")).toEqual([
+        "weekdays",
+        ["wed"],
+      ])
+    })
 
-  test("every 2 week)", () => {
-    expect(findRepeatOptions("every 2 week")).toEqual(["weeks", 2])
+    test("every wed", () => {
+      expect(findRepeatOptions("every wed")).toEqual(["weekdays", ["wed"]])
+    })
+
+    test("every thursday", () => {
+      expect(findRepeatOptions("every thursday")).toEqual(["weekdays", ["thu"]])
+    })
+
+    test("every thu", () => {
+      expect(findRepeatOptions(">>>>every thu<<<<")).toEqual([
+        "weekdays",
+        ["thu"],
+      ])
+    })
+
+    test("every friday", () => {
+      expect(findRepeatOptions(" every friday ")).toEqual(["weekdays", ["fri"]])
+    })
+
+    test("every fri", () => {
+      expect(findRepeatOptions("every fri")).toEqual(["weekdays", ["fri"]])
+    })
+
+    test("every saturday", () => {
+      expect(findRepeatOptions("every saturday")).toEqual([
+        "weekdays",
+        ["saturday"],
+      ])
+    })
+
+    test("every sat", () => {
+      expect(findRepeatOptions("every sat")).toEqual(["weekdays", ["sat"]])
+    })
+
+    test("every sunday and friday", () => {
+      expect(findRepeatOptions("every sunday and friday")).toEqual([
+        "weekdays",
+        ["sun", "fri"],
+      ])
+    })
+
+    test("every sun and tue", () => {
+      expect(findRepeatOptions("every sun and tue")).toEqual([
+        "weekdays",
+        ["sun", "tue"],
+      ])
+    })
+
+    test("every sun and tue and wednesday", () => {
+      expect(findRepeatOptions("every sun and tue and wednesday")).toEqual([
+        "weekdays",
+        ["sun", "tue", "wed"],
+      ])
+    })
+
+    test("every sunday and friday and saturday", () => {
+      expect(
+        findRepeatOptions("every sunday and friday and saturday")
+      ).toEqual(["weekdays", ["sun", "fri", "sat"]])
+    })
+
+    test("every sunday friday saturday", () => {
+      expect(findRepeatOptions("every sunday friday saturday")).toEqual([
+        "weekdays",
+        ["sun", "fri", "sat"],
+      ])
+    })
+
+    test("every sun fri wed", () => {
+      expect(findRepeatOptions("every sun fri wed")).toEqual([
+        "weekdays",
+        ["sun", "fri", "wed"],
+      ])
+    })
+
+    test("every sun, fri, wed", () => {
+      expect(findRepeatOptions("every sun, fri, wed")).toEqual([
+        "weekdays",
+        ["sun", "fri", "wed"],
+      ])
+    })
+
+    test("every sun,fri,wed", () => {
+      expect(findRepeatOptions("every sun,fri,wed")).toEqual([
+        "weekdays",
+        ["sun", "fri", "wed"],
+      ])
+    })
   })
 })
 
@@ -232,6 +397,10 @@ describe("due analyzers", () => {
       ).toBeTruthy()
     })
 
+    // dates in the format DD/MM/YYYY or similar are not very important now
+    // it's better to let the user choose his date format
+    // because month and day may differs from countries
+
     it("doesn't get old dates", () => {
       expect(findDueDateOptions("on 20th jan 1998")).toBeNull()
     })
@@ -246,12 +415,59 @@ describe("due analyzers", () => {
       ).toBeTruthy()
     })
 
-    it("gets after 2 days", () => {
+    it("next sunday", () => {
+      const now = moment()
+      let result = now.add(1, "days")
+
+      while (!result.format("dddd").toLocaleLowerCase() === "sunday") {
+        result.add(1, "days")
+      }
+
       expect(
-        findDueDateOptions("after 2 days").isSame(
-          moment().add(2, "days"),
-          "day"
-        )
+        findDueDateOptions("next sunday").isSame(result, "day")
+      ).toBeTruthy()
+    })
+
+    it("next fri", () => {
+      const now = moment()
+      let result = now.add(1, "days")
+
+      while (!result.format("dddd").toLocaleLowerCase() === "friday") {
+        result.add(1, "days")
+      }
+
+      expect(findDueDateOptions("next fri").isSame(result, "day")).toBeTruthy()
+    })
+
+    it("next day", () => {
+      const tomorrow = moment().add(1, "days")
+
+      expect(
+        findDueDateOptions("next fri").isSame(tomorrow, "day")
+      ).toBeTruthy()
+    })
+
+    it("next week", () => {
+      const nextWeek = moment().add(7, "days")
+
+      expect(
+        findDueDateOptions("next week").isSame(nextWeek, "day")
+      ).toBeTruthy()
+    })
+
+    it("next month", () => {
+      const nextMonth = moment().add(1, "months")
+
+      expect(
+        findDueDateOptions("next month").isSame(nextMonth, "day")
+      ).toBeTruthy()
+    })
+
+    it("tomorrow", () => {
+      const tomorrow = moment().add(1, "days")
+
+      expect(
+        findDueDateOptions("tomorrow").isSame(tomorrow, "day")
       ).toBeTruthy()
     })
   })
@@ -321,6 +537,14 @@ describe("due analyzers", () => {
         findDueTimeOptions("night").isSame(moment("21:00", "HH:mm"), "second")
       ).toBeTruthy()
     })
+
+    it("next night", () => {
+      const repeatOpt = findDueTimeOptions("next night")
+      expect(
+        repeatOpt.isSame(moment("21:00", "HH:mm"), "second") &&
+          repeatOpt.isSame(moment().add(1, "days"), "day")
+      ).toBeTruthy()
+    })
   })
 
   describe("after days/weeks/months..", () => {
@@ -342,6 +566,15 @@ describe("due analyzers", () => {
       ).toBeTruthy()
     })
 
+    it("after one month", () => {
+      expect(
+        findDueDateOptions("after one month").isSame(
+          moment().add(1, "months"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
     it("after 1 day", () => {
       expect(
         findDueDateOptions("after 1 day").isSame(
@@ -355,6 +588,24 @@ describe("due analyzers", () => {
       expect(
         findDueDateOptions("after 4 weeks").isSame(
           moment().add(4, "weeks"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("after week", () => {
+      expect(
+        findDueDateOptions("after week").isSame(
+          moment().add(1, "weeks"),
+          "second"
+        )
+      ).toBeTruthy()
+    })
+
+    it("after one week", () => {
+      expect(
+        findDueDateOptions("after one week").isSame(
+          moment().add(1, "weeks"),
           "second"
         )
       ).toBeTruthy()
