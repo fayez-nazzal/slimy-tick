@@ -39,7 +39,7 @@ const DraftStrategyComponent = props => {
       )
     props.dueDate && dispatch(setDraftTodoDueDate(textContent))
     props.dueTime && dispatch(setDraftTodoDueTime(textContent))
-    props.repeat && dispatch(setDraftTodoRepeat(findRepeatOptions(textContent)))
+    props.repeat && dispatch(setDraftTodoRepeat(textContent))
   }, [props.children])
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const DraftStrategyComponent = props => {
       props.priority && dispatch(setDraftTodoPriority(4))
       props.dueDate && dispatch(setDraftTodoDueDate(null))
       props.dueTime && dispatch(setDraftTodoDueTime(""))
-      props.repeat && dispatch(setDraftTodoRepeat(null))
+      props.repeat && dispatch(setDraftTodoRepeat(""))
     }
   }, [])
 

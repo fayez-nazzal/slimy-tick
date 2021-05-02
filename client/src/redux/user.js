@@ -1,6 +1,11 @@
 import { createSlice } from "@reduxjs/toolkit"
 import { matchPriorityAndReturnRange } from "../utils/matchers"
-import { findDueDateOptions, findDueTimeOptions } from "../utils/regexAnalyzers"
+import {
+  findDueDateOptions,
+  findDueTimeOptions,
+  findRepeatOptions,
+} from "../utils/regexAnalyzers"
+import isEqual from "lodash.isequal"
 
 const replaceRange = (str, start, end, substitute) => {
   return str.substring(0, start) + substitute + str.substring(end)
@@ -27,7 +32,7 @@ export const userSlice = createSlice({
       groupName: null,
       dueDate: "",
       dueTime: "",
-      repeat: null,
+      repeat: "",
     },
   },
   reducers: {
@@ -91,21 +96,38 @@ export const userSlice = createSlice({
       const todoDueTime = state.draftTodoValues.dueTime
 
       if (
+        todoDueTime &&
+        todoBody &&
         !todoBody.includes(action.payload) &&
         !findDueTimeOptions(action.payload).isSame(
           findDueTimeOptions(todoDueTime),
           "hour"
         )
       )
-        state.draftTodoValues.body =
-          todoBody && todoDueTime
-            ? todoBody.replace(todoDueTime, action.payload)
-            : todoBody
+        state.draftTodoValues.body = todoBody.replace(
+          todoDueTime,
+          action.payload
+        )
 
       state.draftTodoValues.dueTime = action.payload
     },
     setDraftTodoRepeat: (state, action) => {
-      state.draftTodoValues.repeat = action.payload
+      const todoBody = state.draftTodoValues.body
+      const oldRepeat = state.draftTodoValues.repeat
+      const analyzedOldRepeat = findRepeatOptions(oldRepeat)
+      const newRepeat =
+        action.payload && action.payload[0] ? action.payload : ""
+      const analyzedNewRepeat = findRepeatOptions(newRepeat)
+
+      if (
+        todoBody &&
+        oldRepeat &&
+        !todoBody.includes(newRepeat) &&
+        !isEqual(analyzedOldRepeat, analyzedNewRepeat)
+      )
+        state.draftTodoValues.body = todoBody.replace(oldRepeat, newRepeat)
+
+      state.draftTodoValues.repeat = newRepeat
     },
     addTodo: (state, action) => {
       const group = state.userData.groups[state.groupIndex]

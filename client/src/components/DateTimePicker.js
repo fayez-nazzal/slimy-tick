@@ -7,7 +7,11 @@ import {
   makeStyles,
   ThemeProvider,
 } from "@material-ui/core/styles"
-import { findDueDateOptions, findDueTimeOptions } from "../utils/regexAnalyzers"
+import {
+  findDueDateOptions,
+  findDueTimeOptions,
+  findRepeatOptions,
+} from "../utils/regexAnalyzers"
 import moment from "moment"
 import "moment-recur"
 import { Button, Popover } from "@material-ui/core"
@@ -58,7 +62,9 @@ const BasicDateTimePicker = props => {
   const recurDates = useRef([])
 
   useEffect(() => {
-    const normalizedRepeat = repeatArrToDays(todoRepeat)
+    const analyzedRepeat = findRepeatOptions(todoRepeat)
+
+    const normalizedRepeat = repeatArrToDays(analyzedRepeat)
     !selectedDate && setSelectedDate(getDate())
     const eqDays = timeToDays(normalizedRepeat)
 
@@ -107,7 +113,8 @@ const BasicDateTimePicker = props => {
   }
 
   const renderDay = (day, selectedDate, _, DayComponent) => {
-    const normalizedRepeat = repeatArrToDays(todoRepeat)
+    const analyzedRepeat = findRepeatOptions(todoRepeat)
+    const normalizedRepeat = repeatArrToDays(analyzedRepeat)
 
     const repeatToDays = selectedDate && timeToDays(normalizedRepeat)
 
@@ -117,7 +124,7 @@ const BasicDateTimePicker = props => {
         recurDates.current.find(date => date.isSame(day, "day")) ||
         (normalizedRepeat[0] === "weekdays" &&
           normalizedRepeat[1].find(weekday => {
-            return day.format("dddd").toLowerCase() === weekday
+            return day.format("ddd").toLowerCase() === weekday
           }) !== undefined &&
           day.isAfter(selectedDate)))
 

@@ -15,7 +15,7 @@ import {
 import "draft-js/dist/Draft.css"
 import clsx from "clsx"
 import IconButton from "@material-ui/core/IconButton"
-import AlarmIcon from "@material-ui/icons/AlarmSharp"
+import Select from "@material-ui/core/Select"
 import PriorityHighIcon from "@material-ui/icons/PriorityHighSharp"
 import DateRangeIcon from "@material-ui/icons/DateRangeSharp"
 import UpdateIcon from "@material-ui/icons/UpdateSharp"
@@ -28,9 +28,9 @@ import {
   setDraftTodoBody,
   setDraftTodoGroup,
   setDraftTodoPriority,
+  setDraftTodoRepeat,
 } from "../redux/user"
 import DraftStrategyComponent from "./DraftStrategyComponent"
-import { toggleDuePicker } from "../redux/app"
 import {
   matchDueDate,
   matchDueTime,
@@ -38,15 +38,43 @@ import {
   matchRemind,
   matchPriorityAndReturnRange,
 } from "../utils/matchers"
-import { ListItemIcon, MenuItem, Typography } from "@material-ui/core"
+import {
+  Button,
+  MenuItem,
+  Popover,
+  TextField,
+  ThemeProvider,
+  Typography,
+} from "@material-ui/core"
 import ListItemText from "@material-ui/core/ListItemText"
 import Menu from "./Menu"
 import BasicDateTimePicker from "./DateTimePicker"
+import { findRepeatOptions } from "../utils/regexAnalyzers"
+import ToggleButton from "@material-ui/lab/ToggleButton"
+import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup"
 
 const theme = createMuiTheme({
   palette: {
     primary: {
       main: "#80b640",
+    },
+  },
+})
+
+const popoverTheme = createMuiTheme({
+  palette: {
+    primary: {
+      main: "#bedc9b",
+    },
+  },
+  overrides: {
+    MuiPopover: {
+      paper: {
+        border: "1px solid #d3d4d5",
+        borderRadius: "4px",
+        transition: "none",
+        padding: "8px",
+      },
     },
   },
 })
@@ -79,6 +107,26 @@ const Input = () => {
   const editorRef = useRef(null)
   const [priorityAnchorEl, setPriorityAnchorEl] = useState(false)
   const [dueAnchorEl, setDueAnchorEl] = useState(false)
+  const [repeatAnchorEl, setRepeatAnchorEl] = useState(false)
+  const [customRepeatAnchorEl, setCustomRepeatAncorEl] = useState(false)
+  const [customRepeatOption, setCustomRepeatOption] = useState({
+    every: "days",
+    value: 2,
+  })
+  const [repeatWeekdays, setRepeatWeekdays] = useState([])
+
+  useEffect(() => {
+    if (draftTodoValues.repeat) {
+      const analyzedRepeat = findRepeatOptions(draftTodoValues.repeat)
+      setRepeatWeekdays(prev =>
+        analyzedRepeat[0] === "weekdays" ? analyzedRepeat[1] : prev
+      )
+      setCustomRepeatOption({
+        every: analyzedRepeat[0],
+        value: analyzedRepeat[1],
+      })
+    }
+  }, [draftTodoValues.repeat])
 
   const classes = useStyles({ focus })
   const [createTodo, { loading }] = useMutation(CREATE_TODO, {
@@ -228,6 +276,40 @@ const Input = () => {
     },
   }
 
+  const handleRepeatWeekdaysChange = (_, newWeekdays) => {
+    setCustomRepeatOption({
+      every: "weekdays",
+      value: newWeekdays,
+    })
+    setRepeatWeekdays(newWeekdays)
+  }
+
+  const handleCustomRepeatOptionChange = (e, changedValue) => {
+    setRepeatWeekdays([])
+    setCustomRepeatOption(prev => ({
+      every: changedValue === "every" ? e.target.value : prev.every,
+      value:
+        changedValue === "value" ? e.target.value : parseInt(prev.value) || 2,
+    }))
+  }
+
+  const handleRepeatPopoverClose = () => {
+    setCustomRepeatAncorEl(false)
+  }
+
+  const handleRepeatPopoverAccept = () => {
+    setCustomRepeatAncorEl(false)
+    repeatWeekdays.length &&
+      dispatch(setDraftTodoRepeat(`every ${repeatWeekdays.join(", ")}`))
+    customRepeatOption.every &&
+      parseInt(customRepeatOption.value) > 0 &&
+      dispatch(
+        setDraftTodoRepeat(
+          `every ${customRepeatOption.value} ${customRepeatOption.every}`
+        )
+      )
+  }
+
   return (
     <MuiThemeProvider theme={theme}>
       <div className={clsx([classes.root])}>
@@ -257,12 +339,155 @@ const Input = () => {
           <PlayArrowIcon color="primary" className={classes.playIcon} />
         </IconButton>
         <div className={clsx([classes.rowFlex, classes.tools])}>
-          <IconButton size="small">
-            <AlarmIcon color="primary" />
+          <IconButton
+            size="small"
+            onClick={e => {
+              setRepeatAnchorEl(e.currentTarget)
+            }}
+            data-testid="repeat-button"
+            {...keepDraftEvents}
+          >
+            <UpdateIcon
+              className={draftTodoValues.repeat && classes.repeatSet}
+              color="primary"
+            />
           </IconButton>
-          <IconButton size="small">
-            <UpdateIcon color="primary" />
-          </IconButton>
+          <Menu
+            anchorEl={repeatAnchorEl}
+            onClose={() => setRepeatAnchorEl(false)}
+          >
+            <MenuItem onClick={() => dispatch(setDraftTodoRepeat("every day"))}>
+              <ListItemText primary="Every day" />
+            </MenuItem>
+            <MenuItem
+              onClick={() => dispatch(setDraftTodoRepeat("every week"))}
+            >
+              <ListItemText primary="Every week" />
+            </MenuItem>
+            <MenuItem
+              data-testid="menuitem-priority-medium"
+              onClick={() => dispatch(setDraftTodoRepeat("every month"))}
+            >
+              <ListItemText primary="Every month" />
+            </MenuItem>
+            <MenuItem onClick={() => setCustomRepeatAncorEl(repeatAnchorEl)}>
+              <ListItemText primary="Custom" />
+            </MenuItem>
+          </Menu>
+          <ThemeProvider theme={popoverTheme}>
+            <Popover
+              anchorEl={customRepeatAnchorEl}
+              onClose={handleRepeatPopoverClose}
+              open={!!customRepeatAnchorEl}
+              aria-haspopup="true"
+              aria-controls="custom-repeat-popup"
+              elevation={0}
+              getContentAnchorEl={null}
+              anchorOrigin={{
+                vertical: "bottom",
+                horizontal: "left",
+              }}
+              transformOrigin={{
+                vertical: "top",
+                horizontal: "left",
+              }}
+            >
+              <div aria-label="weekdays options">
+                <ToggleButtonGroup
+                  value={repeatWeekdays}
+                  onChange={handleRepeatWeekdaysChange}
+                  aria-label="repeat weekdays"
+                  size="small"
+                >
+                  <ToggleButton value="sun" aria-label="sunday">
+                    <Typography variant="caption">Sun</Typography>
+                  </ToggleButton>
+                  <ToggleButton value="mon" aria-label="monday">
+                    <Typography variant="caption">Mon</Typography>
+                  </ToggleButton>
+                  <ToggleButton value="tue" aria-label="tuesday">
+                    <Typography variant="caption">Tue</Typography>
+                  </ToggleButton>
+                  <ToggleButton value="wed" aria-label="wednesday">
+                    <Typography variant="caption">Wed</Typography>
+                  </ToggleButton>
+                  <ToggleButton value="thu" aria-label="thursday">
+                    <Typography variant="caption">Thu</Typography>
+                  </ToggleButton>
+                  <ToggleButton value="fri" aria-label="friday">
+                    <Typography variant="caption">Fri</Typography>
+                  </ToggleButton>
+                  <ToggleButton value="sat" aria-label="saturday">
+                    <Typography variant="caption">Sat</Typography>
+                  </ToggleButton>
+                </ToggleButtonGroup>
+              </div>
+              <div className={clsx([classes.rowFlex, classes.aroundCenter])}>
+                <Typography variant="body1">Every</Typography>
+                <TextField
+                  value={customRepeatOption.value}
+                  onChange={e => handleCustomRepeatOptionChange(e, "value")}
+                  type={
+                    ["times", "weekdays"].includes(customRepeatOption.every)
+                      ? "text"
+                      : "number"
+                  }
+                  disabled={["times", "weekdays"].includes(
+                    customRepeatOption.every
+                  )}
+                  className={classes.repeatNumInput}
+                />
+                <Select
+                  labelId="custom-repeat-option-select-label"
+                  id="custom-repeat-option-select"
+                  value={customRepeatOption.every}
+                  onChange={e => handleCustomRepeatOptionChange(e, "every")}
+                  className={classes.repeatEverySelect}
+                >
+                  <MenuItem value="minutes">Minutes</MenuItem>
+                  <MenuItem value="hours">Hours</MenuItem>
+                  <MenuItem value="days">Days</MenuItem>
+                  <MenuItem value="weeks">Weeks</MenuItem>
+                  <MenuItem value="months">Months</MenuItem>
+                  <MenuItem value="years">Years</MenuItem>
+                  <MenuItem value="mornings" className={classes.hidden}>
+                    Mornings
+                  </MenuItem>
+                  <MenuItem value="afternoons" className={classes.hidden}>
+                    Afternoons
+                  </MenuItem>
+                  <MenuItem value="evenings" className={classes.hidden}>
+                    Evenings
+                  </MenuItem>
+                  <MenuItem value="nights" className={classes.hidden}>
+                    Nights
+                  </MenuItem>
+                  <MenuItem value="times" className={classes.hidden}>
+                    Times
+                  </MenuItem>
+                  <MenuItem value="weekdays" className={classes.hidden}>
+                    Weekdays
+                  </MenuItem>
+                </Select>
+              </div>
+              <div className={clsx(classes.rowFlex, classes.aroundCenter)}>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleRepeatPopoverClose}
+                >
+                  CANCEL
+                </Button>
+                <Button
+                  variant="contained"
+                  color="primary"
+                  onClick={handleRepeatPopoverAccept}
+                >
+                  OK
+                </Button>
+              </div>
+            </Popover>
+          </ThemeProvider>
           <IconButton
             onClick={e => {
               setPriorityAnchorEl(e.currentTarget)
@@ -358,6 +583,12 @@ const useStyles = makeStyles(theme => ({
   rowFlex: {
     flexGrow: 1,
     display: "flex",
+    margin: "2px 8px",
+  },
+  aroundCenter: {
+    margin: "1rem",
+    justifyContent: "space-around",
+    alignItems: "center",
   },
   editorContainer: {
     backgroundColor: "#f1f2f195",
@@ -405,5 +636,19 @@ const useStyles = makeStyles(theme => ({
   },
   dueSet: {
     fill: "#fcd36e",
+  },
+  repeatSet: {
+    fill: "#afddbf",
+  },
+  repeatNumInput: {
+    width: "5.8rem",
+    marginLeft: "0.8rem",
+  },
+  repeatEverySelect: {
+    width: "6.8rem",
+    marginLeft: "0.8rem",
+  },
+  hidden: {
+    display: "none",
   },
 }))

@@ -38,8 +38,8 @@ export const findRepeatOptions = repeatStr => {
   const daytimes =
     repeatStr.includes("and") &&
     repeatStr.match(/\b((morning)|(afternoon)|(evening)|(night))\b/gi)
-  const weekdays = fullWeekdaysName(repeatStr).match(
-    /((sunday)|(monday)|(tuesday)|(wednesday)|(thursday)|(friday)|(saturday))/gi
+  const weekdays = normalizeWeekdayName(repeatStr).match(
+    /((sun)|(mon)|(tue)|(wed)|(thu)|(fr)|(sat))/gi
   )
   const numDays =
     !weekdays &&
@@ -105,14 +105,14 @@ const firstValue = arr => {
   return arr ? arr[0] : null
 }
 
-const fullWeekdaysName = str => {
+const normalizeWeekdayName = str => {
   return str
-    .replace(/sun/, "sunday")
-    .replace(/mon/, "monday")
-    .replace(/tue/, "tuesday")
-    .replace(/wed/, "wednesday")
-    .replace(/thu/, "thursday")
-    .replace(/fri/, "friday")
+    .replace(/sun(day)?/i, "sun")
+    .replace(/mon(day)?/i, "mon")
+    .replace(/tue(sday)?/i, "tue")
+    .replace(/wed(nesday)?/i, "wed")
+    .replace(/thu(rsday)?/i, "thu")
+    .replace(/fri(day)?/i, "fri")
 }
 
 export const findDueDateOptions = str => {

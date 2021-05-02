@@ -1,5 +1,5 @@
 const repeatTimeQuanityRegex = /every (\d* ?minutes?|\d* ?hours?|\d* ?days?|\d* ?months?|\d* ?years?|\d* ?mornings?|\d* ?afternoons?|\d* ?evenings??|\d* ?nights?)/i
-const repeatWeekDaysRegex = /every (((sun(day)?)|(\bmon\b)|(monday)|(tue(sday)?)|(wed(nesday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))( ?and ?)?)+/i
+const repeatWeekDaysRegex = /every (((sun(day)?)|(\bmon\b)|(monday)|(tue(sday)?)|(wed(nesday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))( ?(and|,| ) ?)?)+/i
 const repeatTimeRegex = /every (((([1-9]|1[1-2]|0[1-9]|10):[0-5][0-9] ?(AM|PM))|(([0-2][1-3]|1[0-9]|0[0-9]|[0-9]):[0-5][0-9]))( ?and ?)?)+/i
 const repeatDayTimeRegex = /every ((morning|evening|night|afternoon)( ?and ?)?)+/i
 const repeatOneWeekRegex = /every( (1|one))? week(?!s)/i
