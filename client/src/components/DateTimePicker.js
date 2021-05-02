@@ -128,10 +128,12 @@ const BasicDateTimePicker = props => {
           }) !== undefined &&
           day.isAfter(selectedDate)))
 
-    return renderCustom ? (
-      <CustomDay component={DayComponent} day={day.format("D")} />
-    ) : (
-      DayComponent
+    return (
+      <CustomDay
+        highlighted={renderCustom}
+        component={DayComponent}
+        day={day.format("D")}
+      />
     )
   }
 
@@ -199,7 +201,9 @@ const CustomDay = props => {
     onMouseEnter: () => setHovered(true),
     onMouseLeave: () => setHovered(false),
     style: {
-      boxShadow: `inset 0px 0px 0px 3px ${hovered ? "#bedeaf" : "#bedc9b95"}`,
+      boxShadow:
+        props.highlighted &&
+        `inset 0px 0px 0px 3px ${hovered ? "#bedeaf" : "#bedc9b95"}`,
     },
     "data-testid": `day-${props.day}`,
   })

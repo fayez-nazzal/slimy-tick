@@ -183,8 +183,8 @@ describe("repeat regex", () => {
       expect(matchRepeat(">>>every wed<<<")).toEqual("every wed")
     })
 
-    test("wedensday", () => {
-      expect(matchRepeat(">>>every wedensday<<<")).toBe("every wedensday")
+    test("wednesday", () => {
+      expect(matchRepeat(">>>every wednesday<<<")).toBe("every wednesday")
     })
 
     test("thu", () => {

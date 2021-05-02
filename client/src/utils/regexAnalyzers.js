@@ -39,7 +39,7 @@ export const findRepeatOptions = repeatStr => {
     repeatStr.includes("and") &&
     repeatStr.match(/\b((morning)|(afternoon)|(evening)|(night))\b/gi)
   const weekdays = normalizeWeekdayName(repeatStr).match(
-    /((sun)|(mon)|(tue)|(wed)|(thu)|(fr)|(sat))/gi
+    /((sun)|(mon)|(tue)|(wed)|(thu)|(fri)|(sat))/gi
   )
   const numDays =
     !weekdays &&

@@ -169,35 +169,35 @@ describe("repeat options", () => {
 })
 
 describe("testing weekdays", () => {
-  test("sunday)", () => {
-    expect(findRepeatOptions("every sunday")).toEqual(["weekdays", ["sunday"]])
+  test("sunday", () => {
+    expect(findRepeatOptions("every sunday")).toEqual(["weekdays", ["sun"]])
   })
 
-  test("sunday and friday)", () => {
+  test("sunday and friday", () => {
     expect(findRepeatOptions("every sunday and friday")).toEqual([
       "weekdays",
-      ["sunday", "friday"],
+      ["sun", "fri"],
     ])
   })
 
-  test("sun and tue)", () => {
+  test("sun and tue", () => {
     expect(findRepeatOptions("every sun and tue")).toEqual([
       "weekdays",
-      ["sunday", "tuesday"],
+      ["sun", "tue"],
     ])
   })
 
-  test("sun and tue and wednesday)", () => {
+  test("sun and tue and wednesday", () => {
     expect(findRepeatOptions("every sun and tue and wednesday")).toEqual([
       "weekdays",
-      ["sunday", "tuesday", "wednesday"],
+      ["sun", "tue", "wed"],
     ])
   })
 
-  test("sunday and friday and saturday)", () => {
+  test("sunday and friday and saturday", () => {
     expect(findRepeatOptions("every sunday and friday and saturday")).toEqual([
       "weekdays",
-      ["sunday", "friday", "saturday"],
+      ["sun", "fri", "sat"],
     ])
   })
 
