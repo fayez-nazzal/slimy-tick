@@ -133,6 +133,9 @@ export const userSlice = createSlice({
       const group = state.userData.groups[state.groupIndex]
       group.todos = [...group.todos, action.payload]
     },
+    setGroups: (state, action) => {
+      state.userData.groups = action.payload
+    },
   },
 })
 
@@ -147,6 +150,7 @@ export const {
   setDraftTodoDueDate,
   setDraftTodoDueTime,
   setDraftTodoRepeat,
+  setGroups,
 } = userSlice.actions
 
 export default userSlice.reducer

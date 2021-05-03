@@ -6,7 +6,7 @@ import PriorityHighIcon from "@material-ui/icons/PriorityHighSharp"
 import DateRangeIcon from "@material-ui/icons/DateRangeSharp"
 import UpdateIcon from "@material-ui/icons/UpdateSharp"
 import MenuItem from "@material-ui/core/MenuItem"
-import Menu from "./Menu"
+import Menu from "../general/Menu"
 
 const ActionsMenu = ({ onClose, anchorEl }) => {
   return (

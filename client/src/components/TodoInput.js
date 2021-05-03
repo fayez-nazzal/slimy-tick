@@ -14,8 +14,6 @@ import {
 } from "@material-ui/core/styles"
 import "draft-js/dist/Draft.css"
 import clsx from "clsx"
-import IconButton from "@material-ui/core/IconButton"
-import Select from "@material-ui/core/Select"
 import PriorityHighIcon from "@material-ui/icons/PriorityHighSharp"
 import DateRangeIcon from "@material-ui/icons/DateRangeSharp"
 import UpdateIcon from "@material-ui/icons/UpdateSharp"
@@ -28,53 +26,24 @@ import {
   setDraftTodoBody,
   setDraftTodoGroup,
   setDraftTodoPriority,
-  setDraftTodoRepeat,
 } from "../redux/user"
 import DraftStrategyComponent from "./DraftStrategyComponent"
 import {
   matchDueDate,
   matchDueTime,
   matchRepeat,
-  matchRemind,
   matchPriorityAndReturnRange,
 } from "../utils/matchers"
-import {
-  Button,
-  MenuItem,
-  Popover,
-  TextField,
-  ThemeProvider,
-  Typography,
-} from "@material-ui/core"
-import ListItemText from "@material-ui/core/ListItemText"
-import Menu from "./Menu"
 import BasicDateTimePicker from "./DateTimePicker"
-import { findRepeatOptions } from "../utils/regexAnalyzers"
-import ToggleButton from "@material-ui/lab/ToggleButton"
-import ToggleButtonGroup from "@material-ui/lab/ToggleButtonGroup"
+import ButtonGroupButton from "./general/ButtonGroupIconButton"
+import RepeatMenu from "./menus/RepeatMenu"
+import CustomRepeatPopover from "./menus/CustomRepeatPopover"
+import PriorityMenu from "./menus/PriorityMenu"
 
 const theme = createMuiTheme({
   palette: {
     primary: {
       main: "#80b640",
-    },
-  },
-})
-
-const popoverTheme = createMuiTheme({
-  palette: {
-    primary: {
-      main: "#bedc9b",
-    },
-  },
-  overrides: {
-    MuiPopover: {
-      paper: {
-        border: "1px solid #d3d4d5",
-        borderRadius: "4px",
-        transition: "none",
-        padding: "8px",
-      },
     },
   },
 })
@@ -109,24 +78,6 @@ const Input = () => {
   const [dueAnchorEl, setDueAnchorEl] = useState(false)
   const [repeatAnchorEl, setRepeatAnchorEl] = useState(false)
   const [customRepeatAnchorEl, setCustomRepeatAncorEl] = useState(false)
-  const [customRepeatOption, setCustomRepeatOption] = useState({
-    every: "days",
-    value: 2,
-  })
-  const [repeatWeekdays, setRepeatWeekdays] = useState([])
-
-  useEffect(() => {
-    if (draftTodoValues.repeat) {
-      const analyzedRepeat = findRepeatOptions(draftTodoValues.repeat)
-      setRepeatWeekdays(prev =>
-        analyzedRepeat[0] === "weekdays" ? analyzedRepeat[1] : prev
-      )
-      setCustomRepeatOption({
-        every: analyzedRepeat[0],
-        value: analyzedRepeat[1],
-      })
-    }
-  }, [draftTodoValues.repeat])
 
   const classes = useStyles({ focus })
   const [createTodo, { loading }] = useMutation(CREATE_TODO, {
@@ -201,12 +152,6 @@ const Input = () => {
         },
         {
           strategy: (contentBlock, callback, contentState) => {
-            matchForStrategy(contentBlock, callback, contentState, matchRemind)
-          },
-          component: props => <DraftStrategyComponent {...props} remind />,
-        },
-        {
-          strategy: (contentBlock, callback, contentState) => {
             matchForStrategy(contentBlock, callback, contentState, matchRepeat)
           },
           component: props => <DraftStrategyComponent {...props} repeat />,
@@ -276,38 +221,8 @@ const Input = () => {
     },
   }
 
-  const handleRepeatWeekdaysChange = (_, newWeekdays) => {
-    setCustomRepeatOption({
-      every: "weekdays",
-      value: newWeekdays,
-    })
-    setRepeatWeekdays(newWeekdays)
-  }
-
-  const handleCustomRepeatOptionChange = (e, changedValue) => {
-    setRepeatWeekdays([])
-    setCustomRepeatOption(prev => ({
-      every: changedValue === "every" ? e.target.value : prev.every,
-      value:
-        changedValue === "value" ? e.target.value : parseInt(prev.value) || 2,
-    }))
-  }
-
-  const handleRepeatPopoverClose = () => {
-    setCustomRepeatAncorEl(false)
-  }
-
-  const handleRepeatPopoverAccept = () => {
-    setCustomRepeatAncorEl(false)
-    repeatWeekdays.length &&
-      dispatch(setDraftTodoRepeat(`every ${repeatWeekdays.join(", ")}`))
-    customRepeatOption.every &&
-      parseInt(customRepeatOption.value) > 0 &&
-      dispatch(
-        setDraftTodoRepeat(
-          `every ${customRepeatOption.value} ${customRepeatOption.every}`
-        )
-      )
+  const showCustomRepeat = () => {
+    setCustomRepeatAncorEl(repeatAnchorEl)
   }
 
   return (
@@ -331,15 +246,15 @@ const Input = () => {
             handleReturn={() => "handled"}
           />
         </div>
-        <IconButton
+        <ButtonGroupButton
           size="small"
           className={classes.submitButton}
           onClick={createTodo}
         >
           <PlayArrowIcon color="primary" className={classes.playIcon} />
-        </IconButton>
+        </ButtonGroupButton>
         <div className={clsx([classes.rowFlex, classes.tools])}>
-          <IconButton
+          <ButtonGroupButton
             size="small"
             onClick={e => {
               setRepeatAnchorEl(e.currentTarget)
@@ -351,144 +266,17 @@ const Input = () => {
               className={draftTodoValues.repeat && classes.repeatSet}
               color="primary"
             />
-          </IconButton>
-          <Menu
+          </ButtonGroupButton>
+          <RepeatMenu
             anchorEl={repeatAnchorEl}
             onClose={() => setRepeatAnchorEl(false)}
-          >
-            <MenuItem onClick={() => dispatch(setDraftTodoRepeat("every day"))}>
-              <ListItemText primary="Every day" />
-            </MenuItem>
-            <MenuItem
-              onClick={() => dispatch(setDraftTodoRepeat("every week"))}
-            >
-              <ListItemText primary="Every week" />
-            </MenuItem>
-            <MenuItem
-              data-testid="menuitem-priority-medium"
-              onClick={() => dispatch(setDraftTodoRepeat("every month"))}
-            >
-              <ListItemText primary="Every month" />
-            </MenuItem>
-            <MenuItem onClick={() => setCustomRepeatAncorEl(repeatAnchorEl)}>
-              <ListItemText primary="Custom" />
-            </MenuItem>
-          </Menu>
-          <ThemeProvider theme={popoverTheme}>
-            <Popover
-              anchorEl={customRepeatAnchorEl}
-              onClose={handleRepeatPopoverClose}
-              open={!!customRepeatAnchorEl}
-              aria-haspopup="true"
-              aria-controls="custom-repeat-popup"
-              elevation={0}
-              getContentAnchorEl={null}
-              anchorOrigin={{
-                vertical: "bottom",
-                horizontal: "left",
-              }}
-              transformOrigin={{
-                vertical: "top",
-                horizontal: "left",
-              }}
-            >
-              <div aria-label="weekdays options">
-                <ToggleButtonGroup
-                  value={repeatWeekdays}
-                  onChange={handleRepeatWeekdaysChange}
-                  aria-label="repeat weekdays"
-                  size="small"
-                >
-                  <ToggleButton value="sun" aria-label="sunday">
-                    <Typography variant="caption">Sun</Typography>
-                  </ToggleButton>
-                  <ToggleButton value="mon" aria-label="monday">
-                    <Typography variant="caption">Mon</Typography>
-                  </ToggleButton>
-                  <ToggleButton value="tue" aria-label="tuesday">
-                    <Typography variant="caption">Tue</Typography>
-                  </ToggleButton>
-                  <ToggleButton value="wed" aria-label="wednesday">
-                    <Typography variant="caption">Wed</Typography>
-                  </ToggleButton>
-                  <ToggleButton value="thu" aria-label="thursday">
-                    <Typography variant="caption">Thu</Typography>
-                  </ToggleButton>
-                  <ToggleButton value="fri" aria-label="friday">
-                    <Typography variant="caption">Fri</Typography>
-                  </ToggleButton>
-                  <ToggleButton value="sat" aria-label="saturday">
-                    <Typography variant="caption">Sat</Typography>
-                  </ToggleButton>
-                </ToggleButtonGroup>
-              </div>
-              <div className={clsx([classes.rowFlex, classes.aroundCenter])}>
-                <Typography variant="body1">Every</Typography>
-                <TextField
-                  value={customRepeatOption.value}
-                  onChange={e => handleCustomRepeatOptionChange(e, "value")}
-                  type={
-                    ["times", "weekdays"].includes(customRepeatOption.every)
-                      ? "text"
-                      : "number"
-                  }
-                  disabled={["times", "weekdays"].includes(
-                    customRepeatOption.every
-                  )}
-                  className={classes.repeatNumInput}
-                />
-                <Select
-                  labelId="custom-repeat-option-select-label"
-                  id="custom-repeat-option-select"
-                  value={customRepeatOption.every}
-                  onChange={e => handleCustomRepeatOptionChange(e, "every")}
-                  className={classes.repeatEverySelect}
-                >
-                  <MenuItem value="minutes">Minutes</MenuItem>
-                  <MenuItem value="hours">Hours</MenuItem>
-                  <MenuItem value="days">Days</MenuItem>
-                  <MenuItem value="weeks">Weeks</MenuItem>
-                  <MenuItem value="months">Months</MenuItem>
-                  <MenuItem value="years">Years</MenuItem>
-                  <MenuItem value="mornings" className={classes.hidden}>
-                    Mornings
-                  </MenuItem>
-                  <MenuItem value="afternoons" className={classes.hidden}>
-                    Afternoons
-                  </MenuItem>
-                  <MenuItem value="evenings" className={classes.hidden}>
-                    Evenings
-                  </MenuItem>
-                  <MenuItem value="nights" className={classes.hidden}>
-                    Nights
-                  </MenuItem>
-                  <MenuItem value="times" className={classes.hidden}>
-                    Times
-                  </MenuItem>
-                  <MenuItem value="weekdays" className={classes.hidden}>
-                    Weekdays
-                  </MenuItem>
-                </Select>
-              </div>
-              <div className={clsx(classes.rowFlex, classes.aroundCenter)}>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleRepeatPopoverClose}
-                >
-                  CANCEL
-                </Button>
-                <Button
-                  variant="contained"
-                  color="primary"
-                  onClick={handleRepeatPopoverAccept}
-                >
-                  OK
-                </Button>
-              </div>
-            </Popover>
-          </ThemeProvider>
-          <IconButton
+            showCustomRepeat={showCustomRepeat}
+          />
+          <CustomRepeatPopover
+            anchorEl={customRepeatAnchorEl}
+            onClose={() => setCustomRepeatAncorEl(false)}
+          />
+          <ButtonGroupButton
             onClick={e => {
               setPriorityAnchorEl(e.currentTarget)
             }}
@@ -505,49 +293,12 @@ const Input = () => {
                 "priority-low": draftTodoValues.priority === 4,
               })}
             />
-          </IconButton>
-          <Menu
+          </ButtonGroupButton>
+          <PriorityMenu
             anchorEl={priorityAnchorEl}
             onClose={() => setPriorityAnchorEl(false)}
-          >
-            <MenuItem onClick={() => dispatch(setDraftTodoPriority(1))}>
-              <Typography
-                variant="h6"
-                component="subtitle1"
-                className="priority-veryhigh"
-              >
-                !!!{" "}
-              </Typography>
-              <ListItemText primary="Very high" />
-            </MenuItem>
-            <MenuItem onClick={() => dispatch(setDraftTodoPriority(2))}>
-              <Typography
-                variant="h6"
-                component="subtitle1"
-                className="priority-high"
-              >
-                !!{" "}
-              </Typography>
-              <ListItemText primary=" High" />
-            </MenuItem>
-            <MenuItem
-              data-testid="menuitem-priority-medium"
-              onClick={() => dispatch(setDraftTodoPriority(3))}
-            >
-              <Typography
-                variant="h6"
-                component="subtitle1"
-                className="priority-medium"
-              >
-                !{" "}
-              </Typography>
-              <ListItemText primary="Medium" />
-            </MenuItem>
-            <MenuItem onClick={() => dispatch(setDraftTodoPriority(4))}>
-              <ListItemText primary="Low" />
-            </MenuItem>
-          </Menu>
-          <IconButton
+          />
+          <ButtonGroupButton
             size="small"
             {...keepDraftEvents}
             onClick={handleDueClicked}
@@ -557,7 +308,7 @@ const Input = () => {
               color="primary"
               className={draftTodoValues.dueDate && classes.dueSet}
             />
-          </IconButton>
+          </ButtonGroupButton>
           <BasicDateTimePicker
             anchorEl={dueAnchorEl}
             onClose={() => setDueAnchorEl(false)}
@@ -639,16 +390,5 @@ const useStyles = makeStyles(theme => ({
   },
   repeatSet: {
     fill: "#afddbf",
-  },
-  repeatNumInput: {
-    width: "5.8rem",
-    marginLeft: "0.8rem",
-  },
-  repeatEverySelect: {
-    width: "6.8rem",
-    marginLeft: "0.8rem",
-  },
-  hidden: {
-    display: "none",
   },
 }))

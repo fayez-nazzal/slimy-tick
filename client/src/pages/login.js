@@ -32,7 +32,6 @@ const LoginPage = () => {
       navigate("/")
     },
     onError(err) {
-      console.log(JSON.stringify(err, null, 2))
       setErrors(err.graphQLErrors[0].extensions.errors)
     },
     variables: values,
@@ -61,6 +60,7 @@ const LoginPage = () => {
             margin="dense"
             inputProps={{ "aria-label": "email" }}
             fullWidth
+            autoComplete="on"
           />
           <ErrorTypography error={errors.email} />
           <TextField
@@ -76,6 +76,7 @@ const LoginPage = () => {
             margin="dense"
             inputProps={{ "aria-label": "password" }}
             fullWidth
+            autoComplete="off"
           />
           <ErrorTypography error={errors.password} />
           <Button

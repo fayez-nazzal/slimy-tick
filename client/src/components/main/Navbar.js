@@ -11,8 +11,8 @@ import {
 } from "@material-ui/core/styles"
 import useMediaQuery from "@material-ui/core/useMediaQuery"
 import Button from "@material-ui/core/Button"
-import ButtonGroup from "@material-ui/core/ButtonGroup"
 import AddIcon from "@material-ui/icons/Add"
+import ButtonGroupIconButton from "../general/ButtonGroupIconButton"
 
 const theme = createMuiTheme({
   palette: {
@@ -58,12 +58,13 @@ const NavBar = props => {
               <MenuIcon color="primary" className={classes.largeIcon} />
             </IconButton>
           </MuiThemeProvider>
-          <ButtonGroup fullWidth>
+          <div className={classes.fullFlex}>
             <Button
               className={clsx(classes.button, {
                 [classes.selectedButton]: props.filter === "ALL",
               })}
               onClick={() => props.setFilter("ALL")}
+              fullWidth
             >
               All
             </Button>
@@ -72,6 +73,7 @@ const NavBar = props => {
                 [classes.selectedButton]: props.filter === "TODAY",
               })}
               onClick={() => props.setFilter("TODAY")}
+              fullWidth
             >
               Today
             </Button>
@@ -80,6 +82,7 @@ const NavBar = props => {
                 [classes.selectedButton]: props.filter === "TOMORROW",
               })}
               onClick={() => props.setFilter("TOMORROW")}
+              fullWidth
             >
               Tomorrow
             </Button>
@@ -88,15 +91,16 @@ const NavBar = props => {
                 [classes.selectedButton]: props.filter === "NEXT 7 DAYS",
               })}
               onClick={() => props.setFilter("NEXT 7 DAYS")}
+              fullWidth
             >
               Next 7 days
             </Button>
             <MuiThemeProvider theme={iconsTheme}>
-              <IconButton>
+              <ButtonGroupIconButton>
                 <AddIcon color="primary" />
-              </IconButton>
+              </ButtonGroupIconButton>
             </MuiThemeProvider>
-          </ButtonGroup>
+          </div>
         </Toolbar>
       </AppBar>
     </MuiThemeProvider>
@@ -142,5 +146,10 @@ const useStyles = makeStyles(theme => ({
   },
   largeIcon: {
     transform: "scale(1.2)",
+  },
+  fullFlex: {
+    display: "flex",
+    justifyContent: "stretch",
+    width: "100%",
   },
 }))
