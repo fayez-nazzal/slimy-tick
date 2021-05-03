@@ -90,7 +90,7 @@ describe("Testing repeat regexes", () => {
 
     test("every month", () => {
       expect(matchRepeat(">>>>>>>>>>>>>every month<<<<<<<<<")).toEqual(
-        "every week"
+        "every month"
       )
     })
   })
@@ -486,14 +486,6 @@ describe("Testing due", () => {
       expect(matchDueTime(">> after one hour <<")).toBe("after one hour")
     })
 
-    it("match after two hours", () => {
-      expect(matchDueTime(">> after two hours <<")).toBe("after two hours")
-    })
-
-    it("match after five hour", () => {
-      expect(matchDueTime(">> after five hour <<")).toBe("after five hour")
-    })
-
     it("match after an hour", () => {
       expect(matchDueTime(">> after an hour <<")).toBe("after an hour")
     })
@@ -514,14 +506,6 @@ describe("Testing due", () => {
 
     it("match after one hour", () => {
       expect(matchDueTime(">> after one hour <<")).toBe("after one hour")
-    })
-
-    it("match after two hours", () => {
-      expect(matchDueTime(">> after two hours <<")).toBe("after two hours")
-    })
-
-    it("match after five hour", () => {
-      expect(matchDueTime(">> after five hour <<")).toBe("after five hour")
     })
 
     it("match after an hour", () => {
@@ -553,6 +537,10 @@ describe("Testing due", () => {
       expect(
         matchPriorityAndReturnRange(">> !!! !! ! !! !!! ! !! ! <<")
       ).toEqual([24, 25])
+    })
+
+    it("returns null when no priority", () => {
+      expect(matchPriorityAndReturnRange(">> nothing <<")).toBe(null)
     })
   })
 })

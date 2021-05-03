@@ -3,7 +3,7 @@ import {
   DUE_TIME_REGEXES,
   REPEAT_REGEXES,
   PRIORITY_REGEX,
-} from "../data/regex"
+} from "./regex"
 import moment from "moment"
 import { findDueDateOptions } from "./regexAnalyzers"
 export const matchRepeat = str => {
@@ -18,8 +18,7 @@ export const matchRepeat = str => {
 export const matchDueDate = str => {
   const match = matchRegexFromArray(str, DUE_DATE_REGEXES)
   const date = match && findDueDateOptions(match)
-  console.log("match", match)
-  console.log("date", date)
+
   return !match || !date || (date && date.isBefore(moment()))
     ? null
     : match.trim()
@@ -59,5 +58,5 @@ const matchRegexFromArray = (str, array) => {
     if (matches && matches.length) break
   }
 
-  return matches && matches.length ? matches[0] : null
+  return matches && matches.length ? matches[0].trim() : null
 }

@@ -261,7 +261,7 @@ describe("repeat options", () => {
       test("every evening afternoon", () => {
         expect(findRepeatOptions("every evening afternoon")).toEqual([
           "daytimes",
-          ["evening", "evening"],
+          ["evening", "afternoon"],
         ])
       })
 
@@ -299,6 +299,10 @@ describe("repeat options", () => {
       expect(findRepeatOptions("every tue")).toEqual(["weekdays", ["tue"]])
     })
 
+    test("every wedding !== every wednesday", () => {
+      expect(findRepeatOptions("every wedding")).toEqual([null, null])
+    })
+
     test("every wednesday", () => {
       expect(findRepeatOptions("every wednesday")).toEqual([
         "weekdays",
@@ -330,10 +334,7 @@ describe("repeat options", () => {
     })
 
     test("every saturday", () => {
-      expect(findRepeatOptions("every saturday")).toEqual([
-        "weekdays",
-        ["saturday"],
-      ])
+      expect(findRepeatOptions("every saturday")).toEqual(["weekdays", ["sat"]])
     })
 
     test("every sat", () => {
@@ -435,15 +436,24 @@ describe("due analyzers", () => {
 
     it("next sunday", () => {
       const now = moment()
-      let result = now.add(1, "days")
+      let expected = now.add(1, "days")
 
-      while (!result.format("dddd").toLocaleLowerCase() === "sunday") {
-        result.add(1, "days")
+      while (!expected.format("dddd").toLocaleLowerCase() === "sunday") {
+        expected.add(1, "days")
       }
 
-      expect(
-        findDueDateOptions("next sunday").isSame(result, "day")
-      ).toBeTruthy()
+      const actual = findDueDateOptions("next sunday")
+
+      console.log(actual.format("dddd"))
+      expect(actual.format("dddd").toLocaleLowerCase()).toBe("sunday")
+    })
+
+    it("wedding returns !== wednesday", () => {
+      expect(findDueDateOptions("wedding")).toBeFalsy()
+    })
+
+    it("next wedding returns !== wednesday", () => {
+      expect(findDueDateOptions("next wedding")).toBeFalsy()
     })
 
     it("next fri", () => {
@@ -454,14 +464,16 @@ describe("due analyzers", () => {
         result.add(1, "days")
       }
 
-      expect(findDueDateOptions("next fri").isSame(result, "day")).toBeTruthy()
+      expect(findDueDateOptions("next fri").format("dddd").toLowerCase()).toBe(
+        "friday"
+      )
     })
 
     it("next day", () => {
       const tomorrow = moment().add(1, "days")
 
       expect(
-        findDueDateOptions("next fri").isSame(tomorrow, "day")
+        findDueDateOptions("next day").isSame(tomorrow, "day")
       ).toBeTruthy()
     })
 
@@ -564,12 +576,24 @@ describe("due analyzers", () => {
       ).toBeTruthy()
     })
 
+    it("next morning", () => {
+      const repeatOpt = findDueTimeOptions("next morning")
+      expect(repeatOpt.format("HH")).toBe("08")
+    })
+
+    it("next afternoon", () => {
+      const repeatOpt = findDueTimeOptions("next afternoon")
+      expect(repeatOpt.format("HH")).toBe("13")
+    })
+
+    it("next evening", () => {
+      const repeatOpt = findDueTimeOptions("next evening")
+      expect(repeatOpt.format("HH")).toBe("18")
+    })
+
     it("next night", () => {
       const repeatOpt = findDueTimeOptions("next night")
-      expect(
-        repeatOpt.isSame(moment("21:00", "HH:mm"), "second") &&
-          repeatOpt.isSame(moment().add(1, "days"), "day")
-      ).toBeTruthy()
+      expect(repeatOpt.format("HH")).toBe("21")
     })
   })
 
