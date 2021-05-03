@@ -26,7 +26,7 @@ export const userSlice = createSlice({
   initialState: {
     userData: null,
     groupIndex: null,
-    draftTodoValues: {
+    drafttaskValues: {
       body: "",
       priority: 4,
       groupName: null,
@@ -48,90 +48,90 @@ export const userSlice = createSlice({
     setGroupIndex: (state, action) => {
       state.groupIndex = action.payload
     },
-    setDraftTodoBody: (state, action) => {
-      state.draftTodoValues.body = action.payload
+    setDrafttaskBody: (state, action) => {
+      state.drafttaskValues.body = action.payload
     },
-    setDraftTodoPriority: (state, action) => {
+    setDrafttaskPriority: (state, action) => {
       const newPriority = getPriorityStrEquivelent(action.payload)
 
       // if old priority regex text exist, replace it to the new priority
-      if (state.draftTodoValues.body) {
-        const todoPriorityRange = matchPriorityAndReturnRange(
-          state.draftTodoValues.body
+      if (state.drafttaskValues.body) {
+        const taskPriorityRange = matchPriorityAndReturnRange(
+          state.drafttaskValues.body
         )
 
-        state.draftTodoValues.body = replaceRange(
-          state.draftTodoValues.body,
-          todoPriorityRange[0],
-          todoPriorityRange[1],
+        state.drafttaskValues.body = replaceRange(
+          state.drafttaskValues.body,
+          taskPriorityRange[0],
+          taskPriorityRange[1],
           newPriority
         )
       }
 
-      state.draftTodoValues.priority = action.payload
+      state.drafttaskValues.priority = action.payload
     },
-    setDraftTodoGroup: (state, action) => {
-      state.draftTodoValues.groupName = action.payload.name
+    setDrafttaskGroup: (state, action) => {
+      state.drafttaskValues.groupName = action.payload.name
     },
-    setDraftTodoDueDate: (state, action) => {
-      const todoBody = state.draftTodoValues.body
-      const todoDueDate = state.draftTodoValues.dueDate
+    setDrafttaskDueDate: (state, action) => {
+      const taskBody = state.drafttaskValues.body
+      const taskDueDate = state.drafttaskValues.dueDate
 
       if (
-        !todoBody.includes(action.payload) &&
+        !taskBody.includes(action.payload) &&
         !findDueDateOptions(action.payload).isSame(
-          findDueDateOptions(todoDueDate),
+          findDueDateOptions(taskDueDate),
           "day"
         )
       )
-        state.draftTodoValues.body =
-          todoBody && todoDueDate
-            ? todoBody.replace(todoDueDate, action.payload)
-            : todoBody
+        state.drafttaskValues.body =
+          taskBody && taskDueDate
+            ? taskBody.replace(taskDueDate, action.payload)
+            : taskBody
 
-      state.draftTodoValues.dueDate = action.payload
+      state.drafttaskValues.dueDate = action.payload
     },
-    setDraftTodoDueTime: (state, action) => {
-      const todoBody = state.draftTodoValues.body
-      const todoDueTime = state.draftTodoValues.dueTime
+    setDrafttaskDueTime: (state, action) => {
+      const taskBody = state.drafttaskValues.body
+      const taskDueTime = state.drafttaskValues.dueTime
 
       if (
-        todoDueTime &&
-        todoBody &&
-        !todoBody.includes(action.payload) &&
+        taskDueTime &&
+        taskBody &&
+        !taskBody.includes(action.payload) &&
         !findDueTimeOptions(action.payload).isSame(
-          findDueTimeOptions(todoDueTime),
+          findDueTimeOptions(taskDueTime),
           "hour"
         )
       )
-        state.draftTodoValues.body = todoBody.replace(
-          todoDueTime,
+        state.drafttaskValues.body = taskBody.replace(
+          taskDueTime,
           action.payload
         )
 
-      state.draftTodoValues.dueTime = action.payload
+      state.drafttaskValues.dueTime = action.payload
     },
-    setDraftTodoRepeat: (state, action) => {
-      const todoBody = state.draftTodoValues.body
-      const oldRepeat = state.draftTodoValues.repeat
+    setDrafttaskRepeat: (state, action) => {
+      const taskBody = state.drafttaskValues.body
+      const oldRepeat = state.drafttaskValues.repeat
       const analyzedOldRepeat = findRepeatOptions(oldRepeat)
       const newRepeat =
         action.payload && action.payload[0] ? action.payload : ""
       const analyzedNewRepeat = findRepeatOptions(newRepeat)
 
       if (
-        todoBody &&
+        taskBody &&
         oldRepeat &&
-        !todoBody.includes(newRepeat) &&
+        !taskBody.includes(newRepeat) &&
         !isEqual(analyzedOldRepeat, analyzedNewRepeat)
       )
-        state.draftTodoValues.body = todoBody.replace(oldRepeat, newRepeat)
+        state.drafttaskValues.body = taskBody.replace(oldRepeat, newRepeat)
 
-      state.draftTodoValues.repeat = newRepeat
+      state.drafttaskValues.repeat = newRepeat
     },
-    addTodo: (state, action) => {
+    addtask: (state, action) => {
       const group = state.userData.groups[state.groupIndex]
-      group.todos = [...group.todos, action.payload]
+      group.tasks = [...group.tasks, action.payload]
     },
     setGroups: (state, action) => {
       state.userData.groups = action.payload
@@ -142,14 +142,14 @@ export const userSlice = createSlice({
 export const {
   login,
   logout,
-  addTodo,
+  addtask,
   setGroupIndex,
-  setDraftTodoBody,
-  setDraftTodoPriority,
-  setDraftTodoGroup,
-  setDraftTodoDueDate,
-  setDraftTodoDueTime,
-  setDraftTodoRepeat,
+  setDrafttaskBody,
+  setDrafttaskPriority,
+  setDrafttaskGroup,
+  setDrafttaskDueDate,
+  setDrafttaskDueTime,
+  setDrafttaskRepeat,
   setGroups,
 } = userSlice.actions
 

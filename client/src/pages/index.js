@@ -9,7 +9,7 @@ import Sidebar from "../components/main/Sidebar"
 import TaskList from "../components/main/TaskList"
 import clsx from "clsx"
 import PriorityTabs from "../components/PriorityTabs"
-import TodoInput from "../components/TodoInput"
+import TaskInput from "../components/taskInput"
 import {
   createMuiTheme,
   makeStyles,
@@ -70,7 +70,7 @@ const Index = ({ data }) => {
         })}
       >
         <div className={classes.padded}>
-          <TodoInput />
+          <TaskInput />
           <TaskList />
         </div>
         <PriorityTabs />

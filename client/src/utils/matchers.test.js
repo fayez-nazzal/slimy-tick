@@ -93,6 +93,10 @@ describe("Testing repeat regexes", () => {
         "every month"
       )
     })
+
+    test("every wedding", () => {
+      expect(matchRepeat(">>>>>>>>>>>>>every wedding<<<<<<<<<")).toBe(null)
+    })
   })
 
   describe("months", () => {
@@ -358,6 +362,10 @@ describe("Testing due", () => {
       expect(matchDueDate("next sunday")).toBe("next sunday")
     })
 
+    it("doesn't match next wedding", () => {
+      expect(matchDueDate("next wedding")).toBe(null)
+    })
+
     it("match next fri", () => {
       expect(matchDueDate("next fri")).toBe("next fri")
     })
@@ -432,6 +440,10 @@ describe("Testing due", () => {
 
     it("match on night", () => {
       expect(matchDueTime("on night")).toBe("on night")
+    })
+
+    it("doesn't match on nightblablab;a", () => {
+      expect(matchDueTime("on nightblablab")).toBe(null)
     })
 
     it("match next night", () => {

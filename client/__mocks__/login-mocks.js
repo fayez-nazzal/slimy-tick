@@ -54,7 +54,7 @@ const mocks = [
           groups: [
             {
               name: "group 1",
-              todos: [],
+              tasks: [],
             },
           ],
         },

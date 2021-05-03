@@ -70,7 +70,7 @@ module.exports = {
         throw new UserInputError("Errors", { errors });
       }
 
-      // TODO Make sure user doesn't already exist
+      // task Make sure user doesn't already exist
 
       const user = await User.findOne({ email });
       if (user) {
@@ -81,7 +81,7 @@ module.exports = {
         });
       }
 
-      // TODO hash pasword and create an authentication token
+      // task hash pasword and create an authentication token
       const hashedPassword = await bcrypt.hash(password, 12);
 
       const newUser = new User({

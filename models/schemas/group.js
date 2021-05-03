@@ -1,5 +1,5 @@
-const { Schema } = require('mongoose');
-const todoSchema = require('./todo');
+const { Schema } = require("mongoose");
+const taskSchema = require("./task");
 
 const groupSchema = new Schema({
   name: {
@@ -7,7 +7,7 @@ const groupSchema = new Schema({
     required: true,
   },
   created: String,
-  todos: [todoSchema],
+  tasks: [taskSchema],
 });
 
 module.exports = groupSchema;

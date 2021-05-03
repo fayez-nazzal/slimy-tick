@@ -8,7 +8,7 @@ export const QUERY_USER_INFO = gql`
       groups {
         name
         created
-        todos {
+        tasks {
           body
           created
         }
@@ -17,23 +17,23 @@ export const QUERY_USER_INFO = gql`
   }
 `
 
-export const QUERY_TODOS_IN_GROUP = gql`
+export const QUERY_taskS_IN_GROUP = gql`
   query {
-    todos(groupName: "group 1") {
+    tasks(groupName: "group 1") {
       body
     }
   }
 `
 
-export const CREATE_TODO = gql`
-  mutation createTodo(
+export const CREATE_task = gql`
+  mutation createtask(
     $groupName: String!
     $body: String!
     $priority: Int!
     $dueDate: String
     $dueTime: String
   ) {
-    createTodo(
+    createtask(
       groupName: $groupName
       body: $body
       priority: $priority
@@ -71,7 +71,7 @@ export const REGISTER_USER = gql`
       groups {
         id
         name
-        todos {
+        tasks {
           body
           priority
         }
@@ -89,7 +89,7 @@ export const LOGIN_USER = gql`
       groups {
         id
         name
-        todos {
+        tasks {
           id
           body
           priority

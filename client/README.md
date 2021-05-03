@@ -1,6 +1,6 @@
 # Slimy Tick
 
-A modern Todo App for everyone
+A modern task App for everyone
 
 # Attributions
 

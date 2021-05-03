@@ -1,5 +1,5 @@
 import React from "react"
-import { setDraftTodoRepeat } from "../../redux/user"
+import { setDrafttaskRepeat } from "../../redux/user"
 import { MenuItem } from "@material-ui/core"
 import ListItemText from "@material-ui/core/ListItemText"
 import Menu from "../general/Menu"
@@ -10,15 +10,15 @@ const RepeatMenu = ({ anchorEl, onClose, showCustomRepeat }) => {
 
   return (
     <Menu anchorEl={anchorEl} onClose={onClose}>
-      <MenuItem onClick={() => dispatch(setDraftTodoRepeat("every day"))}>
+      <MenuItem onClick={() => dispatch(setDrafttaskRepeat("every day"))}>
         <ListItemText primary="Every day" />
       </MenuItem>
-      <MenuItem onClick={() => dispatch(setDraftTodoRepeat("every week"))}>
+      <MenuItem onClick={() => dispatch(setDrafttaskRepeat("every week"))}>
         <ListItemText primary="Every week" />
       </MenuItem>
       <MenuItem
         data-testid="menuitem-priority-medium"
-        onClick={() => dispatch(setDraftTodoRepeat("every month"))}
+        onClick={() => dispatch(setDrafttaskRepeat("every month"))}
       >
         <ListItemText primary="Every month" />
       </MenuItem>

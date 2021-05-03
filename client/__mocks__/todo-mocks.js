@@ -1,12 +1,12 @@
-import { CREATE_TODO } from "../src/apollo/queries"
+import { CREATE_task } from "../src/apollo/queries"
 import { UserInputError } from "apollo-server-core"
 
 const mocks = [
   {
     request: {
-      query: CREATE_TODO,
+      query: CREATE_task,
       variables: {
-        body: "sample todo",
+        body: "sample task",
         groupName: "group 1",
         priority: 2,
         dueDate: "22-12-2029",
@@ -15,8 +15,8 @@ const mocks = [
     },
     result: {
       data: {
-        createTodo: {
-          body: "sample todo",
+        createtask: {
+          body: "sample task",
           groupName: "group 1",
           priority: 2,
           dueDate: "22-12-2029",

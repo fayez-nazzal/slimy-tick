@@ -1,5 +1,5 @@
 import React from "react"
 import { storiesOf } from "@storybook/react"
-import TodoInput from "../../src/components/TodoInput"
+import taskInput from "../../src/components/taskInput"
 
-storiesOf("TODO Input", module).add("default", () => <TodoInput />)
+storiesOf("task Input", module).add("default", () => <taskInput />)

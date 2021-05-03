@@ -15,19 +15,19 @@ const TaskList = props => {
   )
   const dispatch = useDispatch()
 
-  const onTodoChange = (todoId, newBody) => {
-    const todoIndex = group.todos.findIndex(todo => todo.id === todoId)
-    let todo = group.todos[todoIndex]
-    todo = {
-      ...todo,
+  const ontaskChange = (taskId, newBody) => {
+    const taskIndex = group.tasks.findIndex(task => task.id === taskId)
+    let task = group.tasks[taskIndex]
+    task = {
+      ...task,
       body: newBody,
     }
     const newGroups = [...groups]
-    const newTodos = [...newGroups[groupIndex].todos]
-    newTodos[todoIndex] = todo
+    const newtasks = [...newGroups[groupIndex].tasks]
+    newtasks[taskIndex] = task
     newGroups[groupIndex] = {
       ...newGroups[groupIndex],
-      todos: [...newTodos],
+      tasks: [...newtasks],
     }
     dispatch(setGroups(newGroups))
   }
@@ -35,8 +35,8 @@ const TaskList = props => {
   return (
     <List className={classes.root}>
       {group &&
-        group.todos.map(todo => (
-          <Task key={todo.id} {...todo} onChange={onTodoChange} />
+        group.tasks.map(task => (
+          <Task key={task.id} {...task} onChange={ontaskChange} />
         ))}
     </List>
   )

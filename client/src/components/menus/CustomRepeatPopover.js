@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core"
 import { ToggleButtonGroup, ToggleButton } from "@material-ui/lab"
 import clsx from "clsx"
-import { setDraftTodoRepeat } from "../../redux/user"
+import { setDrafttaskRepeat } from "../../redux/user"
 import { useState, useEffect } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import {
@@ -44,12 +44,12 @@ const CustomRepeatPopover = ({ anchorEl, onClose }) => {
     value: 2,
   })
   const [weekdays, setWeekdays] = useState([])
-  const draftTodoValues = useSelector(state => state.user.draftTodoValues)
+  const drafttaskValues = useSelector(state => state.user.drafttaskValues)
   const dispatch = useDispatch()
 
   useEffect(() => {
-    if (draftTodoValues.repeat) {
-      const analyzedRepeat = findRepeatOptions(draftTodoValues.repeat)
+    if (drafttaskValues.repeat) {
+      const analyzedRepeat = findRepeatOptions(drafttaskValues.repeat)
       setWeekdays(prev =>
         analyzedRepeat[0] === "weekdays" ? analyzedRepeat[1] : prev
       )
@@ -58,7 +58,7 @@ const CustomRepeatPopover = ({ anchorEl, onClose }) => {
         value: analyzedRepeat[1],
       })
     }
-  }, [draftTodoValues.repeat])
+  }, [drafttaskValues.repeat])
 
   const onWeekdaysChange = (_, newWeekdays) => {
     setStepOption({
@@ -84,11 +84,11 @@ const CustomRepeatPopover = ({ anchorEl, onClose }) => {
   const handleRepeatPopoverAccept = () => {
     onClose()
     weekdays.length &&
-      dispatch(setDraftTodoRepeat(`every ${weekdays.join(", ")}`))
+      dispatch(setDrafttaskRepeat(`every ${weekdays.join(", ")}`))
     stepOption.every &&
       parseInt(stepOption.value) > 0 &&
       dispatch(
-        setDraftTodoRepeat(`every ${stepOption.value} ${stepOption.every}`)
+        setDrafttaskRepeat(`every ${stepOption.value} ${stepOption.every}`)
       )
   }
 

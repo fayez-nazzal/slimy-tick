@@ -1,6 +1,6 @@
-const repeatWeekDaysRegex = /every (((sun(day)?)|(\bmon\b)|(monday)|(tue(sday)?)|(wed(nesday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))( ?(and|,| ) ?)?)+/i
+const repeatWeekDaysRegex = /every (((sun(day)?)|(\bmon\b)|(monday)|(tue(sday)?)|(wed(nesday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))(?!\w)( ?(and|,| ) ?)?)+/i
 const repeatTimeRegex = /every (((([1-9]|1[1-2]|0[1-9]|10):[0-5][0-9] ?(AM|PM))|(([0-2][1-3]|1[0-9]|0[0-9]|[0-9]):[0-5][0-9]))( ?(and|,| ) ?)?)+/i
-const repeatDayTimeRegex = /every ?((morning|evening|night|afternoon)( ?and ?)?)+/i
+const repeatDayTimeRegex = /every ?((morning|evening|night|afternoon)(?!\w)( ?and ?)?)+/i
 const repeatOneTimeQuanityRegex = /every( (1|one))? ?(hour|day|week|month|year)(?!s)/i
 const repeatTimeQuanityRegex = /every ?(\d* ?minutes?|\d* ?hours?|\d* ?days?|\d* weeks?|\d* ?months?|\d* ?years?|\d* ?mornings?|\d* ?afternoons?|\d* ?evenings??|\d* ?nights?)/i
 
@@ -14,10 +14,10 @@ const dueDateFormat5Regex = /(on|before|after|due)? ?((\d{1,2})([\/\\\-])(\d{1,2
 const dueDateAfterRegex = /after ?((a|1|one)? ?(day|week|month|year)|\d+ ?(days?|weeks?|months?|years?))/i
 const dueDateTomorrowRegex = /((due)? ?tomorrow)/i
 const dueDateNextTimeRegex = /(next ?(day|week|month|year))/i
-const dueDateWeekdaysRegex = /(on|before|after|due||next)? ?((sun(day)?)|(\bmon\b)|(monday)|(tue(sday)?)|(wed(nesday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))/i
+const dueDateWeekdaysRegex = /(on|before|after|due||next)? ?((sun(day)?)|(\bmon\b)|(monday)|(tue(sday)?)|(wed(nesday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))(?!\w)/i
 
 const dueTimeRegex = /(on|at|before|due|next)? ?((([1-9]|1[1-2]|0[1-9]|10):[0-5][0-9] ?(AM|PM))|(([0-2][1-3]|1[0-9]|0[0-9]|[0-9]):[0-5][0-9]))/i
-const dueDayTimeRegex = /(on|before|due||next)? ?(morning|afternoon|evening|night)/
+const dueDayTimeRegex = /(on|before|due||next)? ?(morning|afternoon|evening|night)(?!\w)/
 const dueTimeAfterRegex = /after ?((an?|1|one)? ?(minute|hour)|\d+ ?(minutes?|hours?))/i
 
 // for this regex to work, it relies on a specefic priority matcher

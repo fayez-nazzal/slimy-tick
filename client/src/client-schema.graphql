@@ -1,4 +1,4 @@
-type Todo {
+type task {
   body: String!
   created: String!
   remind: String
@@ -10,7 +10,7 @@ type Todo {
 
 type Group {
   name: String!
-  todos: [Todo]!
+  tasks: [task]!
   created: String!
 }
 
@@ -29,7 +29,7 @@ type Query {
 }
 
 type Mutation {
-  createTodo(
+  createtask(
     groupName: String!
     body: String!
     priority: Int!
@@ -37,7 +37,7 @@ type Mutation {
     repeat: String
     dueDate: String
     dueTime: String
-  ): Todo!
+  ): task!
   createGroup(name: String!): Group!
   register(email: String!, password: String!, confirmPassword: String!): User!
   login(email: String!, password: String!): User!

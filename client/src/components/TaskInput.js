@@ -18,14 +18,14 @@ import PriorityHighIcon from "@material-ui/icons/PriorityHighSharp"
 import DateRangeIcon from "@material-ui/icons/DateRangeSharp"
 import UpdateIcon from "@material-ui/icons/UpdateSharp"
 import PlayArrowIcon from "@material-ui/icons/PlayArrowSharp"
-import { CREATE_TODO } from "../apollo/queries"
+import { CREATE_task } from "../apollo/queries"
 import { useMutation } from "@apollo/client"
 import { useDispatch, useSelector } from "react-redux"
 import {
-  addTodo,
-  setDraftTodoBody,
-  setDraftTodoGroup,
-  setDraftTodoPriority,
+  addtask,
+  setDrafttaskBody,
+  setDrafttaskGroup,
+  setDrafttaskPriority,
 } from "../redux/user"
 import DraftStrategyComponent from "./DraftStrategyComponent"
 import {
@@ -50,12 +50,12 @@ const theme = createMuiTheme({
 
 let disableEditorBlur = false
 
-const Input = () => {
+const TaskInput = () => {
   const dispatch = useDispatch()
-  const draftTodoValues = useSelector(state => state.user.draftTodoValues)
+  const drafttaskValues = useSelector(state => state.user.drafttaskValues)
 
   useEffect(() => {
-    resetDraftTodo()
+    resetDrafttask()
   }, [])
 
   useEffect(() => {
@@ -63,10 +63,10 @@ const Input = () => {
       .getCurrentContent()
       .getPlainText("\u0001")
 
-    if (draftTodoValues.body !== currentDraftText) {
-      setDraftBodyText(draftTodoValues.body)
+    if (drafttaskValues.body !== currentDraftText) {
+      setDraftBodyText(drafttaskValues.body)
     }
-  }, [draftTodoValues.body])
+  }, [drafttaskValues.body])
 
   const currentGroup = useSelector(
     state => state.user.userData.groups[state.user.groupIndex]
@@ -80,23 +80,23 @@ const Input = () => {
   const [customRepeatAnchorEl, setCustomRepeatAncorEl] = useState(false)
 
   const classes = useStyles({ focus })
-  const [createTodo, { loading }] = useMutation(CREATE_TODO, {
-    update(proxy, { data: { createTodo: newTodo } }) {
-      dispatch(addTodo(newTodo))
+  const [createtask, { loading }] = useMutation(CREATE_task, {
+    update(proxy, { data: { createtask: newtask } }) {
+      dispatch(addtask(newtask))
       clearEditor()
-      resetDraftTodo()
+      resetDrafttask()
     },
     onError(err) {
       console.log(JSON.stringify(err, null, 2))
     },
-    variables: draftTodoValues,
+    variables: drafttaskValues,
   })
 
-  // sets todo with empty body, low priority and current group the user at (from sidebar)
-  const resetDraftTodo = () => {
-    dispatch(setDraftTodoBody(""))
-    dispatch(setDraftTodoGroup(currentGroup))
-    dispatch(setDraftTodoPriority(4))
+  // sets task with empty body, low priority and current group the user at (from sidebar)
+  const resetDrafttask = () => {
+    dispatch(setDrafttaskBody(""))
+    dispatch(setDrafttaskGroup(currentGroup))
+    dispatch(setDrafttaskPriority(4))
   }
 
   const setDraftBodyText = newText => {
@@ -109,7 +109,7 @@ const Input = () => {
     const block = contentState.getBlockForKey(selection.getAnchorKey())
 
     // this is not the best way to replace
-    // but i think it wont impact performance, most todos text is short
+    // but i think it wont impact performance, most tasks text is short
     const replaced = Modifier.replaceText(
       contentState,
       new SelectionState({
@@ -197,8 +197,8 @@ const Input = () => {
     setEditorState(state)
     const newContent = state.getCurrentContent().getPlainText("\u0001")
 
-    newContent !== draftTodoValues.body &&
-      dispatch(setDraftTodoBody(newContent))
+    newContent !== drafttaskValues.body &&
+      dispatch(setDrafttaskBody(newContent))
   }
 
   const disableEditorBlurTemporarily = () => {
@@ -231,7 +231,7 @@ const Input = () => {
         <div className={clsx([classes.editorContainer])}>
           <Editor
             placeholder={"Type your task here \u2713"}
-            ariaLabel="todo input"
+            ariaLabel="task input"
             ref={editorRef}
             editorState={editorState}
             onChange={onDraftChange}
@@ -249,7 +249,7 @@ const Input = () => {
         <ButtonGroupButton
           size="small"
           className={classes.submitButton}
-          onClick={createTodo}
+          onClick={createtask}
         >
           <PlayArrowIcon color="primary" className={classes.playIcon} />
         </ButtonGroupButton>
@@ -263,7 +263,7 @@ const Input = () => {
             {...keepDraftEvents}
           >
             <UpdateIcon
-              className={draftTodoValues.repeat && classes.repeatSet}
+              className={drafttaskValues.repeat && classes.repeatSet}
               color="primary"
             />
           </ButtonGroupButton>
@@ -287,10 +287,10 @@ const Input = () => {
             <PriorityHighIcon
               color="primary"
               className={clsx({
-                "priority-veryhigh": draftTodoValues.priority === 1,
-                "priority-high": draftTodoValues.priority === 2,
-                "priority-medium": draftTodoValues.priority === 3,
-                "priority-low": draftTodoValues.priority === 4,
+                "priority-veryhigh": drafttaskValues.priority === 1,
+                "priority-high": drafttaskValues.priority === 2,
+                "priority-medium": drafttaskValues.priority === 3,
+                "priority-low": drafttaskValues.priority === 4,
               })}
             />
           </ButtonGroupButton>
@@ -306,7 +306,7 @@ const Input = () => {
           >
             <DateRangeIcon
               color="primary"
-              className={draftTodoValues.dueDate && classes.dueSet}
+              className={drafttaskValues.dueDate && classes.dueSet}
             />
           </ButtonGroupButton>
           <BasicDateTimePicker
@@ -319,7 +319,7 @@ const Input = () => {
   )
 }
 
-export default Input
+export default TaskInput
 
 const useStyles = makeStyles(theme => ({
   root: {

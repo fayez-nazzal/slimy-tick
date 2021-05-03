@@ -9,10 +9,10 @@ import {
 } from "@testing-library/react"
 import WrapRootElement from "../wrap-root-element"
 import { MockedProvider } from "@apollo/client/testing"
-import todoMocks from "../../__mocks__/todo-mocks"
+import taskMocks from "../../__mocks__/task-mocks"
 import loginMocks from "../../__mocks__/login-mocks"
 import renderer from "react-test-renderer"
-import TodoInput from "./TodoInput"
+import taskInput from "./taskInput"
 import { useDispatch } from "react-redux"
 import { useLayoutEffect } from "react"
 import { LOGIN_USER } from "../apollo/queries"
@@ -46,7 +46,7 @@ const WithUser = ({ children }) => {
         "loading"
       ) : (
         <>
-          <TodoInput />
+          <taskInput />
           <DateTimePicker />
         </>
       )}
@@ -54,15 +54,15 @@ const WithUser = ({ children }) => {
   )
 }
 
-describe("Todo Input element", () => {
-  let todoInput
+describe("task Input element", () => {
+  let taskInput
   let draftInput
 
   const component = (
     <WrapRootElement
       element={
         <MockedProvider
-          mocks={[...todoMocks, ...loginMocks]}
+          mocks={[...taskMocks, ...loginMocks]}
           addTypename={false}
         >
           <WithUser />
@@ -72,12 +72,12 @@ describe("Todo Input element", () => {
   )
 
   beforeEach(async () => {
-    todoInput = render(component)
-    const loadingText = await waitFor(() => todoInput.getByText("loading"))
+    taskInput = render(component)
+    const loadingText = await waitFor(() => taskInput.getByText("loading"))
 
     expect(loadingText).toBeInTheDocument()
 
-    draftInput = await waitFor(() => todoInput.getByLabelText("todo input"))
+    draftInput = await waitFor(() => taskInput.getByLabelText("task input"))
   })
 
   afterEach(() => {
@@ -212,12 +212,12 @@ describe("Todo Input element", () => {
       expect(dueDate).toBeTruthy()
     })
 
-    const dueButton = todoInput.getByTestId("due-button")
+    const dueButton = taskInput.getByTestId("due-button")
 
     fireEvent.click(dueButton)
 
     await waitFor(() => {
-      const rightArrowButton = todoInput.getByTestId(
+      const rightArrowButton = taskInput.getByTestId(
         "datetimepicker-rightarrow"
       )
 
@@ -225,13 +225,13 @@ describe("Todo Input element", () => {
     })
 
     await waitFor(() => {
-      const day2thOfNextMonth = todoInput.getByTestId("day-20")
+      const day2thOfNextMonth = taskInput.getByTestId("day-20")
 
       fireEvent.click(day2thOfNextMonth)
     })
 
     await waitFor(() => {
-      const okButton = todoInput.getByText(/ok/i)
+      const okButton = taskInput.getByText(/ok/i)
 
       fireEvent.click(okButton)
     })
@@ -262,12 +262,12 @@ describe("Todo Input element", () => {
       expect(mediumPrioritySpan).toBeFalsy()
     })
 
-    const priorityButton = todoInput.getByTestId("priority-button")
+    const priorityButton = taskInput.getByTestId("priority-button")
 
     fireEvent.click(priorityButton)
 
     await waitFor(() => {
-      const priorityMediumMenuItem = todoInput.getByTestId(
+      const priorityMediumMenuItem = taskInput.getByTestId(
         "menuitem-priority-medium"
       )
 

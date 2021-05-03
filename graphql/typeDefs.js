@@ -1,7 +1,7 @@
 const { gql } = require("apollo-server");
 
 module.exports = gql`
-  type Todo {
+  type task {
     id: String!
     body: String!
     checked: Boolean!
@@ -16,7 +16,7 @@ module.exports = gql`
   type Group {
     id: String!
     name: String!
-    todos: [Todo]!
+    tasks: [task]!
     created: String!
   }
 
@@ -31,12 +31,12 @@ module.exports = gql`
 
   type Query {
     userInfo: User!
-    todos(groupName: String!): [Todo]!
+    tasks(groupName: String!): [task]!
     group(id: ID!): Group!
   }
 
   type Mutation {
-    createTodo(
+    createtask(
       groupName: String!
       body: String!
       priority: Int!
@@ -44,11 +44,11 @@ module.exports = gql`
       repeat: String
       dueDate: String
       dueTime: String
-    ): Todo!
+    ): task!
     createGroup(name: String!): Group!
-    editTodo(
+    edittask(
       groupId: String!
-      todoId: String!
+      taskId: String!
       checked: Boolean
       body: String
       priority: Int
@@ -56,7 +56,7 @@ module.exports = gql`
       repeat: [String]
       dueDate: String
       dueTime: String
-    ): Todo!
+    ): task!
     register(email: String!, password: String!, confirmPassword: String!): User!
     login(email: String!, password: String!): User!
   }

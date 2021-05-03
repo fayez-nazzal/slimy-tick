@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState } from "react"
 import { DateTimePicker } from "@material-ui/pickers"
 import { useDispatch, useSelector } from "react-redux"
-import { setDraftTodoDueDate, setDraftTodoDueTime } from "../redux/user"
+import { setDrafttaskDueDate, setDrafttaskDueTime } from "../redux/user"
 import {
   createMuiTheme,
   makeStyles,
@@ -55,14 +55,14 @@ const repeatArrToDays = repeatArr => {
 const BasicDateTimePicker = props => {
   const dispatch = useDispatch()
   const classes = useStyles()
-  const todoRepeat = useSelector(state => state.user.draftTodoValues.repeat)
-  const todoDueDate = useSelector(state => state.user.draftTodoValues.dueDate)
-  const todoDueTime = useSelector(state => state.user.draftTodoValues.dueTime)
+  const taskRepeat = useSelector(state => state.user.drafttaskValues.repeat)
+  const taskDueDate = useSelector(state => state.user.drafttaskValues.dueDate)
+  const taskDueTime = useSelector(state => state.user.drafttaskValues.dueTime)
   const [selectedDate, setSelectedDate] = useState()
   const recurDates = useRef([])
 
   useEffect(() => {
-    const analyzedRepeat = findRepeatOptions(todoRepeat)
+    const analyzedRepeat = findRepeatOptions(taskRepeat)
 
     const normalizedRepeat = repeatArrToDays(analyzedRepeat)
     !selectedDate && setSelectedDate(getDate())
@@ -84,13 +84,13 @@ const BasicDateTimePicker = props => {
         recurDates.current.push(currClone.clone())
       }
     }
-  }, [todoRepeat, selectedDate])
+  }, [taskRepeat, selectedDate])
 
   const handleOkButton = () => {
     const dateString = selectedDate.format("MMM DD, YYYY")
     const timeString = selectedDate.format("hh:mm a")
-    dispatch(setDraftTodoDueDate(dateString))
-    dispatch(setDraftTodoDueTime(timeString))
+    dispatch(setDrafttaskDueDate(dateString))
+    dispatch(setDrafttaskDueTime(timeString))
     props.onClose()
   }
 
@@ -103,17 +103,17 @@ const BasicDateTimePicker = props => {
   }
 
   const getDate = () => {
-    const todoMomentDate = findDueDateOptions(todoDueDate) || moment()
-    const todoMomentTime = findDueTimeOptions(todoDueTime) || moment()
+    const taskMomentDate = findDueDateOptions(taskDueDate) || moment()
+    const taskMomentTime = findDueTimeOptions(taskDueTime) || moment()
 
-    return todoMomentDate.set({
-      hour: todoMomentTime.get("hour"),
-      minute: todoMomentTime.get("minute"),
+    return taskMomentDate.set({
+      hour: taskMomentTime.get("hour"),
+      minute: taskMomentTime.get("minute"),
     })
   }
 
   const renderDay = (day, selectedDate, _, DayComponent) => {
-    const analyzedRepeat = findRepeatOptions(todoRepeat)
+    const analyzedRepeat = findRepeatOptions(taskRepeat)
     const normalizedRepeat = repeatArrToDays(analyzedRepeat)
 
     const repeatToDays = selectedDate && timeToDays(normalizedRepeat)

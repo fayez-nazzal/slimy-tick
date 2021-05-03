@@ -3,10 +3,10 @@ import { makeStyles } from "@material-ui/core/styles"
 import clsx from "clsx"
 import { createMuiTheme } from "@material-ui/core/styles"
 import {
-  setDraftTodoDueDate,
-  setDraftTodoDueTime,
-  setDraftTodoPriority,
-  setDraftTodoRepeat,
+  setDrafttaskDueDate,
+  setDrafttaskDueTime,
+  setDrafttaskPriority,
+  setDrafttaskRepeat,
 } from "../redux/user"
 import { useDispatch } from "react-redux"
 import { findRepeatOptions } from "../utils/regexAnalyzers"
@@ -33,21 +33,21 @@ const DraftStrategyComponent = props => {
     const textContent = props.children[0].props.text.trim()
     props.priority &&
       dispatch(
-        setDraftTodoPriority(
+        setDrafttaskPriority(
           textContent === "!!!" ? 1 : textContent === "!!" ? 2 : 3
         )
       )
-    props.dueDate && dispatch(setDraftTodoDueDate(textContent))
-    props.dueTime && dispatch(setDraftTodoDueTime(textContent))
-    props.repeat && dispatch(setDraftTodoRepeat(textContent))
+    props.dueDate && dispatch(setDrafttaskDueDate(textContent))
+    props.dueTime && dispatch(setDrafttaskDueTime(textContent))
+    props.repeat && dispatch(setDrafttaskRepeat(textContent))
   }, [props.children])
 
   useEffect(() => {
     return () => {
-      props.priority && dispatch(setDraftTodoPriority(4))
-      props.dueDate && dispatch(setDraftTodoDueDate(null))
-      props.dueTime && dispatch(setDraftTodoDueTime(""))
-      props.repeat && dispatch(setDraftTodoRepeat(""))
+      props.priority && dispatch(setDrafttaskPriority(4))
+      props.dueDate && dispatch(setDrafttaskDueDate(null))
+      props.dueTime && dispatch(setDrafttaskDueTime(""))
+      props.repeat && dispatch(setDrafttaskRepeat(""))
     }
   }, [])
 

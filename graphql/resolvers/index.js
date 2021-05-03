@@ -10,7 +10,7 @@ const { uuid } = require("uuidv4");
 module.exports = {
   Query: {
     ...userResolvers.Query,
-    async todos(_, { groupName }, context) {
+    async tasks(_, { groupName }, context) {
       const { email } = checkAuth(context);
 
       if (!groupName) {
@@ -20,7 +20,7 @@ module.exports = {
       // no error thrown -> user authenticated
       const usr = await User.findOne({ email });
 
-      return usr.groups.find((g) => g.name === groupName).todos;
+      return usr.groups.find((g) => g.name === groupName).tasks;
     },
   },
 
@@ -37,7 +37,7 @@ module.exports = {
       const newGroup = {
         id: uuid(),
         name,
-        todos: [],
+        tasks: [],
         created: new Date().toISOString(),
       };
 
@@ -50,7 +50,7 @@ module.exports = {
       return newGroup;
     },
     // eslint-disable-next-line object-curly-newline
-    async createTodo(
+    async createtask(
       _,
       // eslint-disable-next-line object-curly-newline
       { groupName, body, priority, remind, repeat, dueDate, dueTime },
@@ -59,10 +59,10 @@ module.exports = {
       const { email } = checkAuth(context);
 
       if (!body) {
-        throw new UserInputError("Todo body must not be empty");
+        throw new UserInputError("task body must not be empty");
       }
       // no error thrown -> user authenticated
-      const newTodo = {
+      const newtask = {
         id: uuid(),
         checked: false,
         body,
@@ -80,16 +80,16 @@ module.exports = {
 
       if (!group) throw new UserInputError("Group not found");
 
-      group.todos.push(newTodo);
+      group.tasks.push(newtask);
 
       await usr.save();
-      return newTodo;
+      return newtask;
     },
-    async editTodo(
+    async edittask(
       _,
       {
         groupId,
-        todoId,
+        taskId,
         checked,
         body,
         priority,
@@ -108,21 +108,21 @@ module.exports = {
 
       if (!group) throw new UserInputError("Group not found");
 
-      const todo = group.todos.find((todo) => todo.id === todoId);
+      const task = group.tasks.find((task) => task.id === taskId);
 
-      if (!todo) throw new UserInputError("Todo not found");
+      if (!task) throw new UserInputError("task not found");
 
-      todo.checked = checked ? checked : todo.checked;
-      todo.body = body ? body : todo.body;
-      todo.priority = priority ? priority : todo.priority;
-      todo.remind = remind ? remind : todo.remind;
-      todo.repeat = repeat ? repeat : todo.repeat;
-      todo.dueDate = dueDate ? dueDate : todo.dueDate;
-      todo.dueTime = dueTime ? dueTime : todo.dueTime;
+      task.checked = checked ? checked : task.checked;
+      task.body = body ? body : task.body;
+      task.priority = priority ? priority : task.priority;
+      task.remind = remind ? remind : task.remind;
+      task.repeat = repeat ? repeat : task.repeat;
+      task.dueDate = dueDate ? dueDate : task.dueDate;
+      task.dueTime = dueTime ? dueTime : task.dueTime;
 
       await usr.save();
 
-      return todo;
+      return task;
     },
   },
 };

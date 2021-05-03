@@ -1,6 +1,6 @@
 const { Schema } = require("mongoose");
 
-const todoSchema = new Schema({
+const taskSchema = new Schema({
   body: String,
   checked: Boolean,
   created: String,
@@ -14,4 +14,4 @@ const todoSchema = new Schema({
   dueTime: String,
 });
 
-module.exports = todoSchema;
+module.exports = taskSchema;
