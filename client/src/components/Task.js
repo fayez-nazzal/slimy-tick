@@ -9,7 +9,7 @@ import CheckBoxOutlineBlankSharpIcon from "@material-ui/icons/CheckBoxOutlineBla
 import CheckBoxSharpIcon from "@material-ui/icons/CheckBoxSharp"
 import MoreHorizSharpIcon from "@material-ui/icons/MoreHorizSharp"
 import IconButton from "@material-ui/core/IconButton"
-import Menu from "./ActionsMenu"
+import Menu from "./menus/EditTaskMenu"
 
 export const Task = props => {
   const [anchorEl, setAnchorEl] = useState(false)
@@ -26,14 +26,12 @@ export const Task = props => {
           icon={<CheckBoxOutlineBlankSharpIcon />}
         />
       </ListItemIcon>
-      <ListItemText disableTypography>
-        <input
-          value={props.body}
-          variant="filled"
-          disableAnimation
-          className={classes.input}
-        />
-      </ListItemText>
+      <input
+        value={props.body}
+        onChange={e => props.onChange(props.id, e.target.value)}
+        variant="filled"
+        className={classes.input}
+      />
       <ListItemSecondaryAction>
         <IconButton onClick={e => setAnchorEl(e.currentTarget)}>
           <MoreHorizSharpIcon color="primary" />
