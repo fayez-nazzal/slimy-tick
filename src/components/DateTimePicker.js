@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react';
 import PropTypes from 'prop-types';
 import { DateTimePicker as MuiDateTimePicker } from '@material-ui/pickers';
-import { useDispatch, useSelector } from 'react-redux';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import ThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
@@ -14,7 +13,6 @@ import {
   findDueTimeOptions,
   findRepeatOptions,
 } from '../utils/regexAnalyzers';
-import { setTaskDueDate, setTaskDueTime } from '../redux/user';
 
 const theme = createMuiTheme({
   palette: {
@@ -71,16 +69,10 @@ const useStyles = makeStyles({
   },
 });
 
-const DateTimePicker = ({ anchorEl, onClose }) => {
-  const dispatch = useDispatch();
+const DateTimePicker = ({
+  anchorEl, onClose, taskRepeat, taskDueDate, taskDueTime, setTaskDueDate, setTaskDueTime,
+}) => {
   const classes = useStyles();
-  const taskRepeat = useSelector((state) => state.user.taskValues.repeat);
-  const taskDueDate = useSelector(
-    (state) => state.user.taskValues.dueDate,
-  );
-  const taskDueTime = useSelector(
-    (state) => state.user.taskValues.dueTime,
-  );
   const [selectedDate, setSelectedDate] = useState();
   const recurDates = useRef([]);
 
@@ -118,8 +110,8 @@ const DateTimePicker = ({ anchorEl, onClose }) => {
   const handleOkButton = () => {
     const dateString = selectedDate.format('MMM DD, YYYY');
     const timeString = selectedDate.format('hh:mm a');
-    dispatch(setTaskDueDate(dateString));
-    dispatch(setTaskDueTime(timeString));
+    setTaskDueDate(dateString);
+    setTaskDueTime(timeString);
     onClose();
   };
 
@@ -241,6 +233,11 @@ const CustomDay = (props) => {
 DateTimePicker.propTypes = {
   onClose: PropTypes.func.isRequired,
   anchorEl: PropTypes.element.isRequired,
+  taskRepeat: PropTypes.string.isRequired,
+  taskDueDate: PropTypes.string.isRequired,
+  taskDueTime: PropTypes.string.isRequired,
+  setTaskDueDate: PropTypes.func.isRequired,
+  setTaskDueTime: PropTypes.func.isRequired,
 };
 
 CustomDay.propTypes = {

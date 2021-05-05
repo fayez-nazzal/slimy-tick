@@ -11,14 +11,11 @@ import DateRangeIcon from '@material-ui/icons/DateRangeSharp';
 import UpdateIcon from '@material-ui/icons/UpdateSharp';
 import PlayArrowIcon from '@material-ui/icons/PlayArrowSharp';
 import { useMutation } from '@apollo/client';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, connect } from 'react-redux';
 import { CREATE_TASK } from '../apollo/queries';
-import {
-  addtask,
-  setTaskBody,
-  setTaskGroup,
-  setTaskPriority,
-} from '../redux/user';
+import { newTaskSelector } from '../redux/selectors';
+import { addTask } from '../redux/tasks';
+import { setNewTaskPriority, setNewTaskBody } from '../redux/newTask';
 import DateTimePicker from './DateTimePicker';
 import ButtonGroupButton from './general/ButtonGroupIconButton';
 import RepeatMenu from './menus/RepeatMenu';
@@ -83,19 +80,14 @@ const useStyles = makeStyles({
   },
 });
 
-const TaskInput = () => {
+const newTaskInput = ({ newTask }) => {
   const dispatch = useDispatch();
-  const taskValues = useSelector((state) => state.user.taskValues);
   const [focus, setFocus] = useState(false);
 
   useEffect(() => {
     // eslint-disable-next-line no-use-before-define
     resetTask();
   }, []);
-
-  const currentGroup = useSelector(
-    (state) => state.user.userData.groups[state.user.groupIndex],
-  );
 
   const [priorityAnchorEl, setPriorityAnchorEl] = useState(false);
   const [dueAnchorEl, setDueAnchorEl] = useState(false);
@@ -105,23 +97,22 @@ const TaskInput = () => {
   const classes = useStyles({ focus });
   const [createtask] = useMutation(CREATE_TASK, {
     update(proxy, { data: { createtask: newtask } }) {
-      dispatch(addtask(newtask));
+      dispatch(addTask(newtask));
       // eslint-disable-next-line no-use-before-define
-      dispatch(setTaskBody(''));
+      dispatch(setNewTaskBody(''));
       // eslint-disable-next-line no-use-before-define
       resetTask();
     },
     onError(err) {
       console.log(JSON.stringify(err, null, 2));
     },
-    variables: taskValues,
+    variables: newTask,
   });
 
-  // sets task with empty body, low priority and current group the user at (from sidebar)
+  // sets task with empty body, low priority
   const resetTask = () => {
-    dispatch(setTaskBody(''));
-    dispatch(setTaskGroup(currentGroup));
-    dispatch(setTaskPriority(4));
+    dispatch(setNewTaskBody(''));
+    dispatch(setNewTaskPriority(4));
   };
 
   const disableEditorBlurTemporarily = () => {
@@ -169,7 +160,7 @@ const TaskInput = () => {
             {...keepDraftEvents}
           >
             <UpdateIcon
-              className={taskValues.repeat && classes.repeatSet}
+              className={newTask.repeat && classes.repeatSet}
               color="primary"
             />
           </ButtonGroupButton>
@@ -193,10 +184,10 @@ const TaskInput = () => {
             <PriorityHighIcon
               color="primary"
               className={clsx({
-                'priority-veryhigh': taskValues.priority === 1,
-                'priority-high': taskValues.priority === 2,
-                'priority-medium': taskValues.priority === 3,
-                'priority-low': taskValues.priority === 4,
+                'priority-veryhigh': newTask.priority === 1,
+                'priority-high': newTask.priority === 2,
+                'priority-medium': newTask.priority === 3,
+                'priority-low': newTask.priority === 4,
               })}
             />
           </ButtonGroupButton>
@@ -212,7 +203,7 @@ const TaskInput = () => {
           >
             <DateRangeIcon
               color="primary"
-              className={taskValues.dueDate && classes.dueSet}
+              className={newTask.dueDate && classes.dueSet}
             />
           </ButtonGroupButton>
           <DateTimePicker
@@ -225,4 +216,8 @@ const TaskInput = () => {
   );
 };
 
-export default TaskInput;
+const mapStateToProps = (state) => ({
+  newTask: newTaskSelector(state),
+});
+
+export default connect(mapStateToProps)(newTaskInput);

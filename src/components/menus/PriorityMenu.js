@@ -1,11 +1,11 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { MenuItem, Typography } from '@material-ui/core';
 import ListItemText from '@material-ui/core/ListItemText';
 import { useDispatch } from 'react-redux';
 import Menu from '../general/Menu';
-import { setTaskPriority } from '../../redux/user';
 
-const PriorityMenu = ({ anchorEl, onClose }) => {
+const PriorityMenu = ({ anchorEl, onClose, setTaskPriority }) => {
   const dispatch = useDispatch();
 
   return (
@@ -42,3 +42,9 @@ const PriorityMenu = ({ anchorEl, onClose }) => {
 };
 
 export default PriorityMenu;
+
+PriorityMenu.propTypes = {
+  anchorEl: PropTypes.element.isRequired,
+  onClose: PropTypes.func.isRequired,
+  setTaskPriority: PropTypes.func.isRequired,
+};

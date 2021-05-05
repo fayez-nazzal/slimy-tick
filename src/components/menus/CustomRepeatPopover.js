@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import PropTypes from 'prop-types';
 import Select from '@material-ui/core/Select';
 import {
   MenuItem,
@@ -9,14 +10,10 @@ import {
 } from '@material-ui/core';
 import { ToggleButtonGroup, ToggleButton } from '@material-ui/lab';
 import clsx from 'clsx';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
+import ThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
 
-import { useDispatch, useSelector } from 'react-redux';
-import {
-  makeStyles,
-  createMuiTheme,
-  ThemeProvider,
-} from '@material-ui/core/styles';
-import { setTaskRepeat } from '../../redux/user';
 import { findRepeatOptions } from '../../utils/regexAnalyzers';
 
 const popoverTheme = createMuiTheme({
@@ -37,26 +34,50 @@ const popoverTheme = createMuiTheme({
   },
 });
 
-const CustomRepeatPopover = ({ anchorEl, onClose }) => {
+const useStyles = makeStyles({
+  rowFlex: {
+    flexGrow: 1,
+    display: 'flex',
+    margin: '2px 8px',
+  },
+  aroundCenter: {
+    margin: '1rem',
+    justifyContent: 'space-around',
+    alignItems: 'center',
+  },
+  repeatNumInput: {
+    width: '5.8rem',
+    marginLeft: '0.8rem',
+  },
+  repeatEverySelect: {
+    width: '6.8rem',
+    marginLeft: '0.8rem',
+  },
+  hidden: {
+    display: 'none',
+  },
+});
+
+const CustomRepeatPopover = ({
+  anchorEl, onClose, taskRepeat, setTaskRepeat,
+}) => {
   const classes = useStyles();
   const [stepOption, setStepOption] = useState({
     every: 'days',
     value: 2,
   });
   const [weekdays, setWeekdays] = useState([]);
-  const taskValues = useSelector((state) => state.user.taskValues);
-  const dispatch = useDispatch();
 
   useEffect(() => {
-    if (taskValues.repeat) {
-      const analyzedRepeat = findRepeatOptions(taskValues.repeat);
+    if (taskRepeat) {
+      const analyzedRepeat = findRepeatOptions(taskRepeat);
       setWeekdays((prev) => (analyzedRepeat[0] === 'weekdays' ? analyzedRepeat[1] : prev));
       setStepOption({
         every: analyzedRepeat[0],
         value: analyzedRepeat[1],
       });
     }
-  }, [taskValues.repeat]);
+  }, [taskRepeat]);
 
   const onWeekdaysChange = (_, newWeekdays) => {
     setStepOption({
@@ -71,7 +92,7 @@ const CustomRepeatPopover = ({ anchorEl, onClose }) => {
     setStepOption((prev) => ({
       every: changedValue === 'every' ? e.target.value : prev.every,
       value:
-        changedValue === 'value' ? e.target.value : parseInt(prev.value) || 2,
+        changedValue === 'value' ? e.target.value : parseInt(prev.value, 10) || 2,
     }));
   };
 
@@ -81,13 +102,10 @@ const CustomRepeatPopover = ({ anchorEl, onClose }) => {
 
   const handleRepeatPopoverAccept = () => {
     onClose();
-    weekdays.length &&
-      dispatch(setTaskRepeat(`every ${weekdays.join(', ')}`));
-    stepOption.every &&
-      parseInt(stepOption.value) > 0 &&
-      dispatch(
-        setTaskRepeat(`every ${stepOption.value} ${stepOption.every}`),
-      );
+    if (weekdays.length) setTaskRepeat(`every ${weekdays.join(', ')}`);
+    if (stepOption.every && stepOption.value > 0) {
+      setTaskRepeat(`every ${stepOption.value} ${stepOption.every}`);
+    }
   };
 
   return (
@@ -208,26 +226,9 @@ const CustomRepeatPopover = ({ anchorEl, onClose }) => {
 
 export default CustomRepeatPopover;
 
-const useStyles = makeStyles((theme) => ({
-  rowFlex: {
-    flexGrow: 1,
-    display: 'flex',
-    margin: '2px 8px',
-  },
-  aroundCenter: {
-    margin: '1rem',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-  },
-  repeatNumInput: {
-    width: '5.8rem',
-    marginLeft: '0.8rem',
-  },
-  repeatEverySelect: {
-    width: '6.8rem',
-    marginLeft: '0.8rem',
-  },
-  hidden: {
-    display: 'none',
-  },
-}));
+CustomRepeatPopover.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  anchorEl: PropTypes.element.isRequired,
+  taskRepeat: PropTypes.string.isRequired,
+  setTaskRepeat: PropTypes.func.isRequired,
+};

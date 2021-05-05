@@ -1,11 +1,13 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import { MenuItem } from '@material-ui/core';
 import ListItemText from '@material-ui/core/ListItemText';
 import { useDispatch } from 'react-redux';
 import Menu from '../general/Menu';
-import { setTaskRepeat } from '../../redux/user';
 
-const RepeatMenu = ({ anchorEl, onClose, showCustomRepeat }) => {
+const RepeatMenu = ({
+  anchorEl, onClose, showCustomRepeat, setTaskRepeat,
+}) => {
   const dispatch = useDispatch();
 
   return (
@@ -30,3 +32,10 @@ const RepeatMenu = ({ anchorEl, onClose, showCustomRepeat }) => {
 };
 
 export default RepeatMenu;
+
+RepeatMenu.propTypes = {
+  anchorEl: PropTypes.element.isRequired,
+  onClose: PropTypes.func.isRequired,
+  showCustomRepeat: PropTypes.func.isRequired,
+  setTaskRepeat: PropTypes.func.isRequired,
+};

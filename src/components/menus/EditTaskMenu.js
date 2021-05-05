@@ -1,4 +1,5 @@
 import React from 'react';
+import PropTypes from 'prop-types';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
 import AlarmIcon from '@material-ui/icons/AlarmSharp';
@@ -38,3 +39,8 @@ const ActionsMenu = ({ onClose, anchorEl }) => (
 );
 
 export default ActionsMenu;
+
+ActionsMenu.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  anchorEl: PropTypes.element.isRequired,
+};
