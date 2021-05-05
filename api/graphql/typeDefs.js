@@ -1,7 +1,7 @@
-const { gql } = require("apollo-server");
+const { gql } = require('apollo-server');
 
 module.exports = gql`
-  type task {
+  type Task {
     id: String!
     body: String!
     checked: Boolean!
@@ -16,7 +16,7 @@ module.exports = gql`
   type Group {
     id: String!
     name: String!
-    tasks: [task]!
+    tasks: [Task]!
     created: String!
   }
 
@@ -31,7 +31,7 @@ module.exports = gql`
 
   type Query {
     userInfo: User!
-    tasks(groupName: String!): [task]!
+    tasks(groupName: String!): [Task]!
     group(id: ID!): Group!
   }
 
@@ -44,7 +44,7 @@ module.exports = gql`
       repeat: String
       dueDate: String
       dueTime: String
-    ): task!
+    ): Task!
     createGroup(name: String!): Group!
     edittask(
       groupId: String!
@@ -56,7 +56,7 @@ module.exports = gql`
       repeat: [String]
       dueDate: String
       dueTime: String
-    ): task!
+    ): Task!
     register(email: String!, password: String!, confirmPassword: String!): User!
     login(email: String!, password: String!): User!
   }

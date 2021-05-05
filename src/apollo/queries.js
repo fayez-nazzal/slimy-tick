@@ -1,4 +1,4 @@
-import { gql } from "@apollo/client"
+import { gql } from '@apollo/client';
 
 export const QUERY_USER_INFO = gql`
   query getUserInfo {
@@ -15,17 +15,17 @@ export const QUERY_USER_INFO = gql`
       }
     }
   }
-`
+`;
 
-export const QUERY_taskS_IN_GROUP = gql`
+export const QUERY_TASKS_IN_GROUP = gql`
   query {
     tasks(groupName: "group 1") {
       body
     }
   }
-`
+`;
 
-export const CREATE_task = gql`
+export const CREATE_TASK = gql`
   mutation createtask(
     $groupName: String!
     $body: String!
@@ -51,7 +51,7 @@ export const CREATE_task = gql`
       created
     }
   }
-`
+`;
 
 export const REGISTER_USER = gql`
   mutation register(
@@ -78,7 +78,7 @@ export const REGISTER_USER = gql`
       }
     }
   }
-`
+`;
 
 export const LOGIN_USER = gql`
   mutation login($email: String!, $password: String!) {
@@ -97,4 +97,4 @@ export const LOGIN_USER = gql`
       }
     }
   }
-`
+`;

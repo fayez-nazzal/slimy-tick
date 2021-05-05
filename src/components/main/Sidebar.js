@@ -1,46 +1,96 @@
-import React from "react"
-import { makeStyles } from "@material-ui/core/styles"
-import moment from "moment"
-import Drawer from "@material-ui/core/Drawer"
-import Typography from "@material-ui/core/Typography"
-import Button from "@material-ui/core/Button"
-import IconButton from "@material-ui/core/IconButton"
-import Box from "@material-ui/core/Box"
-import useMediaQuery from "@material-ui/core/useMediaQuery"
-import { createMuiTheme, MuiThemeProvider } from "@material-ui/core/styles"
-import ChevronLeftIcon from "@material-ui/icons/ChevronLeft"
-import ChevronRightIcon from "@material-ui/icons/ChevronRight"
-import AddBoxSharpIcon from "@material-ui/icons/AddBoxSharp"
-import { useDispatch, useSelector } from "react-redux"
-import AccountBoxSharpIcon from "@material-ui/icons/AccountBoxSharp"
-import { setGroupIndex } from "../../redux/user"
+import React from 'react';
+import PropTypes from 'prop-types';
+import moment from 'moment';
+import Drawer from '@material-ui/core/Drawer';
+import Typography from '@material-ui/core/Typography';
+import Button from '@material-ui/core/Button';
+import IconButton from '@material-ui/core/IconButton';
+import Box from '@material-ui/core/Box';
+import useMediaQuery from '@material-ui/core/useMediaQuery';
+import {
+  createMuiTheme,
+  MuiThemeProvider,
+  makeStyles,
+} from '@material-ui/core/styles';
+import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
+import ChevronRightIcon from '@material-ui/icons/ChevronRight';
+import AddBoxSharpIcon from '@material-ui/icons/AddBoxSharp';
+import { useDispatch, useSelector } from 'react-redux';
+import AccountBoxSharpIcon from '@material-ui/icons/AccountBoxSharp';
+import { setGroupIndex } from '../../redux/user';
 
-const theme = createMuiTheme({
+const sidebarTheme = createMuiTheme({
   palette: {
     primary: {
-      main: "#bedc9b",
+      main: '#bedc9b',
     },
   },
-})
+});
 
-const Sidebar = props => {
-  const userData = useSelector(state => state.user.userData)
+const useStyles = makeStyles({
+  root: {
+    display: 'flex',
+  },
+  drawer: {
+    flexShrink: 1,
+    boxSizing: 'border-box',
+  },
+  drawerPaper: {
+    width: (props) => (props.onlySm ? '26vw' : '20vw'),
+    background: '#f6f7ff',
+    borderRight: '1px #999999 solid',
+  },
+  flex: {
+    display: 'flex',
+    alignItems: 'center',
+    width: '100%',
+  },
+  columnFlex: {
+    display: 'flex',
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    flexDirection: 'column',
+    width: '100%',
+  },
+  largeIcon: {
+    transform: 'scale(1.2)',
+  },
+  accountInfo: {
+    display: 'inline-flex',
+    flexDirection: 'column',
+    marginRight: 'auto',
+    justifyContent: 'space-around',
+  },
+  profilePic: {
+    width: '54px',
+    height: '54px',
+  },
+  groupButton: {
+    textTransform: 'none',
+    fontSize: '20px',
+    boxShadow: 'none',
+    borderRadius: '0px',
+  },
+});
+
+const Sidebar = ({ open, toggle }) => {
+  const userData = useSelector((state) => state.user.userData);
   const currentGroup = useSelector(
-    state => state.user.userData.groups[state.user.groupIndex]
-  )
-  const dispatch = useDispatch()
+    (state) => state.user.userData.groups[state.user.groupIndex],
+  );
+  const dispatch = useDispatch();
 
-  const onlySm = useMediaQuery(theme => theme.breakpoints.only("sm"))
-  const classes = useStyles({ onlySm })
+  const onlySm = useMediaQuery((theme) => theme.breakpoints.only('sm'));
+  const classes = useStyles({ onlySm });
 
   return (
-    <MuiThemeProvider theme={theme}>
-      <Box display={{ xs: "none", sm: "block" }}>
+    <MuiThemeProvider theme={sidebarTheme}>
+      <Box display={{ xs: 'none', sm: 'block' }}>
         <Drawer
           className={classes.drawer}
           variant="persistent"
           anchor="left"
-          open={props.open}
+          open={open}
           classes={{
             paper: classes.drawerPaper,
           }}
@@ -50,17 +100,17 @@ const Sidebar = props => {
             <Box flexGrow={1} className={classes.accountInfo}>
               <Typography variant="subtitle1">
                 {userData &&
-                  userData.email.slice(0, userData.email.indexOf("@"))}
+                  userData.email.slice(0, userData.email.indexOf('@'))}
               </Typography>
               <Typography variant="subtitle1" color="textSecondary">
                 {moment(userData && userData.created)
-                  .format("DD-MM-YYYY")
+                  .format('DD-MM-YYYY')
                   .toString()}
               </Typography>
             </Box>
             <Box>
-              <IconButton onClick={props.toggle}>
-                {theme.direction === "rtl" ? (
+              <IconButton onClick={toggle}>
+                {sidebarTheme.direction === 'rtl' ? (
                   <ChevronRightIcon
                     color="primary"
                     className={classes.largeIcon}
@@ -95,13 +145,13 @@ const Sidebar = props => {
                   className={classes.groupButton}
                   variant={
                     currentGroup && group.name === currentGroup.name
-                      ? "contained"
-                      : "text"
+                      ? 'contained'
+                      : 'text'
                   }
                   color={
                     currentGroup && group.name === currentGroup.name
-                      ? "primary"
-                      : "none"
+                      ? 'primary'
+                      : 'none'
                   }
                   fullWidth
                 >
@@ -112,53 +162,12 @@ const Sidebar = props => {
         </Drawer>
       </Box>
     </MuiThemeProvider>
-  )
-}
+  );
+};
 
-export default Sidebar
+export default Sidebar;
 
-const useStyles = makeStyles({
-  root: {
-    display: "flex",
-  },
-  drawer: {
-    flexShrink: 1,
-    boxSizing: "border-box",
-  },
-  drawerPaper: {
-    width: props => (props.onlySm ? "26vw" : "20vw"),
-    background: "#f6f7ff",
-    borderRight: "1px #999999 solid",
-  },
-  flex: {
-    display: "flex",
-    alignItems: "center",
-    width: "100%",
-  },
-  columnFlex: {
-    display: "flex",
-    alignItems: "center",
-    justifyContent: "flex-start",
-    flexDirection: "column",
-    width: "100%",
-  },
-  largeIcon: {
-    transform: "scale(1.2)",
-  },
-  accountInfo: {
-    display: "inline-flex",
-    flexDirection: "column",
-    marginRight: "auto",
-    justifyContent: "space-around",
-  },
-  profilePic: {
-    width: "54px",
-    height: "54px",
-  },
-  groupButton: {
-    textTransform: "none",
-    fontSize: "20px",
-    boxShadow: "none",
-    borderRadius: "0px",
-  },
-})
+Sidebar.propTypes = {
+  open: PropTypes.bool.isRequired,
+  toggle: PropTypes.func.isRequired,
+};

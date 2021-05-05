@@ -5,12 +5,7 @@
     "jest": true,
     "node": true
   },
-  "extends": [
-    "eslint:recommended",
-    "plugin:react/recommended",
-    "prettier",
-    "airbnb"
-  ],
+  "extends": ["airbnb", "eslint:recommended", "plugin:react/recommended", "plugin:react-redux/recommended"],
   "parserOptions": {
     "ecmaFeatures": {
       "jsx": true
@@ -18,15 +13,13 @@
     "ecmaVersion": 12,
     "sourceType": "module"
   },
-  "plugins": ["react", "prettier"],
+  "plugins": ["react", "react-redux"],
   "rules": {
-    "prettier/prettier": [
-      "error",
-      {
-        "singleQuote": true,
-        "semi": true,
-        "endOfLine": "auto"
-      }
-    ]
+    "operator-linebreak": [0],
+    "react/jsx-filename-extension": [1, { "extensions": [".js"] }],
+    "react/jsx-props-no-spreading": [0],
+    "no-param-reassign": ["error", { "props": false }]
+
+
   }
 }

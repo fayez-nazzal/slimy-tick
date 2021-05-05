@@ -1,43 +1,45 @@
-import React from "react"
-import Button from "@material-ui/core/Button"
-import TextField from "@material-ui/core/TextField"
-import Typography from "@material-ui/core/Typography"
-import { makeStyles } from "@material-ui/core/styles"
-import { REGISTER_USER } from "../apollo/queries"
-import { useMutation } from "@apollo/client"
-import useForm from "../hooks/userForm"
-import FormPageContainer from "../components/form/FormPageContainer"
-import ErrorTypography from "../components/form/ErrorTypography"
-import FormThemeProvider from "../themes/FormThemeProvider"
-import { login as globalLogin } from "../redux/user"
-import { useDispatch } from "react-redux"
-import { navigate } from "gatsby"
+import React from 'react';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import { useMutation } from '@apollo/client';
+import { useDispatch } from 'react-redux';
+import { navigate } from 'gatsby';
+import { REGISTER_USER } from '../apollo/queries';
+import useForm from '../hooks/userForm';
+import FormPageContainer from '../components/form/FormPageContainer';
+import ErrorTypography from '../components/general/ErrorTypography';
+import FormThemeProvider from '../themes/FormThemeProvider';
+import { login as globalLogin } from '../redux/user';
 
 const LoginPage = () => {
-  const classes = useStyles()
-  const addUser = () => register()
-  const dispatch = useDispatch()
+  const classes = useStyles();
+  const addUser = () => register();
+  const dispatch = useDispatch();
 
-  const { values, errors, setErrors, onChange, onSubmit } = useForm({
+  const {
+    values, errors, setErrors, onChange, onSubmit,
+  } = useForm({
     submitCallback: addUser,
     initialState: {
-      email: "",
-      password: "",
-      confirmPassword: "",
+      email: '',
+      password: '',
+      confirmPassword: '',
     },
-  })
+  });
 
   const [register, { loading }] = useMutation(REGISTER_USER, {
     update(proxy, { data: { register: userData } }) {
-      dispatch(globalLogin(userData))
-      navigate("/")
+      dispatch(globalLogin(userData));
+      navigate('/');
     },
     onError(err) {
-      console.log(JSON.stringify(err, null, 2))
-      setErrors(err.graphQLErrors[0].extensions.errors)
+      console.log(JSON.stringify(err, null, 2));
+      setErrors(err.graphQLErrors[0].extensions.errors);
     },
     variables: values,
-  })
+  });
 
   return (
     <FormThemeProvider>
@@ -60,7 +62,7 @@ const LoginPage = () => {
             color="primary"
             variant="outlined"
             margin="dense"
-            inputProps={{ "aria-label": "email" }}
+            inputProps={{ 'aria-label': 'email' }}
             fullWidth
           />
           <ErrorTypography error={errors.email} />
@@ -75,7 +77,7 @@ const LoginPage = () => {
             color="primary"
             variant="outlined"
             margin="dense"
-            inputProps={{ "aria-label": "password" }}
+            inputProps={{ 'aria-label': 'password' }}
             fullWidth
           />
           <ErrorTypography error={errors.password} />
@@ -91,7 +93,7 @@ const LoginPage = () => {
             color="primary"
             variant="outlined"
             margin="dense"
-            inputProps={{ "aria-label": "confirm password" }}
+            inputProps={{ 'aria-label': 'confirm password' }}
             fullWidth
           />
           <ErrorTypography error={errors.confirmPassword} />
@@ -109,11 +111,11 @@ const LoginPage = () => {
         </form>
       </FormPageContainer>
     </FormThemeProvider>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;
 
 const useStyles = makeStyles({
-  button: { marginTop: "8px" },
-})
+  button: { marginTop: '8px' },
+});

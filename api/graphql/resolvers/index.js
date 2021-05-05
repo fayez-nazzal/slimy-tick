@@ -1,11 +1,11 @@
 /* eslint-disable comma-dangle */
 /* eslint-disable no-underscore-dangle */
-const { UserInputError } = require("apollo-server-errors");
+const { UserInputError } = require('apollo-server-errors');
 
-const userResolvers = require("./user");
-const User = require("../../models/user");
-const checkAuth = require("../../utils/checkAuth");
-const { uuid } = require("uuidv4");
+const userResolvers = require('./user');
+const User = require('../../models/user');
+const checkAuth = require('../../utils/checkAuth');
+const { uuid } = require('uuidv4');
 
 module.exports = {
   Query: {
@@ -14,7 +14,7 @@ module.exports = {
       const { email } = checkAuth(context);
 
       if (!groupName) {
-        throw new UserInputError("Group name must not be empty");
+        throw new UserInputError('Group name must not be empty');
       }
 
       // no error thrown -> user authenticated
@@ -30,7 +30,7 @@ module.exports = {
       const { email } = checkAuth(context);
 
       if (!name) {
-        throw new UserInputError("Group name must not be empty");
+        throw new UserInputError('Group name must not be empty');
       }
 
       // no error thrown -> user authenticated
@@ -59,7 +59,7 @@ module.exports = {
       const { email } = checkAuth(context);
 
       if (!body) {
-        throw new UserInputError("task body must not be empty");
+        throw new UserInputError('task body must not be empty');
       }
       // no error thrown -> user authenticated
       const newtask = {
@@ -78,7 +78,7 @@ module.exports = {
 
       const group = usr.groups.find((g) => g.name === groupName);
 
-      if (!group) throw new UserInputError("Group not found");
+      if (!group) throw new UserInputError('Group not found');
 
       group.tasks.push(newtask);
 
@@ -106,11 +106,11 @@ module.exports = {
 
       const group = usr.groups.find((group) => group.id === groupId);
 
-      if (!group) throw new UserInputError("Group not found");
+      if (!group) throw new UserInputError('Group not found');
 
       const task = group.tasks.find((task) => task.id === taskId);
 
-      if (!task) throw new UserInputError("task not found");
+      if (!task) throw new UserInputError('task not found');
 
       task.checked = checked ? checked : task.checked;
       task.body = body ? body : task.body;

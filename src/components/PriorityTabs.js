@@ -1,10 +1,48 @@
-import React from "react"
-import { makeStyles } from "@material-ui/core/styles"
-import Button from "@material-ui/core/Button"
-import ButtonGroup from "@material-ui/core/ButtonGroup"
+import React from 'react';
+import { makeStyles } from '@material-ui/core/styles';
+import Button from '@material-ui/core/Button';
+import ButtonGroup from '@material-ui/core/ButtonGroup';
+
+const useStyles = makeStyles({
+  root: {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'flex-end',
+    marginTop: 'auto',
+    borderRadius: 0,
+    background: 'transparent',
+  },
+  button: {
+    color: 'transparent',
+    marginTop: 'auto',
+    textTransform: 'none',
+    border: 'none',
+    height: 10,
+    borderRadius: 0,
+    '&:hover': {
+      color: 'black',
+      height: 20,
+    },
+  },
+  all: {
+    backgroundColor: '#cccccc !important',
+  },
+  veryHigh: {
+    backgroundColor: '#ed5f00 !important',
+  },
+  high: {
+    backgroundColor: '#f48c00 !important',
+  },
+  medium: {
+    backgroundColor: '#f5b900 !important',
+  },
+  low: {
+    backgroundColor: '#7dbc00 !important',
+  },
+});
 
 const PriorityTabs = () => {
-  const classes = useStyles()
+  const classes = useStyles();
 
   return (
     <div className={classes.root}>
@@ -18,45 +56,7 @@ const PriorityTabs = () => {
         <Button className={[classes.button, classes.low]}>Low</Button>
       </ButtonGroup>
     </div>
-  )
-}
+  );
+};
 
-export default PriorityTabs
-
-const useStyles = makeStyles(theme => ({
-  root: {
-    display: "flex",
-    flexDirection: "row",
-    alignItems: "flex-end",
-    marginTop: "auto",
-    borderRadius: 0,
-    background: "transparent",
-  },
-  button: {
-    color: "transparent",
-    marginTop: "auto",
-    textTransform: "none",
-    border: "none",
-    height: 10,
-    borderRadius: 0,
-    "&:hover": {
-      color: "black",
-      height: 20,
-    },
-  },
-  all: {
-    backgroundColor: "#cccccc !important",
-  },
-  veryHigh: {
-    backgroundColor: "#ed5f00 !important",
-  },
-  high: {
-    backgroundColor: "#f48c00 !important",
-  },
-  medium: {
-    backgroundColor: "#f5b900 !important",
-  },
-  low: {
-    backgroundColor: "#7dbc00 !important",
-  },
-}))
+export default PriorityTabs;

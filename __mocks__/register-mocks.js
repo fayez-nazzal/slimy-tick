@@ -1,22 +1,22 @@
-import { LOGIN_USER, REGISTER_USER } from "../src/apollo/queries"
-import { UserInputError } from "apollo-server-core"
+import { LOGIN_USER, REGISTER_USER } from '../src/apollo/queries';
+import { UserInputError } from 'apollo-server-core';
 
 const mocks = [
   {
     request: {
       query: REGISTER_USER,
       variables: {
-        email: "",
-        password: "",
-        confirmPassword: "",
+        email: '',
+        password: '',
+        confirmPassword: '',
       },
     },
     result: {
       errors: [
-        new UserInputError("Error", {
+        new UserInputError('Error', {
           errors: {
-            email: "Email must not be empty",
-            password: "Password must not be empty",
+            email: 'Email must not be empty',
+            password: 'Password must not be empty',
           },
         }),
       ],
@@ -26,16 +26,16 @@ const mocks = [
     request: {
       query: REGISTER_USER,
       variables: {
-        email: "wrong@email..com",
-        password: "",
-        confirmPassword: "",
+        email: 'wrong@email..com',
+        password: '',
+        confirmPassword: '',
       },
     },
     result: {
       errors: [
-        new UserInputError("Error", {
+        new UserInputError('Error', {
           errors: {
-            email: "Email not valid",
+            email: 'Email not valid',
           },
         }),
       ],
@@ -45,16 +45,16 @@ const mocks = [
     request: {
       query: REGISTER_USER,
       variables: {
-        email: "correct@email.com",
-        password: "valid password",
-        confirmPassword: "valid.password",
+        email: 'correct@email.com',
+        password: 'valid password',
+        confirmPassword: 'valid.password',
       },
     },
     result: {
       errors: [
-        new UserInputError("Error", {
+        new UserInputError('Error', {
           errors: {
-            confirmPassword: "Passwords must match",
+            confirmPassword: 'Passwords must match',
           },
         }),
       ],
@@ -64,16 +64,16 @@ const mocks = [
     request: {
       query: REGISTER_USER,
       variables: {
-        email: "correct@email.com",
-        password: "valid password",
-        confirmPassword: "valid password",
+        email: 'correct@email.com',
+        password: 'valid password',
+        confirmPassword: 'valid password',
       },
     },
     result: {
       data: {
         register: {
-          token: "fake token",
-          email: "correct@email.com",
+          token: 'fake token',
+          email: 'correct@email.com',
         },
       },
     },
@@ -82,21 +82,21 @@ const mocks = [
     request: {
       query: REGISTER_USER,
       variables: {
-        email: "correct@email.com",
-        password: "123",
-        confirmPassword: "123",
+        email: 'correct@email.com',
+        password: '123',
+        confirmPassword: '123',
       },
     },
     result: {
       errors: [
-        new UserInputError("Wrong credentials", {
+        new UserInputError('Wrong credentials', {
           errors: {
-            password: "Pasword must have 6 or more characters",
+            password: 'Pasword must have 6 or more characters',
           },
         }),
       ],
     },
   },
-]
+];
 
-export default mocks
+export default mocks;

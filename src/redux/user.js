@@ -1,99 +1,94 @@
-import { createSlice } from "@reduxjs/toolkit"
-import { matchPriorityAndReturnRange } from "../utils/matchers"
+import { createSlice } from '@reduxjs/toolkit';
+import isEqual from 'lodash.isequal';
+import { matchPriorityAndReturnRange } from '../utils/matchers';
 import {
   findDueDateOptions,
   findDueTimeOptions,
   findRepeatOptions,
-} from "../utils/regexAnalyzers"
-import isEqual from "lodash.isequal"
+} from '../utils/regexAnalyzers';
 
 const replaceRange = (str, start, end, substitute) => {
-  return str.substring(0, start) + substitute + str.substring(end)
-}
+  const startSubstr = str.substring(0, start);
+  const endSubstr = str.substring(end);
+  return startSubstr + substitute + endSubstr;
+};
 
-const getPriorityStrEquivelent = priority => {
-  return priority === 4
-    ? ""
-    : priority === 3
-    ? "!"
-    : priority === 2
-    ? "!!"
-    : "!!!"
-}
+const getPriorityStrEquivelent = (priority) => '!'.repeat((4 - priority));
 
 export const userSlice = createSlice({
-  name: "user",
+  name: 'user',
   initialState: {
     userData: null,
     groupIndex: null,
-    drafttaskValues: {
-      body: "",
+    taskValues: {
+      body: '',
       priority: 4,
       groupName: null,
-      dueDate: "",
-      dueTime: "",
-      repeat: "",
+      dueDate: '',
+      dueTime: '',
+      repeat: '',
     },
   },
   reducers: {
     login: (state, action) => {
-      state.userData = action.payload
-      localStorage.setItem("slimy-tick-jwt", state.userData.token)
-      state.groupIndex = 0
+      state.userData = action.payload;
+      localStorage.setItem('slimy-tick-jwt', state.userData.token);
+      state.groupIndex = 0;
     },
-    logout: state => {
-      state.userData = null
-      localStorage.removeItem("slimy-tick-jwt")
+    logout: (state) => {
+      state.userData = null;
+      localStorage.removeItem('slimy-tick-jwt');
     },
     setGroupIndex: (state, action) => {
-      state.groupIndex = action.payload
+      state.groupIndex = action.payload;
     },
-    setDrafttaskBody: (state, action) => {
-      state.drafttaskValues.body = action.payload
+    setTaskBody: (state, action) => {
+      state.taskValues.body = action.payload;
     },
-    setDrafttaskPriority: (state, action) => {
-      const newPriority = getPriorityStrEquivelent(action.payload)
+    setTaskPriority: (state, action) => {
+      const newPriority = getPriorityStrEquivelent(action.payload);
 
       // if old priority regex text exist, replace it to the new priority
-      if (state.drafttaskValues.body) {
+      if (state.taskValues.body) {
         const taskPriorityRange = matchPriorityAndReturnRange(
-          state.drafttaskValues.body
-        )
+          state.taskValues.body,
+        );
 
-        state.drafttaskValues.body = replaceRange(
-          state.drafttaskValues.body,
+        state.taskValues.body = replaceRange(
+          state.taskValues.body,
           taskPriorityRange[0],
           taskPriorityRange[1],
-          newPriority
-        )
+          newPriority,
+        );
       }
 
-      state.drafttaskValues.priority = action.payload
+      state.taskValues.priority = action.payload;
     },
-    setDrafttaskGroup: (state, action) => {
-      state.drafttaskValues.groupName = action.payload.name
+    setTaskGroup: (state, action) => {
+      state.taskValues.groupName = action.payload.name;
     },
-    setDrafttaskDueDate: (state, action) => {
-      const taskBody = state.drafttaskValues.body
-      const taskDueDate = state.drafttaskValues.dueDate
+    setTaskDueDate: (state, action) => {
+      const taskBody = state.taskValues.body;
+      const taskDueDate = state.taskValues.dueDate;
 
       if (
         !taskBody.includes(action.payload) &&
         !findDueDateOptions(action.payload).isSame(
           findDueDateOptions(taskDueDate),
-          "day"
+          'day',
         )
-      )
-        state.drafttaskValues.body =
+      ) {
+        state.taskValues.body =
           taskBody && taskDueDate
             ? taskBody.replace(taskDueDate, action.payload)
-            : taskBody
+            : taskBody;
 
-      state.drafttaskValues.dueDate = action.payload
+        state.taskValues.dueDate = action.payload;
+      }
     },
-    setDrafttaskDueTime: (state, action) => {
-      const taskBody = state.drafttaskValues.body
-      const taskDueTime = state.drafttaskValues.dueTime
+    setTaskDueTime: (state, action) => {
+      const taskBody = state.taskValues.body;
+      const taskDueTime = state.taskValues.dueTime;
 
       if (
         taskDueTime &&
@@ -101,56 +96,56 @@ export const userSlice = createSlice({
         !taskBody.includes(action.payload) &&
         !findDueTimeOptions(action.payload).isSame(
           findDueTimeOptions(taskDueTime),
-          "hour"
+          'hour',
         )
-      )
-        state.drafttaskValues.body = taskBody.replace(
+      ) {
+        state.taskValues.body = taskBody.replace(
           taskDueTime,
-          action.payload
-        )
+          action.payload,
+        );
 
-      state.drafttaskValues.dueTime = action.payload
+        state.taskValues.dueTime = action.payload;
+      }
     },
-    setDrafttaskRepeat: (state, action) => {
-      const taskBody = state.drafttaskValues.body
-      const oldRepeat = state.drafttaskValues.repeat
-      const analyzedOldRepeat = findRepeatOptions(oldRepeat)
+    setTaskRepeat: (state, action) => {
+      const taskBody = state.taskValues.body;
+      const oldRepeat = state.taskValues.repeat;
+      const analyzedOldRepeat = findRepeatOptions(oldRepeat);
       const newRepeat =
-        action.payload && action.payload[0] ? action.payload : ""
-      const analyzedNewRepeat = findRepeatOptions(newRepeat)
+        action.payload && action.payload[0] ? action.payload : '';
+      const analyzedNewRepeat = findRepeatOptions(newRepeat);
 
       if (
         taskBody &&
         oldRepeat &&
         !taskBody.includes(newRepeat) &&
         !isEqual(analyzedOldRepeat, analyzedNewRepeat)
-      )
-        state.drafttaskValues.body = taskBody.replace(oldRepeat, newRepeat)
+      ) state.taskValues.body = taskBody.replace(oldRepeat, newRepeat);
 
-      state.drafttaskValues.repeat = newRepeat
+      state.taskValues.repeat = newRepeat;
     },
     addtask: (state, action) => {
-      const group = state.userData.groups[state.groupIndex]
-      group.tasks = [...group.tasks, action.payload]
+      const group = state.userData.groups[state.groupIndex];
+      group.tasks = [...group.tasks, action.payload];
     },
     setGroups: (state, action) => {
-      state.userData.groups = action.payload
+      state.userData.groups = action.payload;
     },
   },
-})
+});
 
 export const {
   login,
   logout,
   addtask,
   setGroupIndex,
-  setDrafttaskBody,
-  setDrafttaskPriority,
-  setDrafttaskGroup,
-  setDrafttaskDueDate,
-  setDrafttaskDueTime,
-  setDrafttaskRepeat,
+  setTaskBody,
+  setTaskPriority,
+  setTaskGroup,
+  setTaskDueDate,
+  setTaskDueTime,
+  setTaskRepeat,
   setGroups,
-} = userSlice.actions
+} = userSlice.actions;
 
-export default userSlice.reducer
+export default userSlice.reducer;

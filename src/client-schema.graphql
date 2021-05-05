@@ -1,4 +1,4 @@
-type task {
+type Task {
   body: String!
   created: String!
   remind: String

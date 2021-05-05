@@ -1,41 +1,43 @@
-import React from "react"
-import Button from "@material-ui/core/Button"
-import TextField from "@material-ui/core/TextField"
-import Typography from "@material-ui/core/Typography"
-import { makeStyles } from "@material-ui/core/styles"
-import { useDispatch } from "react-redux"
-import { LOGIN_USER } from "../apollo/queries"
-import { useMutation } from "@apollo/client"
-import useForm from "../hooks/userForm"
-import FormPageContainer from "../components/form/FormPageContainer"
-import ErrorTypography from "../components/form/ErrorTypography"
-import FormThemeProvider from "../themes/FormThemeProvider"
-import { login as globalLogin } from "../redux/user"
-import { navigate } from "gatsby"
+import React from 'react';
+import Button from '@material-ui/core/Button';
+import TextField from '@material-ui/core/TextField';
+import Typography from '@material-ui/core/Typography';
+import { makeStyles } from '@material-ui/core/styles';
+import { useDispatch } from 'react-redux';
+import { useMutation } from '@apollo/client';
+import { navigate } from 'gatsby';
+import { LOGIN_USER } from '../apollo/queries';
+import useForm from '../hooks/userForm';
+import FormPageContainer from '../components/form/FormPageContainer';
+import ErrorTypography from '../components/general/ErrorTypography';
+import FormThemeProvider from '../themes/FormThemeProvider';
+import { login as globalLogin } from '../redux/user';
 
 const LoginPage = () => {
-  const classes = useStyles()
-  const dispatch = useDispatch()
-  const lgoinUser = () => login()
+  const classes = useStyles();
+  const dispatch = useDispatch();
+  const lgoinUser = () => login();
 
-  const { values, errors, setErrors, onChange, onSubmit } = useForm({
+  const {
+    values, errors, setErrors, onChange, onSubmit,
+  } = useForm({
     submitCallback: lgoinUser,
     initialState: {
-      email: "",
-      password: "",
+      email: '',
+      password: '',
     },
-  })
+  });
 
   const [login, { loading }] = useMutation(LOGIN_USER, {
     update(proxy, { data: { login: userData } }) {
-      dispatch(globalLogin(userData))
-      navigate("/")
+      dispatch(globalLogin(userData));
+      navigate('/');
     },
     onError(err) {
-      setErrors(err.graphQLErrors[0].extensions.errors)
+      setErrors(err.graphQLErrors[0].extensions.errors);
     },
     variables: values,
-  })
+  });
 
   return (
     <FormThemeProvider>
@@ -58,7 +60,7 @@ const LoginPage = () => {
             color="primary"
             variant="outlined"
             margin="dense"
-            inputProps={{ "aria-label": "email" }}
+            inputProps={{ 'aria-label': 'email' }}
             fullWidth
             autoComplete="on"
           />
@@ -74,7 +76,7 @@ const LoginPage = () => {
             color="primary"
             variant="outlined"
             margin="dense"
-            inputProps={{ "aria-label": "password" }}
+            inputProps={{ 'aria-label': 'password' }}
             fullWidth
             autoComplete="off"
           />
@@ -92,11 +94,11 @@ const LoginPage = () => {
         </form>
       </FormPageContainer>
     </FormThemeProvider>
-  )
-}
+  );
+};
 
-export default LoginPage
+export default LoginPage;
 
 const useStyles = makeStyles({
-  button: { marginTop: "8px" },
-})
+  button: { marginTop: '8px' },
+});

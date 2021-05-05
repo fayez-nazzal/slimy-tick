@@ -7,7 +7,7 @@ generates:
     schema: client-schema.graphql
     plugins:
       - add:
-          content: "/* eslint-disable */"
+          content: '/* eslint-disable */'
       - typescript
       - typescript-operations
       - typescript-react-apollo

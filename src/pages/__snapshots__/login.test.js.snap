@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`login input elements matches the snapshot 1`] = `
+exports['login input elements matches the snapshot 1'] = `
 <div
   className="MuiContainer-root makeStyles-container-2 MuiContainer-disableGutters MuiContainer-maxWidthLg"
 >

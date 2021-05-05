@@ -1,20 +1,20 @@
-import { LOGIN_USER } from "../src/apollo/queries"
-import { UserInputError } from "apollo-server-core"
+import { LOGIN_USER } from '../src/apollo/queries';
+import { UserInputError } from 'apollo-server-core';
 const mocks = [
   {
     request: {
       query: LOGIN_USER,
       variables: {
-        email: "",
-        password: "",
+        email: '',
+        password: '',
       },
     },
     result: {
       errors: [
-        new UserInputError("Error", {
+        new UserInputError('Error', {
           errors: {
-            email: "Email must not be empty",
-            password: "Password must not be empty",
+            email: 'Email must not be empty',
+            password: 'Password must not be empty',
           },
         }),
       ],
@@ -24,15 +24,15 @@ const mocks = [
     request: {
       query: LOGIN_USER,
       variables: {
-        email: "wrong@email..com",
-        password: "",
+        email: 'wrong@email..com',
+        password: '',
       },
     },
     result: {
       errors: [
-        new UserInputError("Error", {
+        new UserInputError('Error', {
           errors: {
-            email: "Email not valid",
+            email: 'Email not valid',
           },
         }),
       ],
@@ -42,18 +42,18 @@ const mocks = [
     request: {
       query: LOGIN_USER,
       variables: {
-        email: "correct@email.com",
-        password: "valid password",
+        email: 'correct@email.com',
+        password: 'valid password',
       },
     },
     result: {
       data: {
         login: {
-          token: "fake token",
-          email: "correct@email.com",
+          token: 'fake token',
+          email: 'correct@email.com',
           groups: [
             {
-              name: "group 1",
+              name: 'group 1',
               tasks: [],
             },
           ],
@@ -65,20 +65,20 @@ const mocks = [
     request: {
       query: LOGIN_USER,
       variables: {
-        email: "correct@email.com",
-        password: "incorrect password",
+        email: 'correct@email.com',
+        password: 'incorrect password',
       },
     },
     result: {
       errors: [
-        new UserInputError("Wrong credentials", {
+        new UserInputError('Wrong credentials', {
           errors: {
-            general: "Wrong credentials",
+            general: 'Wrong credentials',
           },
         }),
       ],
     },
   },
-]
+];
 
-export default mocks
+export default mocks;

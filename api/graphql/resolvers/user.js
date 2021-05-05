@@ -1,12 +1,12 @@
 /* eslint-disable no-underscore-dangle */
-const jwt = require("jsonwebtoken");
-const bcrypt = require("bcryptjs");
-const { UserInputError } = require("apollo-server");
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const { UserInputError } = require('apollo-server');
 
-const User = require("../../models/user");
-const { SECRET_KEY } = require("../../config");
-const validateInput = require("../../utils/validateInput");
-const checkAuth = require("../../utils/checkAuth");
+const User = require('../../models/user');
+const { SECRET_KEY } = require('../../config');
+const validateInput = require('../../utils/validateInput');
+const checkAuth = require('../../utils/checkAuth');
 
 const generateToken = (user) =>
   // eslint-disable-next-line implicit-arrow-linebreak
@@ -14,7 +14,7 @@ const generateToken = (user) =>
     { id: user.id, email: user.email },
     SECRET_KEY,
     // eslint-disable-next-line comma-dangle
-    { expiresIn: "1h" }
+    { expiresIn: '1h' }
   );
 
 module.exports = {
@@ -38,19 +38,19 @@ module.exports = {
       const user = await User.findOne({ email });
 
       if (!valid) {
-        throw new UserInputError("Errors", { errors });
+        throw new UserInputError('Errors', { errors });
       }
 
       if (!user) {
-        errors.general = "User not found";
-        throw new UserInputError("User not found", { errors });
+        errors.general = 'User not found';
+        throw new UserInputError('User not found', { errors });
       }
 
       const match = await bcrypt.compare(password, user.password);
 
       if (!match) {
-        errors.general = "Wrong credentials";
-        throw new UserInputError("Wrong credentials", { errors });
+        errors.general = 'Wrong credentials';
+        throw new UserInputError('Wrong credentials', { errors });
       }
 
       const token = generateToken(user);
@@ -67,16 +67,16 @@ module.exports = {
       const { valid, errors } = validateInput(email, password, confirmPassword);
 
       if (!valid) {
-        throw new UserInputError("Errors", { errors });
+        throw new UserInputError('Errors', { errors });
       }
 
       // task Make sure user doesn't already exist
 
       const user = await User.findOne({ email });
       if (user) {
-        throw new UserInputError("Email is taken", {
+        throw new UserInputError('Email is taken', {
           errors: {
-            email: "This email is taken",
+            email: 'This email is taken',
           },
         });
       }

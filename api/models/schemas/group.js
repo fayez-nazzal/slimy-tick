@@ -1,5 +1,5 @@
-const { Schema } = require("mongoose");
-const taskSchema = require("./task");
+const { Schema } = require('mongoose');
+const taskSchema = require('./task');
 
 const groupSchema = new Schema({
   name: {

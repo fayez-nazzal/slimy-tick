@@ -1,54 +1,70 @@
-import React, { useState } from "react"
-import { makeStyles } from "@material-ui/core/styles"
-import ListItem from "@material-ui/core/ListItem"
-import ListItemIcon from "@material-ui/core/ListItemIcon"
-import ListItemSecondaryAction from "@material-ui/core/ListItemSecondaryAction"
-import ListItemText from "@material-ui/core/ListItemText"
-import Checkbox from "@material-ui/core/Checkbox"
-import CheckBoxOutlineBlankSharpIcon from "@material-ui/icons/CheckBoxOutlineBlankSharp"
-import CheckBoxSharpIcon from "@material-ui/icons/CheckBoxSharp"
-import MoreHorizSharpIcon from "@material-ui/icons/MoreHorizSharp"
-import IconButton from "@material-ui/core/IconButton"
-import Menu from "./menus/EditTaskMenu"
+import React, { useState } from 'react';
+import PropTypes from 'prop-types';
+import { makeStyles } from '@material-ui/core/styles';
+import ListItem from '@material-ui/core/ListItem';
+import ListItemIcon from '@material-ui/core/ListItemIcon';
+import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
+import Checkbox from '@material-ui/core/Checkbox';
+import CheckBoxOutlineBlankSharpIcon from '@material-ui/icons/CheckBoxOutlineBlankSharp';
+import CheckBoxSharpIcon from '@material-ui/icons/CheckBoxSharp';
+import MoreHorizSharpIcon from '@material-ui/icons/MoreHorizSharp';
+import IconButton from '@material-ui/core/IconButton';
+import Menu from './menus/EditTaskMenu';
 
-export const Task = props => {
-  const [anchorEl, setAnchorEl] = useState(false)
+const useStyles = makeStyles({
+  input: {
+    border: 'none !important',
+    backgroundColor: 'transparent !important',
+    outline: 'none !important',
+    height: '100%',
+    fontSize: '16px',
+    width: '100%',
+  },
+});
 
-  const classes = useStyles()
+const Task = ({
+  checked, body, onChange, id,
+}) => {
+  const [anchorEl, setAnchorEl] = useState(false);
+
+  const classes = useStyles();
   return (
     <ListItem dense divider>
       <ListItemIcon>
         <Checkbox
           edge="start"
           color="primary"
-          checked={props.checked}
+          checked={checked}
           checkedIcon={<CheckBoxSharpIcon />}
           icon={<CheckBoxOutlineBlankSharpIcon />}
         />
       </ListItemIcon>
       <input
-        value={props.body}
-        onChange={e => props.onChange(props.id, e.target.value)}
+        value={body}
+        onChange={(e) => onChange(id, e.target.value)}
         variant="filled"
         className={classes.input}
       />
       <ListItemSecondaryAction>
-        <IconButton onClick={e => setAnchorEl(e.currentTarget)}>
+        <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
           <MoreHorizSharpIcon color="primary" />
         </IconButton>
         <Menu onClose={() => setAnchorEl(null)} anchorEl={anchorEl} />
       </ListItemSecondaryAction>
     </ListItem>
-  )
-}
+  );
+};
 
-const useStyles = makeStyles({
-  input: {
-    border: "none !important",
-    backgroundColor: "transparent !important",
-    outline: "none !important",
-    height: "100%",
-    fontSize: "16px",
-    width: "100%",
-  },
-})
+export default Task;
+
+Task.propTypes = {
+  checked: PropTypes.bool.isRequired,
+  body: PropTypes.string.isRequired,
+  id: PropTypes.string.isRequired,
+  // created: PropTypes.string.isRequired,
+  // priority: PropTypes.string.isRequired,
+  // dueDate: PropTypes.string.isRequired,
+  // dueTime: PropTypes.string.isRequired,
+  // repeat: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
+};

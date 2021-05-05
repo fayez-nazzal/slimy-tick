@@ -1,24 +1,24 @@
-import React from "react"
-import { setDrafttaskRepeat } from "../../redux/user"
-import { MenuItem } from "@material-ui/core"
-import ListItemText from "@material-ui/core/ListItemText"
-import Menu from "../general/Menu"
-import { useDispatch } from "react-redux"
+import React from 'react';
+import { MenuItem } from '@material-ui/core';
+import ListItemText from '@material-ui/core/ListItemText';
+import { useDispatch } from 'react-redux';
+import Menu from '../general/Menu';
+import { setTaskRepeat } from '../../redux/user';
 
 const RepeatMenu = ({ anchorEl, onClose, showCustomRepeat }) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
   return (
     <Menu anchorEl={anchorEl} onClose={onClose}>
-      <MenuItem onClick={() => dispatch(setDrafttaskRepeat("every day"))}>
+      <MenuItem onClick={() => dispatch(setTaskRepeat('every day'))}>
         <ListItemText primary="Every day" />
       </MenuItem>
-      <MenuItem onClick={() => dispatch(setDrafttaskRepeat("every week"))}>
+      <MenuItem onClick={() => dispatch(setTaskRepeat('every week'))}>
         <ListItemText primary="Every week" />
       </MenuItem>
       <MenuItem
         data-testid="menuitem-priority-medium"
-        onClick={() => dispatch(setDrafttaskRepeat("every month"))}
+        onClick={() => dispatch(setTaskRepeat('every month'))}
       >
         <ListItemText primary="Every month" />
       </MenuItem>
@@ -26,7 +26,7 @@ const RepeatMenu = ({ anchorEl, onClose, showCustomRepeat }) => {
         <ListItemText primary="Custom" />
       </MenuItem>
     </Menu>
-  )
-}
+  );
+};
 
-export default RepeatMenu
+export default RepeatMenu;

@@ -1,13 +1,11 @@
-import React from "react"
-import { MuiPickersUtilsProvider } from "@material-ui/pickers"
-import MomentUtils from "@date-io/moment"
+import React from 'react';
+import { MuiPickersUtilsProvider } from '@material-ui/pickers';
+import MomentUtils from '@date-io/moment';
 
-const Provider = ({ children }) => {
-  return (
-    <MuiPickersUtilsProvider utils={MomentUtils}>
-      {children}
-    </MuiPickersUtilsProvider>
-  )
-}
+const Provider = ({ children }) => (
+  <MuiPickersUtilsProvider utils={MomentUtils}>
+    {children}
+  </MuiPickersUtilsProvider>
+);
 
-export default Provider
+export default Provider;

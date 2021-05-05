@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useLayoutEffect } from 'react';
 import {
   render,
   cleanup,
@@ -6,44 +6,44 @@ import {
   fireEvent,
   screen,
   waitFor,
-} from "@testing-library/react"
-import WrapRootElement from "../wrap-root-element"
-import { MockedProvider } from "@apollo/client/testing"
-import taskMocks from "../../__mocks__/task-mocks"
-import loginMocks from "../../__mocks__/login-mocks"
-import renderer from "react-test-renderer"
-import taskInput from "./taskInput"
-import { useDispatch } from "react-redux"
-import { useLayoutEffect } from "react"
-import { LOGIN_USER } from "../apollo/queries"
-import { useMutation } from "@apollo/client"
-import { login as globalLogin } from "../redux/user"
-import DateTimePicker from "./DateTimePicker"
-import moment from "moment"
+} from '@testing-library/react';
+import { MockedProvider } from '@apollo/client/testing';
+import renderer from 'react-test-renderer';
+import { useDispatch } from 'react-redux';
+import { useMutation } from '@apollo/client';
+import moment from 'moment';
+import WrapRootElement from '../wrap-root-element';
+import taskMocks from '../../__mocks__/task-mocks';
+import loginMocks from '../../__mocks__/login-mocks';
+import taskInput from './taskInput';
+
+import { LOGIN_USER } from '../apollo/queries';
+import { login as globalLogin } from '../redux/user';
+import DateTimePicker from './DateTimePicker';
 
 const WithUser = ({ children }) => {
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
   const [login, { loading, data }] = useMutation(LOGIN_USER, {
     update(proxy, { data: { login: userData } }) {
-      dispatch(globalLogin(userData))
+      dispatch(globalLogin(userData));
     },
     onError(err) {
-      console.log(JSON.stringify(err, null, 2))
+      console.log(JSON.stringify(err, null, 2));
     },
     variables: {
-      email: "correct@email.com",
-      password: "valid password",
+      email: 'correct@email.com',
+      password: 'valid password',
     },
-  })
+  });
 
   useLayoutEffect(() => {
-    login()
-  }, [])
+    login();
+  }, []);
 
   return (
     <div>
       {loading || !data ? (
-        "loading"
+        'loading'
       ) : (
         <>
           <taskInput />
@@ -51,252 +51,252 @@ const WithUser = ({ children }) => {
         </>
       )}
     </div>
-  )
-}
+  );
+};
 
-describe("task Input element", () => {
-  let taskInput
-  let draftInput
+describe('task Input element', () => {
+  let taskInput;
+  let draftInput;
 
   const component = (
     <WrapRootElement
-      element={
+      element={(
         <MockedProvider
           mocks={[...taskMocks, ...loginMocks]}
           addTypename={false}
         >
           <WithUser />
         </MockedProvider>
-      }
+      )}
     />
-  )
+  );
 
   beforeEach(async () => {
-    taskInput = render(component)
-    const loadingText = await waitFor(() => taskInput.getByText("loading"))
+    taskInput = render(component);
+    const loadingText = await waitFor(() => taskInput.getByText('loading'));
 
-    expect(loadingText).toBeInTheDocument()
+    expect(loadingText).toBeInTheDocument();
 
-    draftInput = await waitFor(() => taskInput.getByLabelText("task input"))
-  })
+    draftInput = await waitFor(() => taskInput.getByLabelText('task input'));
+  });
 
   afterEach(() => {
-    cleanup()
-  })
+    cleanup();
+  });
 
-  it("changes text correctly", async () => {
+  it('changes text correctly', async () => {
     const event = createEvent.paste(draftInput, {
       clipboardData: {
-        types: ["text/plain"],
-        getData: () => "sample text",
+        types: ['text/plain'],
+        getData: () => 'sample text',
       },
-    })
+    });
 
-    fireEvent(draftInput, event)
+    fireEvent(draftInput, event);
 
     await waitFor(() => {
-      expect(draftInput.innerHTML).toMatch(/sample text/)
-    })
-  })
+      expect(draftInput.innerHTML).toMatch(/sample text/);
+    });
+  });
 
-  it("sets priority via regex (very high)", async () => {
+  it('sets priority via regex (very high)', async () => {
     const event = createEvent.paste(draftInput, {
       clipboardData: {
-        types: ["text/plain"],
-        getData: () => "!!!",
+        types: ['text/plain'],
+        getData: () => '!!!',
       },
-    })
+    });
 
-    fireEvent(draftInput, event)
+    fireEvent(draftInput, event);
 
-    const veryHighPrioritySpan = screen.queryByTestId("draft-priority-1")
-    const highPrioritySpan = screen.queryByTestId("draft-priority-2")
-    const mediumPrioritySpan = screen.queryByTestId("draft-priority-3")
+    const veryHighPrioritySpan = screen.queryByTestId('draft-priority-1');
+    const highPrioritySpan = screen.queryByTestId('draft-priority-2');
+    const mediumPrioritySpan = screen.queryByTestId('draft-priority-3');
 
     await waitFor(() => {
-      expect(veryHighPrioritySpan).toBeTruthy()
-      expect(highPrioritySpan).toBeFalsy()
-      expect(mediumPrioritySpan).toBeFalsy()
-    })
-  })
+      expect(veryHighPrioritySpan).toBeTruthy();
+      expect(highPrioritySpan).toBeFalsy();
+      expect(mediumPrioritySpan).toBeFalsy();
+    });
+  });
 
-  it("sets priority via regex (high)", async () => {
+  it('sets priority via regex (high)', async () => {
     const event = createEvent.paste(draftInput, {
       clipboardData: {
-        types: ["text/plain"],
-        getData: () => "!!",
+        types: ['text/plain'],
+        getData: () => '!!',
       },
-    })
+    });
 
-    fireEvent(draftInput, event)
+    fireEvent(draftInput, event);
 
-    const veryHighPrioritySpan = screen.queryByTestId("draft-priority-1")
-    const highPrioritySpan = screen.queryByTestId("draft-priority-2")
-    const mediumPrioritySpan = screen.queryByTestId("draft-priority-3")
+    const veryHighPrioritySpan = screen.queryByTestId('draft-priority-1');
+    const highPrioritySpan = screen.queryByTestId('draft-priority-2');
+    const mediumPrioritySpan = screen.queryByTestId('draft-priority-3');
 
     await waitFor(() => {
-      expect(veryHighPrioritySpan).toBeFalsy()
-      expect(highPrioritySpan).toBeTruthy()
-      expect(mediumPrioritySpan).toBeFalsy()
-    })
-  })
+      expect(veryHighPrioritySpan).toBeFalsy();
+      expect(highPrioritySpan).toBeTruthy();
+      expect(mediumPrioritySpan).toBeFalsy();
+    });
+  });
 
-  it("sets priority via regex (medium)", async () => {
+  it('sets priority via regex (medium)', async () => {
     const event = createEvent.paste(draftInput, {
       clipboardData: {
-        types: ["text/plain"],
-        getData: () => "!",
+        types: ['text/plain'],
+        getData: () => '!',
       },
-    })
+    });
 
-    fireEvent(draftInput, event)
+    fireEvent(draftInput, event);
 
-    const veryHighPrioritySpan = screen.queryByTestId("draft-priority-1")
-    const highPrioritySpan = screen.queryByTestId("draft-priority-2")
-    const mediumPrioritySpan = screen.queryByTestId("draft-priority-3")
+    const veryHighPrioritySpan = screen.queryByTestId('draft-priority-1');
+    const highPrioritySpan = screen.queryByTestId('draft-priority-2');
+    const mediumPrioritySpan = screen.queryByTestId('draft-priority-3');
 
     await waitFor(() => {
-      expect(veryHighPrioritySpan).toBeFalsy()
-      expect(highPrioritySpan).toBeFalsy()
-      expect(mediumPrioritySpan).toBeTruthy()
-    })
-  })
+      expect(veryHighPrioritySpan).toBeFalsy();
+      expect(highPrioritySpan).toBeFalsy();
+      expect(mediumPrioritySpan).toBeTruthy();
+    });
+  });
 
-  it("sets due date via regex MM-DD-YYYY format", async () => {
+  it('sets due date via regex MM-DD-YYYY format', async () => {
     const event = createEvent.paste(draftInput, {
       clipboardData: {
-        types: ["text/plain"],
-        getData: () => "12-25-2025",
+        types: ['text/plain'],
+        getData: () => '12-25-2025',
       },
-    })
+    });
 
-    fireEvent(draftInput, event)
+    fireEvent(draftInput, event);
 
-    let dueDate = screen.queryByTestId("draft-duedate")
+    const dueDate = screen.queryByTestId('draft-duedate');
 
     await waitFor(() => {
-      expect(dueDate).toBeTruthy()
-    })
-  })
+      expect(dueDate).toBeTruthy();
+    });
+  });
 
-  it("sets due date via regex MMM DD, YYYY", async () => {
+  it('sets due date via regex MMM DD, YYYY', async () => {
     const event = createEvent.paste(draftInput, {
       clipboardData: {
-        types: ["text/plain"],
-        getData: () => "Apr 25, 2025",
+        types: ['text/plain'],
+        getData: () => 'Apr 25, 2025',
       },
-    })
+    });
 
-    fireEvent(draftInput, event)
+    fireEvent(draftInput, event);
 
-    let dueDate = screen.queryByTestId("draft-duedate")
+    const dueDate = screen.queryByTestId('draft-duedate');
 
     await waitFor(() => {
-      expect(dueDate).toBeTruthy()
-    })
-  })
+      expect(dueDate).toBeTruthy();
+    });
+  });
 
-  it("sets due via regex then menu -> change existing regex", async () => {
+  it('sets due via regex then menu -> change existing regex', async () => {
     const event = createEvent.paste(draftInput, {
       clipboardData: {
-        types: ["text/plain"],
-        getData: () => "12-10-2025",
+        types: ['text/plain'],
+        getData: () => '12-10-2025',
       },
-    })
+    });
 
-    fireEvent(draftInput, event)
+    fireEvent(draftInput, event);
 
-    let dueDate = screen.queryByTestId("draft-duedate")
+    let dueDate = screen.queryByTestId('draft-duedate');
 
     await waitFor(() => {
-      expect(dueDate).toBeTruthy()
-    })
+      expect(dueDate).toBeTruthy();
+    });
 
-    const dueButton = taskInput.getByTestId("due-button")
+    const dueButton = taskInput.getByTestId('due-button');
 
-    fireEvent.click(dueButton)
+    fireEvent.click(dueButton);
 
     await waitFor(() => {
       const rightArrowButton = taskInput.getByTestId(
-        "datetimepicker-rightarrow"
-      )
+        'datetimepicker-rightarrow',
+      );
 
-      fireEvent.click(rightArrowButton)
-    })
-
-    await waitFor(() => {
-      const day2thOfNextMonth = taskInput.getByTestId("day-20")
-
-      fireEvent.click(day2thOfNextMonth)
-    })
+      fireEvent.click(rightArrowButton);
+    });
 
     await waitFor(() => {
-      const okButton = taskInput.getByText(/ok/i)
+      const day2thOfNextMonth = taskInput.getByTestId('day-20');
 
-      fireEvent.click(okButton)
-    })
-
-    dueDate = screen.queryByTestId("draft-duedate")
+      fireEvent.click(day2thOfNextMonth);
+    });
 
     await waitFor(() => {
-      expect(dueDate.innerHTML.toLowerCase()).not.toMatch(/12-10-2025/i)
-      expect(dueDate.innerHTML.toLowerCase()).toMatch(/\w\w\w 20, \d\d\d\d/i)
-    })
-  })
+      const okButton = taskInput.getByText(/ok/i);
 
-  it("sets priority via regex then via menu replaces the regex content", async () => {
+      fireEvent.click(okButton);
+    });
+
+    dueDate = screen.queryByTestId('draft-duedate');
+
+    await waitFor(() => {
+      expect(dueDate.innerHTML.toLowerCase()).not.toMatch(/12-10-2025/i);
+      expect(dueDate.innerHTML.toLowerCase()).toMatch(/\w\w\w 20, \d\d\d\d/i);
+    });
+  });
+
+  it('sets priority via regex then via menu replaces the regex content', async () => {
     const event = createEvent.paste(draftInput, {
       clipboardData: {
-        types: ["text/plain"],
-        getData: () => "!!!",
+        types: ['text/plain'],
+        getData: () => '!!!',
       },
-    })
+    });
 
-    fireEvent(draftInput, event)
+    fireEvent(draftInput, event);
 
-    let veryHighPrioritySpan = screen.queryByTestId("draft-priority-1")
-    let mediumPrioritySpan = screen.queryByTestId("draft-priority-3")
+    let veryHighPrioritySpan = screen.queryByTestId('draft-priority-1');
+    let mediumPrioritySpan = screen.queryByTestId('draft-priority-3');
 
     await waitFor(() => {
-      expect(veryHighPrioritySpan).toBeTruthy()
-      expect(mediumPrioritySpan).toBeFalsy()
-    })
+      expect(veryHighPrioritySpan).toBeTruthy();
+      expect(mediumPrioritySpan).toBeFalsy();
+    });
 
-    const priorityButton = taskInput.getByTestId("priority-button")
+    const priorityButton = taskInput.getByTestId('priority-button');
 
-    fireEvent.click(priorityButton)
+    fireEvent.click(priorityButton);
 
     await waitFor(() => {
       const priorityMediumMenuItem = taskInput.getByTestId(
-        "menuitem-priority-medium"
-      )
+        'menuitem-priority-medium',
+      );
 
-      fireEvent.click(priorityMediumMenuItem)
-    })
+      fireEvent.click(priorityMediumMenuItem);
+    });
 
-    veryHighPrioritySpan = screen.queryByTestId("draft-priority-1")
-    mediumPrioritySpan = screen.queryByTestId("draft-priority-3")
+    veryHighPrioritySpan = screen.queryByTestId('draft-priority-1');
+    mediumPrioritySpan = screen.queryByTestId('draft-priority-3');
 
     await waitFor(() => {
-      expect(veryHighPrioritySpan).toBeFalsy()
-      expect(mediumPrioritySpan).toBeTruthy()
-    })
-  })
+      expect(veryHighPrioritySpan).toBeFalsy();
+      expect(mediumPrioritySpan).toBeTruthy();
+    });
+  });
 
-  it("sets due time via regex 2:00 AM", async () => {
+  it('sets due time via regex 2:00 AM', async () => {
     const event = createEvent.paste(draftInput, {
       clipboardData: {
-        types: ["text/plain"],
-        getData: () => ">>>>>>2:00 AM<<<<<<<",
+        types: ['text/plain'],
+        getData: () => '>>>>>>2:00 AM<<<<<<<',
       },
-    })
+    });
 
-    fireEvent(draftInput, event)
+    fireEvent(draftInput, event);
 
-    let dueTimeStrategy = screen.queryByTestId("draft-duetime")
+    const dueTimeStrategy = screen.queryByTestId('draft-duetime');
 
     await waitFor(() => {
-      expect(dueTimeStrategy).toBeTruthy()
-    })
-  })
-})
+      expect(dueTimeStrategy).toBeTruthy();
+    });
+  });
+});

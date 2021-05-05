@@ -1,62 +1,63 @@
+import moment from 'moment';
 import {
   DUE_DATE_REGEXES,
   DUE_TIME_REGEXES,
   REPEAT_REGEXES,
   PRIORITY_REGEX,
-} from "./regex"
-import moment from "moment"
-import { findDueDateOptions } from "./regexAnalyzers"
-export const matchRepeat = str => {
-  const match = matchRegexFromArray(str, REPEAT_REGEXES)
+} from './regex';
+import { findDueDateOptions } from './regexAnalyzers';
 
-  const result = match ? match.replace(/( ?and ?)$/, "") : null
+export const matchRepeat = (str) => {
+  const match = matchRegexFromArray(str, REPEAT_REGEXES);
 
-  return result
-}
+  const result = match ? match.replace(/( ?and ?)$/, '') : null;
+
+  return result;
+};
 
 // works for dates and strings like tomorrow, after 2 months..etc
-export const matchDueDate = str => {
-  const match = matchRegexFromArray(str, DUE_DATE_REGEXES)
-  const date = match && findDueDateOptions(match)
+export const matchDueDate = (str) => {
+  const match = matchRegexFromArray(str, DUE_DATE_REGEXES);
+  const date = match && findDueDateOptions(match);
 
   return !match || !date || (date && date.isBefore(moment()))
     ? null
-    : match.trim()
-}
+    : match.trim();
+};
 
-export const matchDueTime = str => {
-  const match = matchRegexFromArray(str, DUE_TIME_REGEXES)
+export const matchDueTime = (str) => {
+  const match = matchRegexFromArray(str, DUE_TIME_REGEXES);
 
-  return match && match.trim()
-}
+  return match && match.trim();
+};
 
-export const matchPriorityAndReturnRange = str => {
-  const match = matchRegexFromArray(str, [PRIORITY_REGEX])
+export const matchPriorityAndReturnRange = (str) => {
+  const match = matchRegexFromArray(str, [PRIORITY_REGEX]);
 
-  if (!match) return null
+  if (!match) return null;
 
-  let index = match.length - 1
-  let count = 0
+  let index = match.length - 1;
+  let count = 0;
 
-  while (match[index] === "!") {
-    count++
-    index--
+  while (match[index] === '!') {
+    count++;
+    index--;
   }
 
-  index++
+  index++;
 
-  return [index, index + count]
-}
+  return [index, index + count];
+};
 
 const matchRegexFromArray = (str, array) => {
-  let matches = []
+  let matches = [];
 
-  for (let regex of array) {
-    let arr = str.match(regex)
-    matches = arr ? [...matches, arr[0]] : matches
+  for (const regex of array) {
+    const arr = str.match(regex);
+    matches = arr ? [...matches, arr[0]] : matches;
 
-    if (matches && matches.length) break
+    if (matches && matches.length) break;
   }
 
-  return matches && matches.length ? matches[0].trim() : null
-}
+  return matches && matches.length ? matches[0].trim() : null;
+};

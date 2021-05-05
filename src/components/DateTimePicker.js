@@ -1,168 +1,197 @@
-import React, { useEffect, useRef, useState } from "react"
-import { DateTimePicker } from "@material-ui/pickers"
-import { useDispatch, useSelector } from "react-redux"
-import { setDrafttaskDueDate, setDrafttaskDueTime } from "../redux/user"
-import {
-  createMuiTheme,
-  makeStyles,
-  ThemeProvider,
-} from "@material-ui/core/styles"
+import React, { useEffect, useRef, useState } from 'react';
+import PropTypes from 'prop-types';
+import { DateTimePicker as MuiDateTimePicker } from '@material-ui/pickers';
+import { useDispatch, useSelector } from 'react-redux';
+import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
+import makeStyles from '@material-ui/core/styles/makeStyles';
+import ThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import moment from 'moment';
+import 'moment-recur';
+import { Button, Popover } from '@material-ui/core';
+import { minutes, hours, days } from 'time-convert';
 import {
   findDueDateOptions,
   findDueTimeOptions,
   findRepeatOptions,
-} from "../utils/regexAnalyzers"
-import moment from "moment"
-import "moment-recur"
-import { Button, Popover } from "@material-ui/core"
-import { minutes, hours, days } from "time-convert"
+} from '../utils/regexAnalyzers';
+import { setTaskDueDate, setTaskDueTime } from '../redux/user';
 
 const theme = createMuiTheme({
   palette: {
     primary: {
-      main: "#bedc9b",
+      main: '#bedc9b',
     },
   },
-})
+});
 
-const timeToDays = repeatArr => {
-  const repeatFor = repeatArr && repeatArr[0]
+const timeToDays = (repeatArr) => {
+  const repeatFor = repeatArr && repeatArr[0];
 
-  return repeatFor === "minutes"
-    ? days.from(minutes)(repeatArr[1])
-    : repeatFor === "hours"
-    ? days.from(hours)(repeatArr[1])
-    : repeatFor === "days"
-    ? repeatArr[1]
-    : null
-}
+  switch (repeatFor) {
+    case 'minutes':
+      return days.from(minutes)(repeatArr[1]);
+    case 'hours':
+      return days.from(hours)(repeatArr[1]);
+    case 'days':
+      return repeatArr[1];
+    default:
+      return null;
+  }
+};
 
-const repeatArrToDays = repeatArr => {
-  const repeatFor = repeatArr && repeatArr[0]
-  return repeatFor === "mornings" ||
-    repeatFor === "afternoons" ||
-    repeatFor === "evenings" ||
-    repeatFor === "nights" ||
-    repeatFor === "days"
-    ? ["days", repeatArr[1]]
-    : repeatFor === "daytimes" || repeatFor === "times"
-    ? ["days", 1]
-    : repeatFor === "weeks"
-    ? ["days", repeatArr[1] * 7]
-    : repeatArr
-}
+const repeatArrToDays = (repeatArr) => {
+  const repeatFor = repeatArr && repeatArr[0];
 
-const BasicDateTimePicker = props => {
-  const dispatch = useDispatch()
-  const classes = useStyles()
-  const taskRepeat = useSelector(state => state.user.drafttaskValues.repeat)
-  const taskDueDate = useSelector(state => state.user.drafttaskValues.dueDate)
-  const taskDueTime = useSelector(state => state.user.drafttaskValues.dueTime)
-  const [selectedDate, setSelectedDate] = useState()
-  const recurDates = useRef([])
+  switch (repeatFor) {
+    case 'mornings':
+    case 'afternoons':
+    case 'evenings':
+    case 'nights':
+    case 'days':
+      return ['days', repeatArr[1]];
+    case 'daytimes':
+    case 'times':
+      return ['days', 1];
+    case 'weeks':
+      return ['days', repeatArr[1] * 7];
+    default:
+      return repeatArr;
+  }
+};
+
+const useStyles = makeStyles({
+  flex: {
+    marginTop: '8px',
+    display: 'flex',
+    width: '100%',
+    justifyContent: 'center',
+  },
+  button: {
+    margin: '0 6px',
+  },
+});
+
+const DateTimePicker = ({ anchorEl, onClose }) => {
+  const dispatch = useDispatch();
+  const classes = useStyles();
+  const taskRepeat = useSelector((state) => state.user.taskValues.repeat);
+  const taskDueDate = useSelector(
+    (state) => state.user.taskValues.dueDate,
+  );
+  const taskDueTime = useSelector(
+    (state) => state.user.taskValues.dueTime,
+  );
+  const [selectedDate, setSelectedDate] = useState();
+  const recurDates = useRef([]);
 
   useEffect(() => {
-    const analyzedRepeat = findRepeatOptions(taskRepeat)
+    const analyzedRepeat = findRepeatOptions(taskRepeat);
 
-    const normalizedRepeat = repeatArrToDays(analyzedRepeat)
-    !selectedDate && setSelectedDate(getDate())
-    const eqDays = timeToDays(normalizedRepeat)
+    const normalizedRepeat = repeatArrToDays(analyzedRepeat);
+    // eslint-disable-next-line no-use-before-define
+    setSelectedDate((prev) => (!selectedDate ? getDate() : prev));
+    const eqDays = timeToDays(normalizedRepeat);
 
     if (
       normalizedRepeat &&
-      !normalizedRepeat["weekdays"] &&
+      !normalizedRepeat.weekdays &&
       selectedDate &&
       (!eqDays || eqDays > 1)
     ) {
-      const currClone = selectedDate.clone()
-      recurDates.current = []
-      const dateCount = eqDays < 4 ? 800 : eqDays < 8 ? 500 : 100
+      const currClone = selectedDate.clone();
+      recurDates.current = [];
 
-      for (let i = 0; i < dateCount; i++) {
-        currClone.add(normalizedRepeat[1], normalizedRepeat[0])
+      // maximum generated dates = 800
+      // as the number of days increases, the interval between each two dates increases
+      // which means that the last date can be long after (may not bee seen by user)
+      // generate less dates --> higher performance
+      const dateCount = Math.floor(800 - eqDays * 100);
 
-        recurDates.current.push(currClone.clone())
+      for (let i = 0; i < dateCount; i += 1) {
+        currClone.add(normalizedRepeat[1], normalizedRepeat[0]);
+
+        recurDates.current.push(currClone.clone());
       }
     }
-  }, [taskRepeat, selectedDate])
+  }, [taskRepeat, selectedDate]);
 
   const handleOkButton = () => {
-    const dateString = selectedDate.format("MMM DD, YYYY")
-    const timeString = selectedDate.format("hh:mm a")
-    dispatch(setDrafttaskDueDate(dateString))
-    dispatch(setDrafttaskDueTime(timeString))
-    props.onClose()
-  }
+    const dateString = selectedDate.format('MMM DD, YYYY');
+    const timeString = selectedDate.format('hh:mm a');
+    dispatch(setTaskDueDate(dateString));
+    dispatch(setTaskDueTime(timeString));
+    onClose();
+  };
 
-  const handleAccept = date => {
-    setSelectedDate(date)
-  }
-
-  const handleOnEnter = () => {
-    setSelectedDate(getDate())
-  }
+  const handleAccept = (date) => {
+    setSelectedDate(date);
+  };
 
   const getDate = () => {
-    const taskMomentDate = findDueDateOptions(taskDueDate) || moment()
-    const taskMomentTime = findDueTimeOptions(taskDueTime) || moment()
+    const taskMomentDate = findDueDateOptions(taskDueDate) || moment();
+    const taskMomentTime = findDueTimeOptions(taskDueTime) || moment();
 
     return taskMomentDate.set({
-      hour: taskMomentTime.get("hour"),
-      minute: taskMomentTime.get("minute"),
-    })
-  }
+      hour: taskMomentTime.get('hour'),
+      minute: taskMomentTime.get('minute'),
+    });
+  };
 
-  const renderDay = (day, selectedDate, _, DayComponent) => {
-    const analyzedRepeat = findRepeatOptions(taskRepeat)
-    const normalizedRepeat = repeatArrToDays(analyzedRepeat)
+  const handleOnEnter = () => {
+    setSelectedDate(getDate());
+  };
 
-    const repeatToDays = selectedDate && timeToDays(normalizedRepeat)
+  const renderDay = (day, selDate, _, DayComponent) => {
+    const analyzedRepeat = findRepeatOptions(taskRepeat);
+    const normalizedRepeat = repeatArrToDays(analyzedRepeat);
 
-    let renderCustom =
+    const repeatToDays = selDate && timeToDays(normalizedRepeat);
+
+    const renderCustom =
       normalizedRepeat &&
       ((repeatToDays && repeatToDays <= 1) ||
-        recurDates.current.find(date => date.isSame(day, "day")) ||
-        (normalizedRepeat[0] === "weekdays" &&
-          normalizedRepeat[1].find(weekday => {
-            return day.format("ddd").toLowerCase() === weekday
-          }) !== undefined &&
-          day.isAfter(selectedDate)))
+        recurDates.current.find((date) => date.isSame(day, 'day')) ||
+        (normalizedRepeat[0] === 'weekdays' &&
+          normalizedRepeat[1].find(
+            (weekday) => day.format('ddd').toLowerCase() === weekday,
+          ) !== undefined &&
+          day.isAfter(selDate)));
 
     return (
       <CustomDay
         highlighted={renderCustom}
         component={DayComponent}
-        day={day.format("D")}
+        day={day.format('D')}
       />
-    )
-  }
+    );
+  };
 
   return (
     <ThemeProvider theme={theme}>
       <Popover
-        open={!!props.anchorEl}
-        anchorEl={props.anchorEl}
-        onClose={props.onClose}
+        open={!!anchorEl}
+        anchorEl={anchorEl}
+        onClose={onClose}
         onEnter={handleOnEnter}
         elevation={0}
         getContentAnchorEl={null}
         anchorOrigin={{
-          vertical: "bottom",
-          horizontal: "left",
+          vertical: 'bottom',
+          horizontal: 'left',
         }}
         transformOrigin={{
-          vertical: "top",
-          horizontal: "left",
+          vertical: 'top',
+          horizontal: 'left',
         }}
       >
-        <DateTimePicker
+        <MuiDateTimePicker
           variant="static"
           value={selectedDate}
           onChange={setSelectedDate}
           onAccept={handleAccept}
           renderDay={renderDay}
           rightArrowButtonProps={{
-            "data-testid": "datetimepicker-rightarrow",
+            'data-testid': 'datetimepicker-rightarrow',
           }}
           color="primary"
           disablePast
@@ -182,20 +211,20 @@ const BasicDateTimePicker = props => {
             variant="contained"
             color="primary"
             className={classes.button}
-            onClick={props.onClose}
+            onClick={onClose}
           >
             Cancel
           </Button>
         </div>
       </Popover>
     </ThemeProvider>
-  )
-}
+  );
+};
 
-export default BasicDateTimePicker
+export default DateTimePicker;
 
-const CustomDay = props => {
-  const [hovered, setHovered] = useState(false)
+const CustomDay = (props) => {
+  const [hovered, setHovered] = useState(false);
 
   return React.cloneElement(props.component, {
     onMouseEnter: () => setHovered(true),
@@ -203,20 +232,17 @@ const CustomDay = props => {
     style: {
       boxShadow:
         props.highlighted &&
-        `inset 0px 0px 0px 3px ${hovered ? "#bedeaf" : "#bedc9b95"}`,
+        `inset 0px 0px 0px 3px ${hovered ? '#bedeaf' : '#bedc9b95'}`,
     },
-    "data-testid": `day-${props.day}`,
-  })
-}
+    'data-testid': `day-${props.day}`,
+  });
+};
 
-const useStyles = makeStyles({
-  flex: {
-    marginTop: "8px",
-    display: "flex",
-    width: "100%",
-    justifyContent: "center",
-  },
-  button: {
-    margin: "0 6px",
-  },
-})
+DateTimePicker.propTypes = {
+  onClose: PropTypes.func.isRequired,
+  anchorEl: PropTypes.element.isRequired,
+};
+
+CustomDay.propTypes = {
+  component: PropTypes.element,
+};
