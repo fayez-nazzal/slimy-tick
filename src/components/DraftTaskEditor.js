@@ -4,8 +4,7 @@ import {
   Editor, EditorState, CompositeDecorator, Modifier, SelectionState,
 } from 'draft-js';
 import clsx from 'clsx';
-
-import { useSelector, useDispatch } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { makeStyles } from '@material-ui/core/styles';
 import {
   DraftPriorityTag,
@@ -16,7 +15,8 @@ import {
 import {
   matchDueDate, matchDueTime, matchRepeat, matchPriorityAndReturnRange,
 } from '../utils/matchers';
-import { setTaskBody } from '../redux/user';
+import { setNewTaskBody } from '../redux/newTask';
+import { newTaskSelector } from '../redux/selectors';
 
 const useStyles = makeStyles((theme) => ({
   editorContainer: {
@@ -35,7 +35,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const DraftTaskEditor = ({ focus, setFocus, disableBlur }) => {
+const DraftTaskEditor = ({
+  focus, setFocus, disableBlur, newTask,
+}) => {
   const matchForStrategy = (
     contentBlock,
     callback,
@@ -52,6 +54,8 @@ const DraftTaskEditor = ({ focus, setFocus, disableBlur }) => {
 
     const matchIndex = text.lastIndexOf(matchResult);
     if (matchResult && matchResult.length) callback(matchIndex, matchIndex + matchResult.length);
+
+    return null;
   };
 
   const [editorState, setEditorState] = useState(() => EditorState.createEmpty(
@@ -98,7 +102,6 @@ const DraftTaskEditor = ({ focus, setFocus, disableBlur }) => {
       },
     ]),
   ));
-  const taskValues = useSelector((state) => state.user.taskValues);
   const editorRef = useRef(null);
   const classes = useStyles({ focus });
   const dispatch = useDispatch();
@@ -108,11 +111,15 @@ const DraftTaskEditor = ({ focus, setFocus, disableBlur }) => {
       .getCurrentContent()
       .getPlainText('\u0001');
 
-    if (taskValues.body !== currentDraftText) {
+    if (newTask.body && newTask.body !== currentDraftText) {
       // eslint-disable-next-line no-use-before-define
-      setDraftBodyText(taskValues.body);
+      setDraftBodyText(newTask.body);
     }
-  }, [taskValues.body]);
+  }, [newTask.body]);
+
+  useEffect(() => {
+    console.debug('draft task editor rendered');
+  });
 
   const setDraftBodyText = (newText) => {
     const currentDraftText = editorState
@@ -144,7 +151,7 @@ const DraftTaskEditor = ({ focus, setFocus, disableBlur }) => {
     setEditorState(state);
     const newContent = state.getCurrentContent().getPlainText('\u0001');
 
-    if (newContent !== taskValues.body) dispatch(setTaskBody(newContent));
+    if (newContent !== newTask.body) dispatch(setNewTaskBody(newContent));
   };
 
   //   const clearEditor = () => {
@@ -167,7 +174,7 @@ const DraftTaskEditor = ({ focus, setFocus, disableBlur }) => {
         onFocus={() => setFocus(true)}
         onBlur={() => {
           setTimeout(() => {
-            if (disableBlur) return;
+            if (disableBlur.current) return;
             setFocus(false);
           });
         }}
@@ -178,10 +185,24 @@ const DraftTaskEditor = ({ focus, setFocus, disableBlur }) => {
   );
 };
 
-export default DraftTaskEditor;
+const mapStateToProps = (state) => ({
+  newTask: newTaskSelector(state),
+});
+
+export default connect(mapStateToProps)(DraftTaskEditor);
 
 DraftTaskEditor.propTypes = {
-  disableBlur: PropTypes.bool.isRequired,
+  disableBlur: PropTypes.shape({
+    current: PropTypes.bool,
+  }).isRequired,
   focus: PropTypes.bool.isRequired,
   setFocus: PropTypes.func.isRequired,
+  newTask: PropTypes.shape({
+    body: PropTypes.string,
+    priority: PropTypes.number,
+    checked: PropTypes.bool,
+    dueDate: PropTypes.string,
+    dueTime: PropTypes.string,
+    repeat: PropTypes.string,
+  }).isRequired,
 };

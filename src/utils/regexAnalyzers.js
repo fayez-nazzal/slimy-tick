@@ -1,7 +1,19 @@
 import moment, { now } from 'moment';
 import { createDateFromStr, createTimeFromStr } from './datetime';
 
+const firstValue = (arr) => (arr ? arr[0] : null);
+
+const normalizeWeekdayName = (str) => str
+  .replace(/sun(day)?/i, 'sun')
+  .replace(/mon(day)?/i, 'mon')
+  .replace(/tue(sday)?/i, 'tue')
+  .replace(/wed(nesday)?/i, 'wed')
+  .replace(/thu(rsday)?/i, 'thu')
+  .replace(/fri(day)?/i, 'fri')
+  .replace(/sat(urday)?/i, 'sat');
+
 export const findRepeatOptions = (repeatStr) => {
+  if (!repeatStr) return null;
   const numMinutes = firstValue(repeatStr.match(/\b\d+?(?= ?minute)/i));
   const numHours =
     firstValue(repeatStr.match(/\d+(?= ?hour)/i)) ||
@@ -50,33 +62,21 @@ export const findRepeatOptions = (repeatStr) => {
       ((repeatStr.match(/(?<!\d) ?day(?!s)/i) ||
         repeatStr.match(/(1|one) ?day(s?)/i)) &&
         1));
-  const repeatType = numMinutes
-    ? 'minutes'
-    : numHours
-      ? 'hours'
-      : numDays
-        ? 'days'
-        : numWeeks
-          ? 'weeks'
-          : numMonths
-            ? 'months'
-            : numYears
-              ? 'years'
-              : times
-                ? 'times'
-                : daytimes && daytimes.length > 1
-                  ? 'daytimes'
-                  : numMornings
-                    ? 'mornings'
-                    : numAfternoons
-                      ? 'afternoons'
-                      : numEvenings
-                        ? 'evenings'
-                        : numNights
-                          ? 'nights'
-                          : weekdays
-                            ? 'weekdays'
-                            : null;
+  const repeatType =
+    (numMinutes && 'minutes') ||
+    (numHours && 'hours') ||
+    (numDays && 'days') ||
+    (numWeeks && 'weeks') ||
+    (numMonths && 'months') ||
+    (numYears && 'years') ||
+    (times && 'times') ||
+    (daytimes && daytimes.length > 1 && 'daytimes') ||
+    (numMornings && 'mornings') ||
+    (numAfternoons && 'afternoons') ||
+    (numEvenings && 'evenings') ||
+    (numNights && 'nights') ||
+    (weekdays && 'weekdays') ||
+    null;
 
   switch (repeatType) {
     case 'weekdays':
@@ -88,82 +88,96 @@ export const findRepeatOptions = (repeatStr) => {
     case null:
       return [null, null];
     default:
-      const repeatStep =
-        numMinutes ||
-        numHours ||
-        numDays ||
-        numWeeks ||
-        numMonths ||
-        numYears ||
-        numMornings ||
-        numAfternoons ||
-        numEvenings ||
-        numNights ||
-        null;
-
-      return [repeatType, parseInt(repeatStep)];
+      return [
+        repeatType,
+        parseInt(
+          numMinutes ||
+            numHours ||
+            numDays ||
+            numWeeks ||
+            numMonths ||
+            numYears ||
+            numMornings ||
+            numAfternoons ||
+            numEvenings ||
+            numNights ||
+            null,
+          10,
+        ),
+      ];
   }
 };
 
 export const findDueDateOptions = (str) => {
-  const date = createDateFromStr(str);
+  if (!str) return null;
+
+  let date = createDateFromStr(str);
   if (date.isValid()) {
     return date.isAfter() ? date : null;
-  } else {
-    const date = moment();
-    const isTomorrow = str.match(/((tomorrow)|(next day))/);
-    const nextMorning = str.match(/next morning/);
-    const nextAfternoon = str.match(/next afternoon/);
-    const nextEvening = str.match(/next evening/);
-    const nextNight = str.match(/next night/);
-    let nDays = str.match(/\d+ ?(?=days)/i);
-    nDays = str.match(/(a|1|one)? ?day(?!s)/i) ? [1] : nDays;
-    let nWeeks = str.match(/\d+ ?(?=weeks)/i);
-    nWeeks = str.match(/(a|1|one)? ?week(?!s)/i) ? [1] : nWeeks;
-    let nMonths = str.match(/\d+ ?(?=months)/i);
-    nMonths = str.match(/(a|1|one)? ?month(?!s)/i) ? [1] : nMonths;
-    let nYears = str.match(/\d+ ?(?=years)/i);
-    nYears = str.match(/(a|1|one)? ?year(?!s)/i) ? [1] : nYears;
-    const weekDay = str.match(
-      /\b((sun(day)?)|(mon(day)?)|(tue(sday)?)|(wed(nesday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))\b/i,
-    );
-    const nextWeekDay = firstValue(weekDay) && str.match(/next/);
-
-    nextWeekDay && date.add(1, 'days');
-
-    while (
-      firstValue(weekDay) &&
-      date.format('ddd').toLowerCase() !==
-        normalizeWeekdayName(firstValue(weekDay))
-    ) {
-      date.add(1, 'days');
-    }
-
-    return weekDay
-      ? date
-      : nextMorning
-        ? moment('08:00', 'HH:mm').add(+(parseInt(now.format('HH')) < 8), 'days')
-        : nextAfternoon
-          ? moment('13:00', 'HH:mm').add(+(parseInt(now.format('HH')) < 13), 'days')
-          : nextEvening
-            ? moment('18:00', 'HH:mm').add(+(parseInt(now.format('HH')) < 18), 'days')
-            : nextNight
-              ? moment('21:00', 'HH:mm').add(+(parseInt(now.format('HH')) < 21), 'days')
-              : isTomorrow
-                ? date.add(1, 'days')
-                : nDays
-                  ? date.add(parseInt(nDays[0]), 'days')
-                  : nWeeks
-                    ? date.add(parseInt(nWeeks[0]), 'weeks')
-                    : nMonths
-                      ? date.add(parseInt(nMonths[0]), 'months')
-                      : nYears
-                        ? date.add(parseInt(nYears[0]), 'years')
-                        : null;
   }
+  date = moment();
+  const isTomorrow = str.match(/((tomorrow)|(next day))/);
+  const nextMorning = str.match(/next morning/);
+  const nextAfternoon = str.match(/next afternoon/);
+  const nextEvening = str.match(/next evening/);
+  const nextNight = str.match(/next night/);
+  let nDays = str.match(/\d+ ?(?=days)/i);
+  nDays = str.match(/(a|1|one)? ?day(?!s)/i) ? [1] : nDays;
+  let nWeeks = str.match(/\d+ ?(?=weeks)/i);
+  nWeeks = str.match(/(a|1|one)? ?week(?!s)/i) ? [1] : nWeeks;
+  let nMonths = str.match(/\d+ ?(?=months)/i);
+  nMonths = str.match(/(a|1|one)? ?month(?!s)/i) ? [1] : nMonths;
+  let nYears = str.match(/\d+ ?(?=years)/i);
+  nYears = str.match(/(a|1|one)? ?year(?!s)/i) ? [1] : nYears;
+  const weekDay = str.match(
+    /\b((sun(day)?)|(mon(day)?)|(tue(sday)?)|(wed(nesday)?)|(thu(rsday)?)|(fri(day)?)|(sat(urday)?))\b/i,
+  );
+  const nextWeekDay = firstValue(weekDay) && str.match(/next/);
+
+  if (nextWeekDay) date.add(1, 'days');
+
+  while (
+    firstValue(weekDay) &&
+    date.format('ddd').toLowerCase() !==
+      normalizeWeekdayName(firstValue(weekDay))
+  ) {
+    date.add(1, 'days');
+  }
+
+  return (
+    (weekDay && date) ||
+    (nextMorning &&
+      moment('08:00', 'HH:mm').add(
+        +(parseInt(now.format('HH'), 10) < 8),
+        'days',
+      )) ||
+    (nextAfternoon &&
+      moment('13:00', 'HH:mm').add(
+        +(parseInt(now.format('HH'), 10) < 13),
+        'days',
+      )) ||
+    (nextEvening &&
+      moment('18:00', 'HH:mm').add(
+        +(parseInt(now.format('HH'), 10) < 18),
+        'days',
+      )) ||
+    (nextNight &&
+      moment('21:00', 'HH:mm').add(
+        +(parseInt(now.format('HH'), 10) < 21),
+        'days',
+      )) ||
+    (isTomorrow && date.add(1, 'days')) ||
+    (nDays && date.add(parseInt(nDays[0], 10), 'days')) ||
+    (nWeeks && date.add(parseInt(nWeeks[0], 10), 'weeks')) ||
+    (nMonths && date.add(parseInt(nMonths[0], 10), 'months')) ||
+    (nYears && date.add(parseInt(nYears[0], 10), 'years')) ||
+    null
+  );
 };
 
 export const findDueTimeOptions = (str) => {
+  if (!str) return null;
+
   const time = createTimeFromStr(str);
   if (!str.includes('after') && time.isValid()) {
     return time;
@@ -177,28 +191,13 @@ export const findDueTimeOptions = (str) => {
   let nHours = str.match(/\d+ ?(?=hours?)/i);
   nHours = str.match(/(an?|1|one)? ?(hour(?!s))/i) ? [1] : nHours;
 
-  return morning
-    ? createTimeFromStr('8:00AM')
-    : afternoon
-      ? createTimeFromStr('01:00PM')
-      : evening
-        ? createTimeFromStr('6:00PM')
-        : night
-          ? createTimeFromStr('9:00PM')
-          : nHours
-            ? moment().add(parseInt(nHours[0]), 'hours')
-            : nMinutes
-              ? moment().add(parseInt(nMinutes[0]), 'minutes')
-              : null;
+  return (
+    (morning && createTimeFromStr('8:00AM')) ||
+    (afternoon && createTimeFromStr('01:00PM')) ||
+    (evening && createTimeFromStr('6:00PM')) ||
+    (night && createTimeFromStr('9:00PM')) ||
+    (nHours && moment().add(parseInt(nHours[0], 10), 'hours')) ||
+    (nMinutes && moment().add(parseInt(nMinutes[0], 10), 'minutes')) ||
+    null
+  );
 };
-
-const firstValue = (arr) => (arr ? arr[0] : null);
-
-const normalizeWeekdayName = (str) => str
-  .replace(/sun(day)?/i, 'sun')
-  .replace(/mon(day)?/i, 'mon')
-  .replace(/tue(sday)?/i, 'tue')
-  .replace(/wed(nesday)?/i, 'wed')
-  .replace(/thu(rsday)?/i, 'thu')
-  .replace(/fri(day)?/i, 'fri')
-  .replace(/sat(urday)?/i, 'sat');

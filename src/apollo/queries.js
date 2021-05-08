@@ -26,14 +26,14 @@ export const QUERY_TASKS_IN_GROUP = gql`
 `;
 
 export const CREATE_TASK = gql`
-  mutation createtask(
+  mutation addTask(
     $groupName: String!
     $body: String!
     $priority: Int!
     $dueDate: String
     $dueTime: String
   ) {
-    createtask(
+    addTask(
       groupName: $groupName
       body: $body
       priority: $priority

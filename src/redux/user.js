@@ -8,10 +8,10 @@ export const userSlice = createSlice({
   },
   reducers: {
     login: (state, { payload }) => {
-      const { email, name } = payload;
+      const { email, name, token } = payload;
       state.email = email;
       state.name = name;
-      localStorage.setItem('slimy-tick-jwt', state.userData.token);
+      localStorage.setItem('slimy-tick-jwt', token);
     },
     logout: (state) => {
       state.userData = null;

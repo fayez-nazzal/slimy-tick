@@ -12,7 +12,7 @@ import { ToggleButtonGroup, ToggleButton } from '@material-ui/lab';
 import clsx from 'clsx';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
-import ThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import { ThemeProvider } from '@material-ui/core/styles';
 
 import { findRepeatOptions } from '../../utils/regexAnalyzers';
 
@@ -226,9 +226,13 @@ const CustomRepeatPopover = ({
 
 export default CustomRepeatPopover;
 
+CustomRepeatPopover.defaultProps = {
+  anchorEl: null,
+};
+
 CustomRepeatPopover.propTypes = {
   onClose: PropTypes.func.isRequired,
-  anchorEl: PropTypes.element.isRequired,
+  anchorEl: PropTypes.node,
   taskRepeat: PropTypes.string.isRequired,
   setTaskRepeat: PropTypes.func.isRequired,
 };

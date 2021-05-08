@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   makeStyles,
   createMuiTheme,
@@ -14,8 +14,13 @@ import { useMutation } from '@apollo/client';
 import { useDispatch, connect } from 'react-redux';
 import { CREATE_TASK } from '../apollo/queries';
 import { newTaskSelector } from '../redux/selectors';
-import { addTask } from '../redux/tasks';
-import { setNewTaskPriority, setNewTaskBody } from '../redux/newTask';
+import {
+  setNewTaskDueDate,
+  setNewTaskDueTime,
+  setNewTaskRepeat,
+  setNewTaskPriority,
+  setNewTaskBody,
+} from '../redux/newTask';
 import DateTimePicker from './DateTimePicker';
 import ButtonGroupButton from './general/ButtonGroupIconButton';
 import RepeatMenu from './menus/RepeatMenu';
@@ -30,8 +35,6 @@ const theme = createMuiTheme({
     },
   },
 });
-
-let disableEditorBlur = false;
 
 const useStyles = makeStyles({
   root: {
@@ -83,20 +86,22 @@ const useStyles = makeStyles({
 const newTaskInput = ({ newTask }) => {
   const dispatch = useDispatch();
   const [focus, setFocus] = useState(false);
+  const disableEditorBlur = useRef(false);
 
   useEffect(() => {
+    console.debug('new task input rendered');
     // eslint-disable-next-line no-use-before-define
     resetTask();
   }, []);
 
-  const [priorityAnchorEl, setPriorityAnchorEl] = useState(false);
-  const [dueAnchorEl, setDueAnchorEl] = useState(false);
-  const [repeatAnchorEl, setRepeatAnchorEl] = useState(false);
-  const [customRepeatAnchorEl, setCustomRepeatAncorEl] = useState(false);
+  const [priorityAnchorEl, setPriorityAnchorEl] = useState(null);
+  const [dueAnchorEl, setDueAnchorEl] = useState(null);
+  const [repeatAnchorEl, setRepeatAnchorEl] = useState(null);
+  const [customRepeatAnchorEl, setCustomRepeatAncorEl] = useState(null);
 
   const classes = useStyles({ focus });
-  const [createtask] = useMutation(CREATE_TASK, {
-    update(proxy, { data: { createtask: newtask } }) {
+  const [addTask] = useMutation(CREATE_TASK, {
+    update(proxy, { data: { addTask: newtask } }) {
       dispatch(addTask(newtask));
       // eslint-disable-next-line no-use-before-define
       dispatch(setNewTaskBody(''));
@@ -117,7 +122,7 @@ const newTaskInput = ({ newTask }) => {
 
   const disableEditorBlurTemporarily = () => {
     setTimeout(() => {
-      disableEditorBlur = false;
+      disableEditorBlur.current = false;
     }, 1);
   };
 
@@ -128,10 +133,10 @@ const newTaskInput = ({ newTask }) => {
 
   const keepDraftEvents = {
     onMouseEnter: () => {
-      disableEditorBlur = true;
+      disableEditorBlur.current = true;
     },
     onMouseLeave: () => {
-      disableEditorBlur = false;
+      disableEditorBlur.current = false;
     },
   };
 
@@ -139,14 +144,34 @@ const newTaskInput = ({ newTask }) => {
     setCustomRepeatAncorEl(repeatAnchorEl);
   };
 
+  const setPriority = (newPriority) => {
+    dispatch(setNewTaskPriority(newPriority));
+  };
+
+  const setDueDate = (newDate) => {
+    dispatch(setNewTaskDueDate(newDate));
+  };
+
+  const setDueTime = (newTime) => {
+    dispatch(setNewTaskDueTime(newTime));
+  };
+
+  const setRepeat = (newRepeat) => {
+    dispatch(setNewTaskRepeat(newRepeat));
+  };
+
   return (
     <MuiThemeProvider theme={theme}>
       <div className={clsx([classes.root])}>
-        <DraftTaskEditor disableBlur={disableEditorBlur} focus={focus} setFocus={setFocus} />
+        <DraftTaskEditor
+          disableBlur={disableEditorBlur}
+          focus={focus}
+          setFocus={setFocus}
+        />
         <ButtonGroupButton
           size="small"
           className={classes.submitButton}
-          onClick={createtask}
+          onClick={addTask}
         >
           <PlayArrowIcon color="primary" className={classes.playIcon} />
         </ButtonGroupButton>
@@ -166,12 +191,15 @@ const newTaskInput = ({ newTask }) => {
           </ButtonGroupButton>
           <RepeatMenu
             anchorEl={repeatAnchorEl}
-            onClose={() => setRepeatAnchorEl(false)}
+            onClose={() => setRepeatAnchorEl(null)}
             showCustomRepeat={showCustomRepeat}
+            setTaskRepeat={setRepeat}
           />
           <CustomRepeatPopover
             anchorEl={customRepeatAnchorEl}
-            onClose={() => setCustomRepeatAncorEl(false)}
+            onClose={() => setCustomRepeatAncorEl(null)}
+            taskRepeat={newTask.repeat}
+            setTaskRepeat={setRepeat}
           />
           <ButtonGroupButton
             onClick={(e) => {
@@ -194,6 +222,7 @@ const newTaskInput = ({ newTask }) => {
           <PriorityMenu
             anchorEl={priorityAnchorEl}
             onClose={() => setPriorityAnchorEl(false)}
+            setTaskPriority={setPriority}
           />
           <ButtonGroupButton
             size="small"
@@ -209,6 +238,11 @@ const newTaskInput = ({ newTask }) => {
           <DateTimePicker
             anchorEl={dueAnchorEl}
             onClose={() => setDueAnchorEl(false)}
+            setTaskDueDate={setDueDate}
+            setTaskDueTime={setDueTime}
+            taskDueDate={newTask.dueDate}
+            taskDueTime={newTask.dueTime}
+            taskRepeat={newTask.repeat}
           />
         </div>
       </div>

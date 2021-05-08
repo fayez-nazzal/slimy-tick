@@ -98,5 +98,5 @@ const FormPageContainer = ({ children }) => {
 export default FormPageContainer;
 
 FormPageContainer.propTypes = {
-  children: PropTypes.element.isRequired,
+  children: PropTypes.arrayOf(PropTypes.node).isRequired,
 };

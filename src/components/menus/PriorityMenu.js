@@ -43,8 +43,12 @@ const PriorityMenu = ({ anchorEl, onClose, setTaskPriority }) => {
 
 export default PriorityMenu;
 
+PriorityMenu.defaultProps = {
+  anchorEl: null,
+};
+
 PriorityMenu.propTypes = {
-  anchorEl: PropTypes.element.isRequired,
+  anchorEl: PropTypes.node,
   onClose: PropTypes.func.isRequired,
   setTaskPriority: PropTypes.func.isRequired,
 };

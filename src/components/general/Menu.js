@@ -40,9 +40,14 @@ const Menu = ({
 
 export default Menu;
 
+Menu.defaultProps = {
+  anchorEl: null,
+  ariaControls: '',
+};
+
 Menu.propTypes = {
   onClose: PropTypes.func.isRequired,
-  anchorEl: PropTypes.element.isRequired,
-  children: PropTypes.element.isRequired,
-  ariaControls: PropTypes.string.isRequired,
+  anchorEl: PropTypes.node,
+  children: PropTypes.arrayOf(PropTypes.element).isRequired,
+  ariaControls: PropTypes.string,
 };

@@ -50,7 +50,7 @@ module.exports = {
       return newGroup;
     },
     // eslint-disable-next-line object-curly-newline
-    async createtask(
+    async addTask(
       _,
       // eslint-disable-next-line object-curly-newline
       { groupName, body, priority, remind, repeat, dueDate, dueTime },

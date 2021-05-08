@@ -1,9 +1,9 @@
-import React from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
 import List from '@material-ui/core/List';
 import { makeStyles } from '@material-ui/core/styles';
 import Task from '../Task';
-import { setGroups } from '../../redux/user';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -13,40 +13,40 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const TaskList = () => {
+const TaskList = ({ tasks }) => {
   const classes = useStyles();
-  const groupIndex = useSelector((state) => state.user.groupIndex);
-  const groups = useSelector((state) => state.user.userData.groups);
-  const group = useSelector(
-    (state) => state.user.userData.groups[state.user.groupIndex],
-  );
-  const dispatch = useDispatch();
 
-  const ontaskChange = (taskId, newBody) => {
-    const taskIndex = group.tasks.findIndex((task) => task.id === taskId);
-    let task = group.tasks[taskIndex];
-    task = {
-      ...task,
-      body: newBody,
-    };
-    const newGroups = [...groups];
-    const newtasks = [...newGroups[groupIndex].tasks];
-    newtasks[taskIndex] = task;
-    newGroups[groupIndex] = {
-      ...newGroups[groupIndex],
-      tasks: [...newtasks],
-    };
-    dispatch(setGroups(newGroups));
+  useEffect(() => {
+    console.debug('task list rendered');
+  });
+
+  const ontaskChange = () => {
   };
 
   return (
     <List className={classes.root}>
-      {group &&
-        group.tasks.map((task) => (
-          <Task key={task.id} {...task} onChange={ontaskChange} />
-        ))}
+      { tasks.map((task) => (
+        <Task key={task.id} {...task} onChange={ontaskChange} />
+      ))}
     </List>
   );
 };
 
-export default TaskList;
+const mapStateToProps = (state) => ({
+  tasks: state.tasks,
+});
+
+export default connect(mapStateToProps)(TaskList);
+
+TaskList.propTypes = {
+  tasks: PropTypes.arrayOf(PropTypes.shape({
+    checked: PropTypes.bool,
+    body: PropTypes.string,
+    id: PropTypes.string,
+    created: PropTypes.string,
+    priority: PropTypes.string,
+    dueDate: PropTypes.string,
+    dueTime: PropTypes.string,
+    repeat: PropTypes.string,
+  })).isRequired,
+};

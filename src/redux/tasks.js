@@ -1,4 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
+import { login } from './user';
 
 const moveInArray = (arr, from, to) => {
   if (Object.prototype.toString.call(arr) !== '[object Array]') {
@@ -42,6 +43,10 @@ const tasksSlice = createSlice({
       moveInArray(state, taskToReOrder, newOrder);
     },
   },
+  extraReducers: {
+    [login]: (_, { payload }) => payload.groups[0].tasks,
+  },
+
 });
 
 export const {

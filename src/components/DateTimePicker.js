@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { DateTimePicker as MuiDateTimePicker } from '@material-ui/pickers';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import makeStyles from '@material-ui/core/styles/makeStyles';
-import ThemeProvider from '@material-ui/core/styles/MuiThemeProvider';
+import { ThemeProvider } from '@material-ui/core/styles';
 import moment from 'moment';
 import 'moment-recur';
 import { Button, Popover } from '@material-ui/core';
@@ -139,6 +139,10 @@ const DateTimePicker = ({
 
     const repeatToDays = selDate && timeToDays(normalizedRepeat);
 
+    useEffect(() => {
+      console.debug('date picker rendered');
+    });
+
     const renderCustom =
       normalizedRepeat &&
       ((repeatToDays && repeatToDays <= 1) ||
@@ -230,9 +234,13 @@ const CustomDay = (props) => {
   });
 };
 
+DateTimePicker.defaultProps = {
+  anchorEl: null,
+};
+
 DateTimePicker.propTypes = {
   onClose: PropTypes.func.isRequired,
-  anchorEl: PropTypes.element.isRequired,
+  anchorEl: PropTypes.node,
   taskRepeat: PropTypes.string.isRequired,
   taskDueDate: PropTypes.string.isRequired,
   taskDueTime: PropTypes.string.isRequired,

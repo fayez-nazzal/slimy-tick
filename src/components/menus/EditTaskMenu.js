@@ -40,7 +40,11 @@ const ActionsMenu = ({ onClose, anchorEl }) => (
 
 export default ActionsMenu;
 
+ActionsMenu.defaultProps = {
+  anchorEl: null,
+};
+
 ActionsMenu.propTypes = {
   onClose: PropTypes.func.isRequired,
-  anchorEl: PropTypes.element.isRequired,
+  anchorEl: PropTypes.node,
 };

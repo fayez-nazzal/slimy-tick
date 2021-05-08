@@ -13,8 +13,13 @@ import ErrorTypography from '../components/general/ErrorTypography';
 import FormThemeProvider from '../themes/FormThemeProvider';
 import { login as globalLogin } from '../redux/user';
 
-const LoginPage = () => {
+const useStyles = makeStyles({
+  button: { marginTop: '8px' },
+});
+
+const RegisterPage = () => {
   const classes = useStyles();
+  // eslint-disable-next-line no-use-before-define
   const addUser = () => register();
   const dispatch = useDispatch();
 
@@ -29,7 +34,7 @@ const LoginPage = () => {
     },
   });
 
-  const [register, { loading }] = useMutation(REGISTER_USER, {
+  const [register] = useMutation(REGISTER_USER, {
     update(proxy, { data: { register: userData } }) {
       dispatch(globalLogin(userData));
       navigate('/');
@@ -114,8 +119,4 @@ const LoginPage = () => {
   );
 };
 
-export default LoginPage;
-
-const useStyles = makeStyles({
-  button: { marginTop: '8px' },
-});
+export default RegisterPage;

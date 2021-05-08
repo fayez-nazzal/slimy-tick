@@ -33,8 +33,12 @@ const RepeatMenu = ({
 
 export default RepeatMenu;
 
+RepeatMenu.defaultProps = {
+  anchorEl: null,
+};
+
 RepeatMenu.propTypes = {
-  anchorEl: PropTypes.element.isRequired,
+  anchorEl: PropTypes.node,
   onClose: PropTypes.func.isRequired,
   showCustomRepeat: PropTypes.func.isRequired,
   setTaskRepeat: PropTypes.func.isRequired,

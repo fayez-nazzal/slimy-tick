@@ -57,7 +57,7 @@ describe('login input elements', () => {
 
     const emailErrorMessage = await waitFor(() => loginPage.getByText(/email must not be empty/i));
 
-    expect(emailErrorMessage).toBeTruthy;
+    expect(emailErrorMessage).toBeTruthy();
   });
 
   it('displays an error when no password is entered', async () => {
@@ -67,7 +67,7 @@ describe('login input elements', () => {
 
     const passwordErrorMessage = await waitFor(() => loginPage.getByText(/password must not be empty/i));
 
-    expect(passwordErrorMessage).toBeTruthy;
+    expect(passwordErrorMessage).toBeTruthy();
   });
 
   it('displays an error when no email is entered', async () => {

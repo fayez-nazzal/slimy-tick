@@ -6,11 +6,11 @@ import { makeStyles, createMuiTheme } from '@material-ui/core/styles';
 import clsx from 'clsx';
 import { useDispatch } from 'react-redux';
 import {
-  setTaskDueDate,
-  setTaskDueTime,
-  setTaskPriority,
-  setTaskRepeat,
-} from '../redux/user';
+  setNewTaskDueDate,
+  setNewTaskDueTime,
+  setNewTaskPriority,
+  setNewTaskRepeat,
+} from '../redux/newTask';
 
 const theme = createMuiTheme({
   palette: {
@@ -53,18 +53,18 @@ const StrategyTag = (props) => {
   useEffect(() => {
     const textContent = props.children[0].props.text.trim();
     props.priority &&
-      dispatch(setTaskPriority(4 - textContent.length));
-    props.dueDate && dispatch(setTaskDueDate(textContent));
-    props.dueTime && dispatch(setTaskDueTime(textContent));
-    props.repeat && dispatch(setTaskRepeat(textContent));
+      dispatch(setNewTaskPriority(4 - textContent.length));
+    props.dueDate && dispatch(setNewTaskDueDate(textContent));
+    props.dueTime && dispatch(setNewTaskDueTime(textContent));
+    props.repeat && dispatch(setNewTaskRepeat(textContent));
   }, [props.children]);
 
   useEffect(
     () => () => {
-      props.priority && dispatch(setTaskPriority(4));
-      props.dueDate && dispatch(setTaskDueDate(null));
-      props.dueTime && dispatch(setTaskDueTime(''));
-      props.repeat && dispatch(setTaskRepeat(''));
+      props.priority && dispatch(setNewTaskPriority(4));
+      props.dueDate && dispatch(setNewTaskDueDate(null));
+      props.dueTime && dispatch(setNewTaskDueTime(''));
+      props.repeat && dispatch(setNewTaskRepeat(''));
     },
     [],
   );

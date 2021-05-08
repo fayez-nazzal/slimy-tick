@@ -36,7 +36,7 @@ module.exports = gql`
   }
 
   type Mutation {
-    createtask(
+    addTask(
       groupName: String!
       body: String!
       priority: Int!

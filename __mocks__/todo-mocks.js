@@ -1,5 +1,5 @@
-import { CREATE_task } from '../src/apollo/queries';
 import { UserInputError } from 'apollo-server-core';
+import { CREATE_task } from '../src/apollo/queries';
 
 const mocks = [
   {
@@ -15,7 +15,7 @@ const mocks = [
     },
     result: {
       data: {
-        createtask: {
+        addTask: {
           body: 'sample task',
           groupName: 'group 1',
           priority: 2,

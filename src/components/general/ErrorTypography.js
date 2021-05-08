@@ -34,10 +34,11 @@ const ErrorTypography = ({ error, lg }) => {
 export default ErrorTypography;
 
 ErrorTypography.propTypes = {
-  error: PropTypes.string.isRequired,
+  error: PropTypes.string,
   lg: PropTypes.bool,
 };
 
 ErrorTypography.defaultProps = {
+  error: '',
   lg: false,
 };

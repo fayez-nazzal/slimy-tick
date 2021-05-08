@@ -15,9 +15,9 @@ import {
 import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
 import ChevronRightIcon from '@material-ui/icons/ChevronRight';
 import AddBoxSharpIcon from '@material-ui/icons/AddBoxSharp';
-import { useDispatch, useSelector } from 'react-redux';
+import { useDispatch, connect } from 'react-redux';
 import AccountBoxSharpIcon from '@material-ui/icons/AccountBoxSharp';
-import { setGroupIndex } from '../../redux/user';
+import { setActiveGroupId } from '../../redux/activeGroupId';
 
 const sidebarTheme = createMuiTheme({
   palette: {
@@ -73,11 +73,9 @@ const useStyles = makeStyles({
   },
 });
 
-const Sidebar = ({ open, toggle }) => {
-  const userData = useSelector((state) => state.user.userData);
-  const currentGroup = useSelector(
-    (state) => state.user.userData.groups[state.user.groupIndex],
-  );
+const Sidebar = ({
+  open, toggle, userData, groups, activeGroupId,
+}) => {
   const dispatch = useDispatch();
 
   const onlySm = useMediaQuery((theme) => theme.breakpoints.only('sm'));
@@ -137,19 +135,19 @@ const Sidebar = ({ open, toggle }) => {
             </Box>
           </div>
           <div className={classes.columnFlex}>
-            {userData &&
-              userData.groups.map((group, index) => (
+            {
+              groups.map((group, index) => (
                 <Button
                   key={group.id}
-                  onClick={() => dispatch(setGroupIndex(index))}
+                  onClick={() => dispatch(setActiveGroupId(index))}
                   className={classes.groupButton}
                   variant={
-                    currentGroup && group.name === currentGroup.name
+                    activeGroupId && group.id === activeGroupId
                       ? 'contained'
                       : 'text'
                   }
                   color={
-                    currentGroup && group.name === currentGroup.name
+                    activeGroupId && group.id === activeGroupId
                       ? 'primary'
                       : 'none'
                   }
@@ -157,7 +155,8 @@ const Sidebar = ({ open, toggle }) => {
                 >
                   {group.name}
                 </Button>
-              ))}
+              ))
+}
           </div>
         </Drawer>
       </Box>
@@ -165,9 +164,23 @@ const Sidebar = ({ open, toggle }) => {
   );
 };
 
-export default Sidebar;
+const mapStateToProps = (state) => ({
+  activeGroupId: state.activeGroupId,
+  groups: state.groups,
+  userData: state.user,
+});
+
+export default connect(mapStateToProps)(Sidebar);
 
 Sidebar.propTypes = {
   open: PropTypes.bool.isRequired,
   toggle: PropTypes.func.isRequired,
+  userData: PropTypes.shape({
+    email: PropTypes.string,
+    created: PropTypes.string,
+  }).isRequired,
+  activeGroupId: PropTypes.string.isRequired,
+  groups: PropTypes.arrayOf(PropTypes.shape({
+    id: PropTypes.string,
+  })).isRequired,
 };

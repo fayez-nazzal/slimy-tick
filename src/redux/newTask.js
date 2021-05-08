@@ -2,6 +2,7 @@ import { createSlice } from '@reduxjs/toolkit';
 import isEqual from 'lodash.isequal';
 import { matchPriorityAndReturnRange } from '../utils/matchers';
 import { findDueDateOptions, findDueTimeOptions, findRepeatOptions } from '../utils/regexAnalyzers';
+import { login } from './user';
 
 const replaceRange = (str, start, end, substitute) => {
   const startSubstr = str.substring(0, start);
@@ -23,30 +24,30 @@ const newTaskSlice = createSlice({
   },
   reducers: {
     setBody: (state, action) => {
-      state.taskValues.body = action.payload;
+      state.body = action.payload;
     },
     setPriority: (state, action) => {
       const newPriority = getPriorityStrEquivelent(action.payload);
 
       // if old priority regex text exist, replace it to the new priority
-      if (state.taskValues.body) {
+      if (state.body) {
         const taskPriorityRange = matchPriorityAndReturnRange(
-          state.taskValues.body,
+          state.body,
         );
 
-        state.taskValues.body = replaceRange(
-          state.taskValues.body,
+        state.body = replaceRange(
+          state.body,
           taskPriorityRange[0],
           taskPriorityRange[1],
           newPriority,
         );
       }
 
-      state.taskValues.priority = action.payload;
+      state.priority = action.payload;
     },
     setDueDate: (state, action) => {
-      const taskBody = state.taskValues.body;
-      const taskDueDate = state.taskValues.dueDate;
+      const taskBody = state.body;
+      const taskDueDate = state.dueDate;
 
       if (
         !taskBody.includes(action.payload) &&
@@ -55,17 +56,17 @@ const newTaskSlice = createSlice({
             'day',
           )
       ) {
-        state.taskValues.body =
+        state.body =
             taskBody && taskDueDate
               ? taskBody.replace(taskDueDate, action.payload)
               : taskBody;
 
-        state.taskValues.dueDate = action.payload;
+        state.dueDate = action.payload;
       }
     },
     setDueTime: (state, action) => {
-      const taskBody = state.taskValues.body;
-      const taskDueTime = state.taskValues.dueTime;
+      const taskBody = state.body;
+      const taskDueTime = state.dueTime;
 
       if (
         taskDueTime &&
@@ -76,17 +77,17 @@ const newTaskSlice = createSlice({
             'hour',
           )
       ) {
-        state.taskValues.body = taskBody.replace(
+        state.body = taskBody.replace(
           taskDueTime,
           action.payload,
         );
 
-        state.taskValues.dueTime = action.payload;
+        state.dueTime = action.payload;
       }
     },
     setRepeat: (state, action) => {
-      const taskBody = state.taskValues.body;
-      const oldRepeat = state.taskValues.repeat;
+      const taskBody = state.body;
+      const oldRepeat = state.repeat;
       const analyzedOldRepeat = findRepeatOptions(oldRepeat);
       const newRepeat =
           action.payload && action.payload[0] ? action.payload : '';
@@ -97,9 +98,14 @@ const newTaskSlice = createSlice({
           oldRepeat &&
           !taskBody.includes(newRepeat) &&
           !isEqual(analyzedOldRepeat, analyzedNewRepeat)
-      ) state.taskValues.body = taskBody.replace(oldRepeat, newRepeat);
+      ) state.body = taskBody.replace(oldRepeat, newRepeat);
 
-      state.taskValues.repeat = newRepeat;
+      state.repeat = newRepeat;
+    },
+  },
+  extraReducers: {
+    [login]: (state, { payload }) => {
+      state.groupName = payload.groups[0].name;
     },
   },
 });

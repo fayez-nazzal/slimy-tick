@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import { makeStyles } from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
@@ -25,7 +25,11 @@ const useStyles = makeStyles({
 const Task = ({
   checked, body, onChange, id,
 }) => {
-  const [anchorEl, setAnchorEl] = useState(false);
+  const [anchorEl, setAnchorEl] = useState(null);
+
+  useEffect(() => {
+    console.debug('task rendered');
+  });
 
   const classes = useStyles();
   return (
@@ -58,7 +62,7 @@ const Task = ({
 export default Task;
 
 Task.propTypes = {
-  checked: PropTypes.bool.isRequired,
+  // checked: PropTypes.bool.isRequired,
   body: PropTypes.string.isRequired,
   id: PropTypes.string.isRequired,
   // created: PropTypes.string.isRequired,

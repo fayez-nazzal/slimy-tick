@@ -13,9 +13,14 @@ import ErrorTypography from '../components/general/ErrorTypography';
 import FormThemeProvider from '../themes/FormThemeProvider';
 import { login as globalLogin } from '../redux/user';
 
+const useStyles = makeStyles({
+  button: { marginTop: '8px' },
+});
+
 const LoginPage = () => {
   const classes = useStyles();
   const dispatch = useDispatch();
+  // eslint-disable-next-line no-use-before-define
   const lgoinUser = () => login();
 
   const {
@@ -28,12 +33,13 @@ const LoginPage = () => {
     },
   });
 
-  const [login, { loading }] = useMutation(LOGIN_USER, {
+  const [login] = useMutation(LOGIN_USER, {
     update(proxy, { data: { login: userData } }) {
-      dispatch(globalLogin(userData));
+      dispatch(globalLogin({ ...userData }));
       navigate('/');
     },
     onError(err) {
+      console.log(err);
       setErrors(err.graphQLErrors[0].extensions.errors);
     },
     variables: values,
@@ -98,7 +104,3 @@ const LoginPage = () => {
 };
 
 export default LoginPage;
-
-const useStyles = makeStyles({
-  button: { marginTop: '8px' },
-});
