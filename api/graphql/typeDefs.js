@@ -52,7 +52,7 @@ module.exports = gql`
       body: String
       priority: Int
       remind: String
-      repeat: [String]
+      repeat: String
       dueDate: String
       dueTime: String
     ): Task!

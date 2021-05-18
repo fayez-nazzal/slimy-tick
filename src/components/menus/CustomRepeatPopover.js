@@ -16,11 +16,11 @@ import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import { ThemeProvider } from '@material-ui/core/styles';
 import { findRepeatOptions } from '../../utils/regexAnalyzers';
 import {
-  anchorIdsSelector, dueTaskIdSelector, newTaskSelector, tasksSelector,
+  anchorIdsSelector, activeTaskIdSelector, newTaskSelector, tasksSelector,
 } from '../../redux/selectors';
 import { setCustomRepeatAnchorId } from '../../redux/anchorIds';
 import { setNewTaskRepeat } from '../../redux/newTask';
-import { editTask } from '../../redux/tasks';
+import { setTaskRepeat } from '../../redux/tasks';
 
 const popoverTheme = createMuiTheme({
   palette: {
@@ -112,22 +112,16 @@ const CustomRepeatPopover = ({
     onClose();
   };
 
-  const setTaskRepeat = (newRepeat) => {
-    const action = activeTaskId === 'new' ? setNewTaskRepeat(newRepeat) : editTask({
-      id: activeTaskId,
-      newValues: {
-        ...taskValues,
-        repeat: newRepeat,
-      },
-    });
+  const setRepeat = (newRepeat) => {
+    const action = activeTaskId === 'new' ? setNewTaskRepeat(newRepeat) : setTaskRepeat({ id: activeTaskId, newRepeat });
     dispatch(action);
   };
 
   const handleRepeatPopoverAccept = () => {
     onClose();
-    if (weekdays.length) setTaskRepeat(`every ${weekdays.join(', ')}`);
+    if (weekdays.length) setRepeat(`every ${weekdays.join(', ')}`);
     if (stepOption.every && stepOption.value > 0) {
-      setTaskRepeat(`every ${stepOption.value} ${stepOption.every}`);
+      setRepeat(`every ${stepOption.value} ${stepOption.every}`);
     }
   };
 
@@ -248,8 +242,8 @@ const CustomRepeatPopover = ({
 };
 
 const mapStateToProps = (state) => {
-  const activeTaskId = dueTaskIdSelector(state);
-  const taskValues = activeTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task.id === activeTaskId);
+  const activeTaskId = activeTaskIdSelector(state);
+  const taskValues = activeTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task._id === activeTaskId);
   const anchorId = anchorIdsSelector(state).customRepeatId;
 
   return {

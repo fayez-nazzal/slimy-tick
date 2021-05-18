@@ -4,26 +4,22 @@ import { MenuItem } from '@material-ui/core';
 import ListItemText from '@material-ui/core/ListItemText';
 import { connect, useDispatch } from 'react-redux';
 import Menu from '../general/Menu';
+import { anchorIdsSelector, activeTaskIdSelector } from '../../redux/selectors';
 import {
-  anchorIdsSelector, dueTaskIdSelector, newTaskSelector, tasksSelector,
-} from '../../redux/selectors';
-import { setCustomRepeatAnchorId, setRepeatAnchorId } from '../../redux/anchorIds';
+  setCustomRepeatAnchorId,
+  setRepeatAnchorId,
+} from '../../redux/anchorIds';
 import { setNewTaskRepeat } from '../../redux/newTask';
-import { editTask } from '../../redux/tasks';
+import { editTask, setTaskRepeat } from '../../redux/tasks';
 
-const RepeatMenu = ({
-  activeTaskId, anchorId, taskValues,
-}) => {
+const RepeatMenu = ({ activeTaskId, anchorId }) => {
   const dispatch = useDispatch();
 
   const setRepeat = (newRepeat) => {
-    const action = activeTaskId === 'new' ? setNewTaskRepeat(newRepeat) : editTask({
-      id: activeTaskId,
-      newValues: {
-        ...taskValues,
-        repeat: newRepeat,
-      },
-    });
+    const action =
+      activeTaskId === 'new'
+        ? setNewTaskRepeat(newRepeat)
+        : setTaskRepeat({ id: activeTaskId, newRepeat });
     dispatch(action);
   };
 
@@ -36,7 +32,10 @@ const RepeatMenu = ({
   };
 
   return (
-    <Menu anchorEl={!!anchorId && document.getElementById(anchorId)} onClose={onClose}>
+    <Menu
+      anchorEl={!!anchorId && document.getElementById(anchorId)}
+      onClose={onClose}
+    >
       <MenuItem onClick={() => setRepeat('every day')}>
         <ListItemText primary="Every day" />
       </MenuItem>
@@ -57,13 +56,11 @@ const RepeatMenu = ({
 };
 
 const mapStateToProps = (state) => {
-  const activeTaskId = dueTaskIdSelector(state);
-  const taskValues = activeTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task.id === activeTaskId);
+  const activeTaskId = activeTaskIdSelector(state);
   const anchorId = anchorIdsSelector(state).repeatId;
 
   return {
     activeTaskId,
-    taskValues,
     anchorId,
   };
 };
@@ -73,7 +70,4 @@ export default connect(mapStateToProps)(RepeatMenu);
 RepeatMenu.propTypes = {
   activeTaskId: PropTypes.string.isRequired,
   anchorId: PropTypes.string.isRequired,
-  taskValues: PropTypes.shape({
-    priority: PropTypes.string,
-  }).isRequired,
 };

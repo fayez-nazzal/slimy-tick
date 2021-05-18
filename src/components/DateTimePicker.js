@@ -16,12 +16,12 @@ import {
 import { setNewTaskDueDate, setNewTaskDueTime } from '../redux/newTask';
 import {
   anchorIdsSelector,
-  dueTaskIdSelector,
+  activeTaskIdSelector,
   newTaskSelector,
   tasksSelector,
 } from '../redux/selectors';
-import { editTask } from '../redux/tasks';
 import { setDueAnchorId } from '../redux/anchorIds';
+import { setTaskDueDate, setTaskDueTime } from '../redux/tasks';
 
 const theme = createMuiTheme({
   palette: {
@@ -117,13 +117,13 @@ const DateTimePicker = ({
     }
   }, [taskValues.repeat, selectedDate]);
 
-  const setDueDate = (newDate) => {
-    const action = activeTaskId === 'new' ? setNewTaskDueDate(newDate) : editTask({ ...taskValues, dueDate: newDate });
+  const setDueDate = (newDueDate) => {
+    const action = activeTaskId === 'new' ? setNewTaskDueDate(newDueDate) : setTaskDueDate({ id: activeTaskId, newDueDate });
     dispatch(action);
   };
 
-  const setDueTime = (newTime) => {
-    const action = activeTaskId === 'new' ? setNewTaskDueTime(newTime) : editTask({ ...taskValues, dueTime: newTime });
+  const setDueTime = (newDueTime) => {
+    const action = activeTaskId === 'new' ? setNewTaskDueTime(newDueTime) : setTaskDueTime({ id: activeTaskId, newDueTime });
     dispatch(action);
   };
 
@@ -238,8 +238,8 @@ const DateTimePicker = ({
 };
 
 const mapStateToProps = (state) => {
-  const activeTaskId = dueTaskIdSelector(state);
-  const taskValues = activeTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task.id === activeTaskId);
+  const activeTaskId = activeTaskIdSelector(state);
+  const taskValues = activeTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task._id === activeTaskId);
   const anchorId = anchorIdsSelector(state).dueId;
 
   return {

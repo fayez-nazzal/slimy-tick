@@ -52,6 +52,6 @@ const ActionsMenu = ({ anchorId, onClose }) => {
 export default ActionsMenu;
 
 ActionsMenu.propTypes = {
-  anchorId: PropTypes.string,
+  anchorId: PropTypes.string.isRequired,
   onClose: PropTypes.func.isRequired,
 };

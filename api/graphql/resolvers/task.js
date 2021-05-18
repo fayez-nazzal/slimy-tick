@@ -81,6 +81,7 @@ module.exports = {
       task.priority = priority ? priority : task.priority;
       task.remind = remind ? remind : task.remind;
       task.repeat = repeat ? repeat : task.repeat;
+      console.log(repeat)
       task.dueDate = dueDate ? dueDate : task.dueDate;
       task.dueTime = dueTime ? dueTime : task.dueTime;
 

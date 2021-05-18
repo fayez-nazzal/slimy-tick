@@ -27,7 +27,7 @@ export const newTaskSelector = createSelector(
   (newTask) => newTask,
 );
 
-export const dueTaskIdSelector = createSelector(
+export const activeTaskIdSelector = createSelector(
   (state) => state.activeTaskId,
   (activeTaskId) => activeTaskId,
 );

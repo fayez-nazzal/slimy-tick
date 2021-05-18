@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import {
-  makeStyles, createMuiTheme, ThemeProvider, useTheme,
+  makeStyles,
 } from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
@@ -14,15 +14,13 @@ import IconButton from '@material-ui/core/IconButton';
 import { Button } from '@material-ui/core';
 import { connect, useDispatch } from 'react-redux';
 import moment from 'moment';
-import { useMutation } from '@apollo/client';
 import clsx from 'clsx';
 import EditTaskMenu from './menus/EditTaskMenu';
 import { findDueDateOptions, findDueTimeOptions } from '../utils/regexAnalyzers';
 import { activeGroupSelector } from '../redux/selectors';
-import { editTask } from '../redux/tasks';
-import { EDIT_TASK } from '../apollo/queries';
-import { setDueAnchorElId } from '../redux/dueAnchorElId';
-import { setPriorityAnchorId } from '../redux/anchorIds';
+import { setTaskBody } from '../redux/tasks';
+import { setActiveTaskId } from '../redux/activeTaskId';
+import { setPriorityAnchorId, setDueAnchorId } from '../redux/anchorIds';
 
 const useStyles = makeStyles({
   input: {
@@ -44,30 +42,16 @@ const Task = ({
 }) => {
   const classes = useStyles();
   const [editMenuAnchorId, setEditMenuAnchorId] = useState(null);
-  const [dueAnchorEl, setDueAnchorEl] = useState(null);
   const [dueStr, setDueStr] = useState(null);
   const [priorityStr, setPriorityStr] = useState(null);
-  const [mutationVariables, setMutationVariables] = useState();
   const dispatch = useDispatch();
-
-  const [editTaskMutation] = useMutation(EDIT_TASK, {
-    update() {
-    },
-    onError(err) {
-      console.log(JSON.stringify(err, null, 2));
-    },
-    variables: mutationVariables,
-  });
 
   useEffect(() => {
     console.debug('task rendered');
   });
 
   useEffect(() => {
-    editTaskMutation();
-  }, [mutationVariables]);
-
-  useEffect(() => {
+    console.log(dueDate);
     const momentDueDate = findDueDateOptions(dueDate);
     if (momentDueDate && momentDueDate.isValid()) {
       let newDueStr;
@@ -86,31 +70,43 @@ const Task = ({
       } else if (momentDueDate.isBefore(moment)) {
         newDueStr = 'overdue';
       } else {
-        newDueStr = momentDueDate.format('MMM do hh:mm a');
+        newDueStr = momentDueDate.format('MMM Do hh:mm a');
       }
+
+      console.log(newDueStr);
 
       setDueStr(newDueStr);
     }
+  }, [dueDate, dueTime]);
 
+  useEffect(() => {
     setPriorityStr('!'.repeat(4 - priority));
-  }, []);
+  }, [priority]);
 
   const onBodyChange = (e) => {
-    const newValues = {
-      checked,
-      body: e.target.value,
-      priority,
-      dueDate,
-      dueTime,
-      repeat,
-    };
-
-    setMutationVariables({ ...newValues, taskId: _id, groupName });
-
-    dispatch(editTask({
+    dispatch(setTaskBody({
       id: _id,
-      newValues,
+      newBody: e.target.value,
     }));
+  };
+
+  const setAsActiveTask = () => {
+    dispatch(setActiveTaskId(_id));
+  };
+
+  const onHorizButton = (e) => {
+    setEditMenuAnchorId(e.currentTarget.id);
+    setAsActiveTask();
+  };
+
+  const onPriorityStr = (e) => {
+    dispatch(setPriorityAnchorId(e.currentTarget.id));
+    setAsActiveTask();
+  };
+
+  const onDueStr = (e) => {
+    dispatch(setDueAnchorId(e.currentTarget.id));
+    setAsActiveTask();
   };
 
   return (
@@ -139,17 +135,17 @@ const Task = ({
             'priority-high': priority === 2,
             'priority-medium': priority === 3,
           })}
-          onClick={(e) => dispatch(setPriorityAnchorId(e.currentTarget.id))}
+          onClick={onPriorityStr}
         >
           {priorityStr}
         </Button>
         )}
         {dueStr && (
-        <Button className={classes.dueStr} id={`taskDueDate${_id}`} onClick={(e) => dispatch(setDueAnchorElId(e.currentTarget.id))}>
+        <Button className={classes.dueStr} id={`taskDueDate${_id}`} onClick={onDueStr}>
           {dueStr}
         </Button>
         )}
-        <IconButton id={`editTaskButton${_id}`} onClick={(e) => setEditMenuAnchorId(e.currentTarget.id)}>
+        <IconButton id={`editTaskButton${_id}`} onClick={onHorizButton}>
           <MoreHorizSharpIcon color="info" />
         </IconButton>
         <EditTaskMenu

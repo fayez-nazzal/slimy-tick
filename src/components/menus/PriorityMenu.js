@@ -5,23 +5,17 @@ import ListItemText from '@material-ui/core/ListItemText';
 import { connect, useDispatch } from 'react-redux';
 import Menu from '../general/Menu';
 import {
-  anchorIdsSelector, dueTaskIdSelector, newTaskSelector, tasksSelector,
+  anchorIdsSelector, activeTaskIdSelector,
 } from '../../redux/selectors';
 import { setPriorityAnchorId } from '../../redux/anchorIds';
 import { setNewTaskPriority } from '../../redux/newTask';
-import { editTask } from '../../redux/tasks';
+import { editTask, setTaskPriority } from '../../redux/tasks';
 
-const PriorityMenu = ({ anchorId, activeTaskId, taskValues }) => {
+const PriorityMenu = ({ anchorId, activeTaskId }) => {
   const dispatch = useDispatch();
 
   const setPriority = (newPriority) => {
-    const action = activeTaskId === 'new' ? setNewTaskPriority(newPriority) : editTask({
-      id: activeTaskId,
-      newValues: {
-        ...taskValues,
-        priority: newPriority,
-      },
-    });
+    const action = activeTaskId === 'new' ? setNewTaskPriority(newPriority) : setTaskPriority({ id: activeTaskId, newPriority });
     dispatch(action);
   };
 
@@ -63,13 +57,11 @@ const PriorityMenu = ({ anchorId, activeTaskId, taskValues }) => {
 };
 
 const mapStateToProps = (state) => {
-  const activeTaskId = dueTaskIdSelector(state);
-  const taskValues = activeTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task.id === activeTaskId);
+  const activeTaskId = activeTaskIdSelector(state);
   const anchorId = anchorIdsSelector(state).priorityId;
 
   return {
     activeTaskId,
-    taskValues,
     anchorId,
   };
 };
@@ -79,7 +71,4 @@ export default connect(mapStateToProps)(PriorityMenu);
 PriorityMenu.propTypes = {
   activeTaskId: PropTypes.string.isRequired,
   anchorId: PropTypes.string.isRequired,
-  taskValues: PropTypes.shape({
-    priority: PropTypes.string,
-  }).isRequired,
 };

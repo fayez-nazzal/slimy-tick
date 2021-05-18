@@ -61,6 +61,7 @@ export const EDIT_TASK = gql`
     $priority: Int!
     $dueDate: String
     $dueTime: String
+    $repeat: String
   ) {
     editTask(
       taskId: $taskId
@@ -69,6 +70,7 @@ export const EDIT_TASK = gql`
       priority: $priority
       dueDate: $dueDate
       dueTime: $dueTime
+      repeat: $repeat
     ) {
       _id
       checked
