@@ -21,8 +21,8 @@ import { findDueDateOptions, findDueTimeOptions } from '../utils/regexAnalyzers'
 import { activeGroupSelector } from '../redux/selectors';
 import { editTask } from '../redux/tasks';
 import { EDIT_TASK } from '../apollo/queries';
-import DateTimePicker from './DateTimePicker';
-import { setNewTaskDueDate, setNewTaskDueTime } from '../redux/newTask';
+import { setDueAnchorElId } from '../redux/dueAnchorElId';
+import { setPriorityAnchorId } from '../redux/anchorIds';
 
 const useStyles = makeStyles({
   input: {
@@ -43,7 +43,7 @@ const Task = ({
   checked, body, priority, groupName, _id, dueDate, dueTime, repeat,
 }) => {
   const classes = useStyles();
-  const [editMenuAnchorElId, setEditMenuAnchorElId] = useState(null);
+  const [editMenuAnchorId, setEditMenuAnchorId] = useState(null);
   const [dueAnchorEl, setDueAnchorEl] = useState(null);
   const [dueStr, setDueStr] = useState(null);
   const [priorityStr, setPriorityStr] = useState(null);
@@ -139,22 +139,23 @@ const Task = ({
             'priority-high': priority === 2,
             'priority-medium': priority === 3,
           })}
+          onClick={(e) => dispatch(setPriorityAnchorId(e.currentTarget.id))}
         >
           {priorityStr}
         </Button>
         )}
         {dueStr && (
-        <Button className={classes.dueStr}>
+        <Button className={classes.dueStr} id={`taskDueDate${_id}`} onClick={(e) => dispatch(setDueAnchorElId(e.currentTarget.id))}>
           {dueStr}
         </Button>
         )}
-        <IconButton id={`editTaskButton${_id}`} onClick={(e) => setEditMenuAnchorElId(e.currentTarget.id)}>
+        <IconButton id={`editTaskButton${_id}`} onClick={(e) => setEditMenuAnchorId(e.currentTarget.id)}>
           <MoreHorizSharpIcon color="info" />
         </IconButton>
         <EditTaskMenu
           taskId={_id}
-          onClose={() => setEditMenuAnchorElId(null)}
-          anchorElId={editMenuAnchorElId}
+          onClose={() => setEditMenuAnchorId(null)}
+          anchorId={editMenuAnchorId}
         />
       </ListItemSecondaryAction>
     </ListItem>

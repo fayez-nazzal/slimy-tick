@@ -14,18 +14,15 @@ import { useMutation } from '@apollo/client';
 import { useDispatch, connect } from 'react-redux';
 import { CREATE_TASK } from '../apollo/queries';
 import { newTaskSelector } from '../redux/selectors';
-import {
-  setNewTaskRepeat,
-  setNewTaskPriority,
-  setNewTaskBody,
-} from '../redux/newTask';
+import { setNewTaskPriority, setNewTaskBody } from '../redux/newTask';
 import { addNewTask } from '../redux/tasks';
 import ButtonGroupButton from './general/ButtonGroupIconButton';
-import RepeatMenu from './menus/RepeatMenu';
-import CustomRepeatPopover from './menus/CustomRepeatPopover';
-import PriorityMenu from './menus/PriorityMenu';
 import DraftTaskEditor from './DraftTaskEditor';
-import { setDueAnchorElId } from '../redux/dueAnchorElId';
+import {
+  setPriorityAnchorId,
+  setDueAnchorId,
+  setRepeatAnchorId,
+} from '../redux/anchorIds';
 
 const theme = createMuiTheme({
   palette: {
@@ -87,16 +84,11 @@ const newTaskInput = ({ newTask }) => {
   const [focus, setFocus] = useState(false);
   const disableEditorBlur = useRef(false);
   const [mutationVariables, setMutationVariables] = useState();
-  const dueRef = useRef(null);
   useEffect(() => {
     console.debug('new task input rendered');
     // eslint-disable-next-line no-use-before-define
     resetTask();
   }, []);
-
-  const [priorityAnchorEl, setPriorityAnchorEl] = useState(null);
-  const [repeatAnchorEl, setRepeatAnchorEl] = useState(null);
-  const [customRepeatAnchorEl, setCustomRepeatAncorEl] = useState(null);
 
   const classes = useStyles({ focus });
   const [addTaskMutation] = useMutation(CREATE_TASK, {
@@ -129,9 +121,8 @@ const newTaskInput = ({ newTask }) => {
   };
 
   const handleDueClicked = (e) => {
-    console.log(dueRef);
     const { id } = e.currentTarget;
-    dispatch(setDueAnchorElId(id));
+    dispatch(setDueAnchorId(id));
     disableEditorBlurTemporarily();
   };
 
@@ -142,18 +133,6 @@ const newTaskInput = ({ newTask }) => {
     onMouseLeave: () => {
       disableEditorBlur.current = false;
     },
-  };
-
-  const showCustomRepeat = () => {
-    setCustomRepeatAncorEl(repeatAnchorEl);
-  };
-
-  const setPriority = (newPriority) => {
-    dispatch(setNewTaskPriority(newPriority));
-  };
-
-  const setRepeat = (newRepeat) => {
-    dispatch(setNewTaskRepeat(newRepeat));
   };
 
   return (
@@ -175,8 +154,9 @@ const newTaskInput = ({ newTask }) => {
         <div className={clsx([classes.rowFlex, classes.tools])}>
           <ButtonGroupButton
             size="small"
+            id="newTaskRepeatButton"
             onClick={(e) => {
-              setRepeatAnchorEl(e.currentTarget);
+              dispatch(setRepeatAnchorId(e.currentTarget.id));
             }}
             data-testid="repeat-button"
             {...keepDraftEvents}
@@ -186,21 +166,10 @@ const newTaskInput = ({ newTask }) => {
               color="primary"
             />
           </ButtonGroupButton>
-          <RepeatMenu
-            anchorEl={repeatAnchorEl}
-            onClose={() => setRepeatAnchorEl(null)}
-            showCustomRepeat={showCustomRepeat}
-            setTaskRepeat={setRepeat}
-          />
-          <CustomRepeatPopover
-            anchorEl={customRepeatAnchorEl}
-            onClose={() => setCustomRepeatAncorEl(null)}
-            taskRepeat={newTask.repeat}
-            setTaskRepeat={setRepeat}
-          />
           <ButtonGroupButton
+            id="newTaskPriorityButton"
             onClick={(e) => {
-              setPriorityAnchorEl(e.currentTarget);
+              dispatch(setPriorityAnchorId(e.currentTarget.id));
             }}
             data-testid="priority-button"
             size="small"
@@ -216,11 +185,6 @@ const newTaskInput = ({ newTask }) => {
               })}
             />
           </ButtonGroupButton>
-          <PriorityMenu
-            anchorEl={priorityAnchorEl}
-            onClose={() => setPriorityAnchorEl(false)}
-            setTaskPriority={setPriority}
-          />
           <ButtonGroupButton
             size="small"
             {...keepDraftEvents}

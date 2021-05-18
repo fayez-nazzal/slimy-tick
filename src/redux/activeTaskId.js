@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const dueTaskId = createSlice({
-  name: 'dueTaskId',
+const activeTaskId = createSlice({
+  name: 'activeTaskId',
   initialState: 'new',
   reducers: {
     set: (state, { payload }) => payload,
@@ -9,7 +9,7 @@ const dueTaskId = createSlice({
 });
 
 export const {
-  set: setDueTaskId,
-} = dueTaskId.actions;
+  set: setActiveTaskId,
+} = activeTaskId.actions;
 
-export default dueTaskId.reducer;
+export default activeTaskId.reducer;

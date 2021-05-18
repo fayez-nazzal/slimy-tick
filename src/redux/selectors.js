@@ -28,11 +28,11 @@ export const newTaskSelector = createSelector(
 );
 
 export const dueTaskIdSelector = createSelector(
-  (state) => state.dueTaskId,
-  (dueTaskId) => dueTaskId,
+  (state) => state.activeTaskId,
+  (activeTaskId) => activeTaskId,
 );
 
-export const dueAnchorElIdSelector = createSelector(
-  (state) => state.dueAnchorELId,
-  (dueAnchorELId) => dueAnchorELId,
+export const anchorIdsSelector = createSelector(
+  (state) => state.anchorIds,
+  (anchorIds) => anchorIds,
 );

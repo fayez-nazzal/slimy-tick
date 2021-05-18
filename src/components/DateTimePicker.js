@@ -15,13 +15,13 @@ import {
 } from '../utils/regexAnalyzers';
 import { setNewTaskDueDate, setNewTaskDueTime } from '../redux/newTask';
 import {
-  dueAnchorElIdSelector,
+  anchorIdsSelector,
   dueTaskIdSelector,
   newTaskSelector,
   tasksSelector,
 } from '../redux/selectors';
 import { editTask } from '../redux/tasks';
-import { setDueAnchorElId } from '../redux/dueAnchorElId';
+import { setDueAnchorId } from '../redux/anchorIds';
 
 const theme = createMuiTheme({
   palette: {
@@ -79,7 +79,7 @@ const useStyles = makeStyles({
 });
 
 const DateTimePicker = ({
-  anchorElId, dueTaskId, taskValues,
+  anchorId, activeTaskId, taskValues,
 }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -118,17 +118,17 @@ const DateTimePicker = ({
   }, [taskValues.repeat, selectedDate]);
 
   const setDueDate = (newDate) => {
-    const action = dueTaskId === 'new' ? setNewTaskDueDate(newDate) : editTask({ ...taskValues, dueDate: newDate });
+    const action = activeTaskId === 'new' ? setNewTaskDueDate(newDate) : editTask({ ...taskValues, dueDate: newDate });
     dispatch(action);
   };
 
   const setDueTime = (newTime) => {
-    const action = dueTaskId === 'new' ? setNewTaskDueTime(newTime) : editTask({ ...taskValues, dueTime: newTime });
+    const action = activeTaskId === 'new' ? setNewTaskDueTime(newTime) : editTask({ ...taskValues, dueTime: newTime });
     dispatch(action);
   };
 
   const onClose = () => {
-    dispatch(setDueAnchorElId(null));
+    dispatch(setDueAnchorId(''));
   };
 
   const handleOkButton = () => {
@@ -185,8 +185,8 @@ const DateTimePicker = ({
   return (
     <ThemeProvider theme={theme}>
       <Popover
-        open={!!anchorElId}
-        anchorEl={!!anchorElId && document.getElementById(anchorElId)}
+        open={!!anchorId}
+        anchorEl={!!anchorId && document.getElementById(anchorId)}
         onClose={onClose}
         onEnter={handleOnEnter}
         elevation={0}
@@ -238,14 +238,14 @@ const DateTimePicker = ({
 };
 
 const mapStateToProps = (state) => {
-  const dueTaskId = dueTaskIdSelector(state);
-  const taskValues = dueTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task.id === dueTaskId);
-  const anchorElId = dueAnchorElIdSelector(state);
+  const activeTaskId = dueTaskIdSelector(state);
+  const taskValues = activeTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task.id === activeTaskId);
+  const anchorId = anchorIdsSelector(state).dueId;
 
   return {
-    dueTaskId,
+    activeTaskId,
     taskValues,
-    anchorElId,
+    anchorId,
   };
 };
 
@@ -267,8 +267,8 @@ const CustomDay = (props) => {
 };
 
 DateTimePicker.propTypes = {
-  anchorElId: PropTypes.string.isRequired,
-  dueTaskId: PropTypes.string.isRequired,
+  anchorId: PropTypes.string.isRequired,
+  activeTaskId: PropTypes.string.isRequired,
   taskValues: PropTypes.shape({
     body: PropTypes.string,
     dueDate: PropTypes.string,

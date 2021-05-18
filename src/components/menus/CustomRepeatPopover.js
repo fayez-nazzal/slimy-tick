@@ -8,13 +8,19 @@ import {
   Popover,
   Button,
 } from '@material-ui/core';
+import { connect, useDispatch } from 'react-redux';
 import { ToggleButtonGroup, ToggleButton } from '@material-ui/lab';
 import clsx from 'clsx';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import { ThemeProvider } from '@material-ui/core/styles';
-
 import { findRepeatOptions } from '../../utils/regexAnalyzers';
+import {
+  anchorIdsSelector, dueTaskIdSelector, newTaskSelector, tasksSelector,
+} from '../../redux/selectors';
+import { setCustomRepeatAnchorId } from '../../redux/anchorIds';
+import { setNewTaskRepeat } from '../../redux/newTask';
+import { editTask } from '../../redux/tasks';
 
 const popoverTheme = createMuiTheme({
   palette: {
@@ -59,9 +65,11 @@ const useStyles = makeStyles({
 });
 
 const CustomRepeatPopover = ({
-  anchorEl, onClose, taskRepeat, setTaskRepeat,
+  anchorId, activeTaskId, taskValues,
 }) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+
   const [stepOption, setStepOption] = useState({
     every: 'days',
     value: 2,
@@ -69,15 +77,15 @@ const CustomRepeatPopover = ({
   const [weekdays, setWeekdays] = useState([]);
 
   useEffect(() => {
-    if (taskRepeat) {
-      const analyzedRepeat = findRepeatOptions(taskRepeat);
+    if (taskValues.repeat) {
+      const analyzedRepeat = findRepeatOptions(taskValues.repeat);
       setWeekdays((prev) => (analyzedRepeat[0] === 'weekdays' ? analyzedRepeat[1] : prev));
       setStepOption({
         every: analyzedRepeat[0],
         value: analyzedRepeat[1],
       });
     }
-  }, [taskRepeat]);
+  }, [taskValues.repeat]);
 
   const onWeekdaysChange = (_, newWeekdays) => {
     setStepOption({
@@ -96,8 +104,23 @@ const CustomRepeatPopover = ({
     }));
   };
 
+  const onClose = () => {
+    dispatch(setCustomRepeatAnchorId(''));
+  };
+
   const handleRepeatPopoverClose = () => {
     onClose();
+  };
+
+  const setTaskRepeat = (newRepeat) => {
+    const action = activeTaskId === 'new' ? setNewTaskRepeat(newRepeat) : editTask({
+      id: activeTaskId,
+      newValues: {
+        ...taskValues,
+        repeat: newRepeat,
+      },
+    });
+    dispatch(action);
   };
 
   const handleRepeatPopoverAccept = () => {
@@ -111,9 +134,9 @@ const CustomRepeatPopover = ({
   return (
     <ThemeProvider theme={popoverTheme}>
       <Popover
-        anchorEl={anchorEl}
+        anchorEl={!!anchorId && document.getElementById(anchorId)}
         onClose={onClose}
-        open={!!anchorEl}
+        open={!!anchorId}
         aria-haspopup="true"
         aria-controls="custom-repeat-popup"
         elevation={0}
@@ -224,15 +247,24 @@ const CustomRepeatPopover = ({
   );
 };
 
-export default CustomRepeatPopover;
+const mapStateToProps = (state) => {
+  const activeTaskId = dueTaskIdSelector(state);
+  const taskValues = activeTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task.id === activeTaskId);
+  const anchorId = anchorIdsSelector(state).customRepeatId;
 
-CustomRepeatPopover.defaultProps = {
-  anchorEl: null,
+  return {
+    activeTaskId,
+    taskValues,
+    anchorId,
+  };
 };
 
+export default connect(mapStateToProps)(CustomRepeatPopover);
+
 CustomRepeatPopover.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  anchorEl: PropTypes.node,
-  taskRepeat: PropTypes.string.isRequired,
-  setTaskRepeat: PropTypes.func.isRequired,
+  activeTaskId: PropTypes.string.isRequired,
+  anchorId: PropTypes.string.isRequired,
+  taskValues: PropTypes.shape({
+    repeat: PropTypes.string,
+  }).isRequired,
 };

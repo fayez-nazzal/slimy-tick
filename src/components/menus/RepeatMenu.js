@@ -2,25 +2,50 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { MenuItem } from '@material-ui/core';
 import ListItemText from '@material-ui/core/ListItemText';
-import { useDispatch } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import Menu from '../general/Menu';
+import {
+  anchorIdsSelector, dueTaskIdSelector, newTaskSelector, tasksSelector,
+} from '../../redux/selectors';
+import { setCustomRepeatAnchorId, setRepeatAnchorId } from '../../redux/anchorIds';
+import { setNewTaskRepeat } from '../../redux/newTask';
+import { editTask } from '../../redux/tasks';
 
 const RepeatMenu = ({
-  anchorEl, onClose, showCustomRepeat, setTaskRepeat,
+  activeTaskId, anchorId, taskValues,
 }) => {
   const dispatch = useDispatch();
 
+  const setRepeat = (newRepeat) => {
+    const action = activeTaskId === 'new' ? setNewTaskRepeat(newRepeat) : editTask({
+      id: activeTaskId,
+      newValues: {
+        ...taskValues,
+        repeat: newRepeat,
+      },
+    });
+    dispatch(action);
+  };
+
+  const onClose = () => {
+    dispatch(setRepeatAnchorId(''));
+  };
+
+  const showCustomRepeat = () => {
+    dispatch(setCustomRepeatAnchorId(anchorId));
+  };
+
   return (
-    <Menu anchorEl={anchorEl} onClose={onClose}>
-      <MenuItem onClick={() => dispatch(setTaskRepeat('every day'))}>
+    <Menu anchorEl={!!anchorId && document.getElementById(anchorId)} onClose={onClose}>
+      <MenuItem onClick={() => setRepeat('every day')}>
         <ListItemText primary="Every day" />
       </MenuItem>
-      <MenuItem onClick={() => dispatch(setTaskRepeat('every week'))}>
+      <MenuItem onClick={() => setRepeat('every week')}>
         <ListItemText primary="Every week" />
       </MenuItem>
       <MenuItem
         data-testid="menuitem-priority-medium"
-        onClick={() => dispatch(setTaskRepeat('every month'))}
+        onClick={() => setRepeat('every month')}
       >
         <ListItemText primary="Every month" />
       </MenuItem>
@@ -31,15 +56,24 @@ const RepeatMenu = ({
   );
 };
 
-export default RepeatMenu;
+const mapStateToProps = (state) => {
+  const activeTaskId = dueTaskIdSelector(state);
+  const taskValues = activeTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task.id === activeTaskId);
+  const anchorId = anchorIdsSelector(state).repeatId;
 
-RepeatMenu.defaultProps = {
-  anchorEl: null,
+  return {
+    activeTaskId,
+    taskValues,
+    anchorId,
+  };
 };
 
+export default connect(mapStateToProps)(RepeatMenu);
+
 RepeatMenu.propTypes = {
-  anchorEl: PropTypes.node,
-  onClose: PropTypes.func.isRequired,
-  showCustomRepeat: PropTypes.func.isRequired,
-  setTaskRepeat: PropTypes.func.isRequired,
+  activeTaskId: PropTypes.string.isRequired,
+  anchorId: PropTypes.string.isRequired,
+  taskValues: PropTypes.shape({
+    priority: PropTypes.string,
+  }).isRequired,
 };

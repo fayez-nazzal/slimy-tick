@@ -19,6 +19,9 @@ import NewTaskInput from '../components/NewTaskInput';
 import { REFRESH_LOGIN_USER } from '../apollo/queries';
 import { login as globalLogin } from '../redux/user';
 import DateTimePicker from '../components/DateTimePicker';
+import RepeatMenu from '../components/menus/RepeatMenu';
+import CustomRepeatPopover from '../components/menus/CustomRepeatPopover';
+import PriorityMenu from '../components/menus/PriorityMenu';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -103,6 +106,10 @@ const Index = ({ data, loggedIn }) => {
           <NewTaskInput />
           <TaskList />
           <DateTimePicker />
+          <RepeatMenu />
+          <CustomRepeatPopover />
+          <PriorityMenu />
+
         </div>
         <PriorityTabs />
       </main>
