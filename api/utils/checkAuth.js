@@ -2,11 +2,9 @@ const jwt = require('jsonwebtoken');
 const { AuthenticationError } = require('apollo-server');
 const { SECRET_KEY } = require('../config');
 
-module.exports = (context) => {
-  const authHeader = context.req.headers.authorization;
-
-  if (authHeader) {
-    const token = authHeader.split('Bearer ')[1];
+module.exports = (fullToken) => {
+  if (fullToken) {
+    const token = fullToken.split('Bearer ')[1];
 
     if (token) {
       try {

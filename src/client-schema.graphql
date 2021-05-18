@@ -1,9 +1,10 @@
 type Task {
+  _id: ID!
   body: String!
   created: String!
   remind: String
   repeat: [String]
-  priority: String!
+  priority: Int!
   dueDate: String
   dueTime: String
 }
@@ -15,21 +16,20 @@ type Group {
 }
 
 type User {
-  id: ID!
+  _id: ID!
   email: String!
   password: String!
-  token: String!
   created: String!
   groups: [Group]!
 }
 
 type Query {
   userInfo: User!
-  group(id: ID!): Group!
 }
 
 type Mutation {
   addTask(
+    id: ID!
     groupName: String!
     body: String!
     priority: Int!
@@ -37,8 +37,20 @@ type Mutation {
     repeat: String
     dueDate: String
     dueTime: String
-  ): task!
+  ): Task!
+  editTask(
+    taskId: ID!
+    groupName: String!
+    checked: Boolean
+    body: String
+    priority: Int
+    remind: String
+    repeat: [String]
+    dueDate: String
+    dueTime: String
+  ): Task!
   createGroup(name: String!): Group!
   register(email: String!, password: String!, confirmPassword: String!): User!
   login(email: String!, password: String!): User!
+  refreshLogin: User!
 }

@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
-import { makeStyles } from '@material-ui/core/styles';
+import {
+  makeStyles, createMuiTheme, ThemeProvider, useTheme,
+} from '@material-ui/core/styles';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemSecondaryAction from '@material-ui/core/ListItemSecondaryAction';
@@ -9,7 +11,18 @@ import CheckBoxOutlineBlankSharpIcon from '@material-ui/icons/CheckBoxOutlineBla
 import CheckBoxSharpIcon from '@material-ui/icons/CheckBoxSharp';
 import MoreHorizSharpIcon from '@material-ui/icons/MoreHorizSharp';
 import IconButton from '@material-ui/core/IconButton';
-import Menu from './menus/EditTaskMenu';
+import { Button } from '@material-ui/core';
+import { connect, useDispatch } from 'react-redux';
+import moment from 'moment';
+import { useMutation } from '@apollo/client';
+import clsx from 'clsx';
+import EditTaskMenu from './menus/EditTaskMenu';
+import { findDueDateOptions, findDueTimeOptions } from '../utils/regexAnalyzers';
+import { activeGroupSelector } from '../redux/selectors';
+import { editTask } from '../redux/tasks';
+import { EDIT_TASK } from '../apollo/queries';
+import DateTimePicker from './DateTimePicker';
+import { setNewTaskDueDate, setNewTaskDueTime } from '../redux/newTask';
 
 const useStyles = makeStyles({
   input: {
@@ -20,18 +33,86 @@ const useStyles = makeStyles({
     fontSize: '16px',
     width: '100%',
   },
+  dueStr: {
+    color: '#e9c46a',
+    textTransform: 'none',
+  },
 });
 
 const Task = ({
-  checked, body, onChange, id,
+  checked, body, priority, groupName, _id, dueDate, dueTime, repeat,
 }) => {
+  const classes = useStyles();
   const [anchorEl, setAnchorEl] = useState(null);
+  const [dueAnchorEl, setDueAnchorEl] = useState(null);
+  const [dueStr, setDueStr] = useState(null);
+  const [priorityStr, setPriorityStr] = useState(null);
+  const [mutationVariables, setMutationVariables] = useState();
+  const dispatch = useDispatch();
+
+  const [editTaskMutation] = useMutation(EDIT_TASK, {
+    update() {
+    },
+    onError(err) {
+      console.log(JSON.stringify(err, null, 2));
+    },
+    variables: mutationVariables,
+  });
 
   useEffect(() => {
     console.debug('task rendered');
   });
 
-  const classes = useStyles();
+  useEffect(() => {
+    editTaskMutation();
+  }, [mutationVariables]);
+
+  useEffect(() => {
+    const momentDueDate = findDueDateOptions(dueDate);
+    if (momentDueDate && momentDueDate.isValid()) {
+      let newDueStr;
+
+      const momentDueTime = findDueTimeOptions(dueTime);
+      if (momentDueTime && momentDueTime.isValid()) {
+        momentDueDate.set({
+          hour: momentDueTime.get('hour'),
+          minute: momentDueTime.get('minute'),
+          second: momentDueTime.get('second'),
+        });
+      }
+
+      if (momentDueDate.isSame(moment().add('days', 1), 'day')) {
+        newDueStr = 'tomorrow';
+      } else if (momentDueDate.isBefore(moment)) {
+        newDueStr = 'overdue';
+      } else {
+        newDueStr = momentDueDate.format('MMM do hh:mm a');
+      }
+
+      setDueStr(newDueStr);
+    }
+
+    setPriorityStr('!'.repeat(4 - priority));
+  }, []);
+
+  const onBodyChange = (e) => {
+    const newValues = {
+      checked,
+      body: e.target.value,
+      priority,
+      dueDate,
+      dueTime,
+      repeat,
+    };
+
+    setMutationVariables({ ...newValues, taskId: _id, groupName });
+
+    dispatch(editTask({
+      id: _id,
+      newValues,
+    }));
+  };
+
   return (
     <ListItem dense divider>
       <ListItemIcon>
@@ -45,30 +126,55 @@ const Task = ({
       </ListItemIcon>
       <input
         value={body}
-        onChange={(e) => onChange(id, e.target.value)}
+        onChange={onBodyChange}
         variant="filled"
         className={classes.input}
       />
       <ListItemSecondaryAction>
-        <IconButton onClick={(e) => setAnchorEl(e.currentTarget)}>
-          <MoreHorizSharpIcon color="primary" />
+        {priorityStr && (
+        <Button
+          size="large"
+          className={clsx({
+            'priority-veryhigh': priority === 1,
+            'priority-high': priority === 2,
+            'priority-medium': priority === 3,
+          })}
+        >
+          {priorityStr}
+        </Button>
+        )}
+        {dueStr && (
+        <Button className={classes.dueStr}>
+          {dueStr}
+        </Button>
+        )}
+        <IconButton id={`editTaskButton${_id}`} onClick={(e) => setAnchorEl(e.currentTarget.id)}>
+          <MoreHorizSharpIcon color="info" />
         </IconButton>
-        <Menu onClose={() => setAnchorEl(null)} anchorEl={anchorEl} />
+        <EditTaskMenu
+          taskId={_id}
+          onClose={() => setAnchorEl(null)}
+          anchorEl={anchorEl}
+        />
       </ListItemSecondaryAction>
     </ListItem>
   );
 };
 
-export default Task;
+const mapStateToProps = (state) => ({
+  groupName: activeGroupSelector(state).name,
+});
+
+export default connect(mapStateToProps)(Task);
 
 Task.propTypes = {
-  // checked: PropTypes.bool.isRequired,
+  checked: PropTypes.bool.isRequired,
   body: PropTypes.string.isRequired,
-  id: PropTypes.string.isRequired,
+  _id: PropTypes.string.isRequired,
+  groupName: PropTypes.string.isRequired,
   // created: PropTypes.string.isRequired,
-  // priority: PropTypes.string.isRequired,
-  // dueDate: PropTypes.string.isRequired,
-  // dueTime: PropTypes.string.isRequired,
-  // repeat: PropTypes.string.isRequired,
-  onChange: PropTypes.func.isRequired,
+  priority: PropTypes.number.isRequired,
+  dueDate: PropTypes.string.isRequired,
+  dueTime: PropTypes.string.isRequired,
+  repeat: PropTypes.string.isRequired,
 };

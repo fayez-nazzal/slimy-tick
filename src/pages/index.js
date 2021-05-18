@@ -1,6 +1,6 @@
-import React from 'react';
+import React, { useLayoutEffect } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import { navigate } from 'gatsby-link';
 import jwtDecode from 'jwt-decode';
 import { Helmet } from 'react-helmet';
@@ -9,12 +9,16 @@ import clsx from 'clsx';
 import { graphql } from 'gatsby';
 import useMediaQuery from '@material-ui/core/useMediaQuery';
 import makeStyles from '@material-ui/core/styles/makeStyles';
+import { useMutation } from '@apollo/client';
 import { userSelector } from '../redux/selectors';
 import Navbar from '../components/main/Navbar';
 import Sidebar from '../components/main/Sidebar';
 import TaskList from '../components/main/TaskList';
 import PriorityTabs from '../components/PriorityTabs';
 import NewTaskInput from '../components/NewTaskInput';
+import { REFRESH_LOGIN_USER } from '../apollo/queries';
+import { login as globalLogin } from '../redux/user';
+import DateTimePicker from '../components/DateTimePicker';
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,28 +53,29 @@ const Index = ({ data, loggedIn }) => {
   const sm = useMediaQuery((theme) => theme.breakpoints.up('sm'));
   const onlySm = useMediaQuery((theme) => theme.breakpoints.only('sm'));
   const classes = useStyles({ sm, onlySm });
+  const dispatch = useDispatch();
   const [drawerOpen, setOpen] = React.useState(true);
   const [filter, setFilter] = React.useState('ALL');
+
+  const [refreshLogin] = useMutation(REFRESH_LOGIN_USER, {
+    update(proxy, { data: { refreshLogin: userData } }) {
+      dispatch(globalLogin({ ...userData }));
+    },
+    onError(err) {
+      console.log(err);
+    },
+  });
+
+  useLayoutEffect(() => {
+    refreshLogin();
+    setInterval(() => {
+      refreshLogin();
+    }, 39000);
+  }, []);
 
   const toggleDrawer = () => {
     setOpen((prev) => !prev);
   };
-
-  const token = localStorage.getItem('slimy-tick-jwt');
-
-  if (!loggedIn && token) {
-    const decodedToken = jwtDecode(token);
-
-    if (decodedToken.exp * 1000 < Date.now()) {
-      localStorage.removeItem('jwt');
-    } else {
-      console.log(decodedToken);
-    }
-  }
-
-  if (!loggedIn) {
-    navigate('/login');
-  }
 
   return (
     <div className={classes.root}>
@@ -97,6 +102,7 @@ const Index = ({ data, loggedIn }) => {
         <div className={classes.padded}>
           <NewTaskInput />
           <TaskList />
+          <DateTimePicker />
         </div>
         <PriorityTabs />
       </main>

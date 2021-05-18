@@ -15,18 +15,17 @@ import { useDispatch, connect } from 'react-redux';
 import { CREATE_TASK } from '../apollo/queries';
 import { newTaskSelector } from '../redux/selectors';
 import {
-  setNewTaskDueDate,
-  setNewTaskDueTime,
   setNewTaskRepeat,
   setNewTaskPriority,
   setNewTaskBody,
 } from '../redux/newTask';
-import DateTimePicker from './DateTimePicker';
+import { addNewTask } from '../redux/tasks';
 import ButtonGroupButton from './general/ButtonGroupIconButton';
 import RepeatMenu from './menus/RepeatMenu';
 import CustomRepeatPopover from './menus/CustomRepeatPopover';
 import PriorityMenu from './menus/PriorityMenu';
 import DraftTaskEditor from './DraftTaskEditor';
+import { setDueAnchorEl } from '../redux/dueAnchorEl';
 
 const theme = createMuiTheme({
   palette: {
@@ -87,7 +86,8 @@ const newTaskInput = ({ newTask }) => {
   const dispatch = useDispatch();
   const [focus, setFocus] = useState(false);
   const disableEditorBlur = useRef(false);
-
+  const [mutationVariables, setMutationVariables] = useState();
+  const dueRef = useRef(null);
   useEffect(() => {
     console.debug('new task input rendered');
     // eslint-disable-next-line no-use-before-define
@@ -95,18 +95,13 @@ const newTaskInput = ({ newTask }) => {
   }, []);
 
   const [priorityAnchorEl, setPriorityAnchorEl] = useState(null);
-  const [dueAnchorEl, setDueAnchorEl] = useState(null);
   const [repeatAnchorEl, setRepeatAnchorEl] = useState(null);
   const [customRepeatAnchorEl, setCustomRepeatAncorEl] = useState(null);
 
   const classes = useStyles({ focus });
-  const [addTask] = useMutation(CREATE_TASK, {
+  const [addTaskMutation] = useMutation(CREATE_TASK, {
     update(proxy, { data: { addTask: newtask } }) {
-      dispatch(addTask(newtask));
-      // eslint-disable-next-line no-use-before-define
       dispatch(setNewTaskBody(''));
-      // eslint-disable-next-line no-use-before-define
-      resetTask();
     },
     onError(err) {
       console.log(JSON.stringify(err, null, 2));
@@ -126,8 +121,18 @@ const newTaskInput = ({ newTask }) => {
     }, 1);
   };
 
+  const addTask = () => {
+    setMutationVariables(newTask);
+    resetTask();
+    dispatch(addNewTask(newTask));
+    addTaskMutation();
+  };
+
   const handleDueClicked = (e) => {
-    setDueAnchorEl(e.currentTarget);
+    console.log(dueRef);
+    const target = e.currentTarget;
+    const { id } = target;
+    dispatch(setDueAnchorEl(id));
     disableEditorBlurTemporarily();
   };
 
@@ -148,14 +153,6 @@ const newTaskInput = ({ newTask }) => {
     dispatch(setNewTaskPriority(newPriority));
   };
 
-  const setDueDate = (newDate) => {
-    dispatch(setNewTaskDueDate(newDate));
-  };
-
-  const setDueTime = (newTime) => {
-    dispatch(setNewTaskDueTime(newTime));
-  };
-
   const setRepeat = (newRepeat) => {
     dispatch(setNewTaskRepeat(newRepeat));
   };
@@ -172,6 +169,7 @@ const newTaskInput = ({ newTask }) => {
           size="small"
           className={classes.submitButton}
           onClick={addTask}
+          {...keepDraftEvents}
         >
           <PlayArrowIcon color="primary" className={classes.playIcon} />
         </ButtonGroupButton>
@@ -229,21 +227,13 @@ const newTaskInput = ({ newTask }) => {
             {...keepDraftEvents}
             onClick={handleDueClicked}
             data-testid="due-button"
+            id="newTaskDueButton"
           >
             <DateRangeIcon
               color="primary"
               className={newTask.dueDate && classes.dueSet}
             />
           </ButtonGroupButton>
-          <DateTimePicker
-            anchorEl={dueAnchorEl}
-            onClose={() => setDueAnchorEl(false)}
-            setTaskDueDate={setDueDate}
-            setTaskDueTime={setDueTime}
-            taskDueDate={newTask.dueDate}
-            taskDueTime={newTask.dueTime}
-            taskRepeat={newTask.repeat}
-          />
         </div>
       </div>
     </MuiThemeProvider>

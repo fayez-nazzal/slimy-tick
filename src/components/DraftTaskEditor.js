@@ -111,7 +111,7 @@ const DraftTaskEditor = ({
       .getCurrentContent()
       .getPlainText('\u0001');
 
-    if (newTask.body && newTask.body !== currentDraftText) {
+    if (newTask.body !== currentDraftText) {
       // eslint-disable-next-line no-use-before-define
       setDraftBodyText(newTask.body);
     }

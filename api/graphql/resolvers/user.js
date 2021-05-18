@@ -1,21 +1,74 @@
 /* eslint-disable no-underscore-dangle */
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
-const { UserInputError } = require('apollo-server');
+const { UserInputError } = require('apollo-server-express');
 
 const User = require('../../models/user');
-const { SECRET_KEY } = require('../../config');
+const { SECRET_KEY, SECRET_KEY_REFRESH } = require('../../config');
 const validateInput = require('../../utils/validateInput');
 const checkAuth = require('../../utils/checkAuth');
+const { ContactsOutlined } = require('@material-ui/icons');
 
-const generateToken = (user) =>
-  // eslint-disable-next-line implicit-arrow-linebreak
-  jwt.sign(
-    { id: user.id, email: user.email },
-    SECRET_KEY,
+const generateTokens = async (user, secret, refreshSecret) => {
+  const generateToken = jwt.sign(
+    { email: user.email },
+    secret,
     // eslint-disable-next-line comma-dangle
-    { expiresIn: '1h' }
+    { expiresIn: '40s' }
   );
+
+const generateRefreshToken =  jwt.sign(
+    { email: user.email },
+    refreshSecret,
+    // eslint-disable-next-line comma-dangle
+    { expiresIn: '1y' }
+  );
+
+  return Promise.all([generateToken, generateRefreshToken])
+}
+
+const refreshTokens = async (refreshToken, SECRET, SECRET_2) => {
+  let email = -1;
+  try {
+    email = jwt.decode(refreshToken).email;
+  } catch (err) {
+    return {};
+  }
+
+  if (!email) {
+    return {};
+  }
+
+
+  let user = await User.findOne({ email });
+
+  if (!user) {
+    return {};
+  }
+
+
+  const refreshSecret = SECRET_2 + user.password;
+
+  try {
+    jwt.verify(refreshToken, refreshSecret);
+  } catch (err) {
+    return {};
+  }
+
+  const [newToken, newRefreshToken] = await generateTokens(user, SECRET, refreshSecret);
+  
+  return {
+    user,
+    token: newToken,
+    refreshToken: newRefreshToken,
+  };
+};
+
+const setResTokenCookies = (res, token, refreshToken) => {
+  const cookieFlags = {maxAge: 157784630,  httpOnly: true }
+  res.cookie('slimytick-jwt', `Bearer ${token}`, cookieFlags);
+  res.cookie('slimytick-refresh-jwt', `Bearer ${refreshToken}`, cookieFlags);
+}
 
 module.exports = {
   Query: {
@@ -33,7 +86,7 @@ module.exports = {
   },
 
   Mutation: {
-    async login(_, { email, password }) {
+    async login(_, { email, password }, context) {
       const { errors, valid } = validateInput(email, password, false);
       const user = await User.findOne({ email });
 
@@ -53,15 +106,37 @@ module.exports = {
         throw new UserInputError('Wrong credentials', { errors });
       }
 
-      const token = generateToken(user);
+      const [token, refreshToken] = await generateTokens(user, SECRET_KEY, SECRET_KEY_REFRESH + user.password)
+      const { res } = context;
+      
+      setResTokenCookies(res, token, refreshToken)
 
       return {
         ...user._doc,
-        id: user._id,
         token,
       };
     },
-    async register(_, { email, password, confirmPassword }) {
+    async refreshLogin(_, __, {req, res}) {
+      const token = req.cookies['slimytick-jwt'];
+      let user
+      
+      if (token) {
+        try {
+          const { email } = checkAuth(token); 
+          user = await User.findOne({ email });
+        } catch (err) {
+          const refreshToken = req.cookies['slimytick-refresh-jwt'];
+          const newTokens = await refreshTokens(refreshToken.split('Bearer ')[1], SECRET_KEY, SECRET_KEY_REFRESH)
+          if (newTokens.token && newTokens.refreshToken) {
+            setResTokenCookies(res, newTokens.token, newTokens.refreshToken)
+            user = newTokens.user
+          }
+        }
+      }
+        
+        return user;
+    },
+    async register(_, { email, password, confirmPassword }, {res}) {
       // Validate user data
 
       const { valid, errors } = validateInput(email, password, confirmPassword);
@@ -84,22 +159,26 @@ module.exports = {
       // task hash pasword and create an authentication token
       const hashedPassword = await bcrypt.hash(password, 12);
 
-      const newUser = new User({
+      const inboxGroup = {
+        name: "Inbox",
+        tasks: [],
+        created: new Date().toISOString(),
+      };
+
+      let newUser = new User({
         email,
         password: hashedPassword,
         created: new Date().toISOString(),
-        groups: [],
+        groups: [inboxGroup],
       });
 
-      const res = await newUser.save();
+      newUser = await newUser.save();
 
-      const token = generateToken(res);
+      const [token, refreshToken] = await generateTokens(newUser, SECRET_KEY, SECRET_KEY_REFRESH + newUser.password)
 
-      return {
-        ...res._doc,
-        id: res._id,
-        token,
-      };
+      setResTokenCookies(res, token, refreshToken)  
+
+      return newUser
     },
   },
 };

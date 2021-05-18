@@ -12,7 +12,7 @@ const groupsSlice = createSlice({
     },
     remove: (state, { payload }) => {
       const { id } = payload;
-      const groupIndex = state.find((group) => group.id === id);
+      const groupIndex = state.find((group) => group._id === id);
       state.splice(groupIndex, 1);
     },
   },

@@ -1,7 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
 import isEqual from 'lodash.isequal';
 import { matchPriorityAndReturnRange } from '../utils/matchers';
-import { findDueDateOptions, findDueTimeOptions, findRepeatOptions } from '../utils/regexAnalyzers';
+import {
+  findDueDateOptions,
+  findDueTimeOptions,
+  findRepeatOptions,
+} from '../utils/regexAnalyzers';
 import { login } from './user';
 
 const replaceRange = (str, start, end, substitute) => {
@@ -10,7 +14,7 @@ const replaceRange = (str, start, end, substitute) => {
   return startSubstr + substitute + endSubstr;
 };
 
-const getPriorityStrEquivelent = (priority) => '!'.repeat((4 - priority));
+const getPriorityStrEquivelent = (priority) => '!'.repeat(4 - priority);
 
 const newTaskSlice = createSlice({
   name: 'newTask',
@@ -31,9 +35,7 @@ const newTaskSlice = createSlice({
 
       // if old priority regex text exist, replace it to the new priority
       if (state.body) {
-        const taskPriorityRange = matchPriorityAndReturnRange(
-          state.body,
-        );
+        const taskPriorityRange = matchPriorityAndReturnRange(state.body);
 
         state.body = replaceRange(
           state.body,
@@ -50,54 +52,51 @@ const newTaskSlice = createSlice({
       const taskDueDate = state.dueDate;
 
       if (
+        action.payload &&
         !taskBody.includes(action.payload) &&
-          !findDueDateOptions(action.payload).isSame(
-            findDueDateOptions(taskDueDate),
-            'day',
-          )
+        !findDueDateOptions(action.payload).isSame(
+          findDueDateOptions(taskDueDate),
+          'day',
+        )
       ) {
         state.body =
-            taskBody && taskDueDate
-              ? taskBody.replace(taskDueDate, action.payload)
-              : taskBody;
-
-        state.dueDate = action.payload;
+          taskBody && taskDueDate
+            ? taskBody.replace(taskDueDate, action.payload)
+            : taskBody;
       }
+      state.dueDate = action.payload;
     },
     setDueTime: (state, action) => {
       const taskBody = state.body;
       const taskDueTime = state.dueTime;
 
       if (
+        action.payload &&
         taskDueTime &&
-          taskBody &&
-          !taskBody.includes(action.payload) &&
-          !findDueTimeOptions(action.payload).isSame(
-            findDueTimeOptions(taskDueTime),
-            'hour',
-          )
+        taskBody &&
+        !taskBody.includes(action.payload) &&
+        !findDueTimeOptions(action.payload).isSame(
+          findDueTimeOptions(taskDueTime),
+          'hour',
+        )
       ) {
-        state.body = taskBody.replace(
-          taskDueTime,
-          action.payload,
-        );
-
-        state.dueTime = action.payload;
+        state.body = taskBody.replace(taskDueTime, action.payload);
       }
+      state.dueTime = action.payload;
     },
     setRepeat: (state, action) => {
       const taskBody = state.body;
       const oldRepeat = state.repeat;
       const analyzedOldRepeat = findRepeatOptions(oldRepeat);
       const newRepeat =
-          action.payload && action.payload[0] ? action.payload : '';
+        action.payload && action.payload[0] ? action.payload : '';
       const analyzedNewRepeat = findRepeatOptions(newRepeat);
 
       if (
         taskBody &&
-          oldRepeat &&
-          !taskBody.includes(newRepeat) &&
-          !isEqual(analyzedOldRepeat, analyzedNewRepeat)
+        oldRepeat &&
+        !taskBody.includes(newRepeat) &&
+        !isEqual(analyzedOldRepeat, analyzedNewRepeat)
       ) state.body = taskBody.replace(oldRepeat, newRepeat);
 
       state.repeat = newRepeat;

@@ -7,36 +7,46 @@ import PriorityHighIcon from '@material-ui/icons/PriorityHighSharp';
 import DateRangeIcon from '@material-ui/icons/DateRangeSharp';
 import UpdateIcon from '@material-ui/icons/UpdateSharp';
 import MenuItem from '@material-ui/core/MenuItem';
+import { useDispatch } from 'react-redux';
 import Menu from '../general/Menu';
+import { setDueAnchorEl } from '../../redux/dueAnchorEl';
 
-const ActionsMenu = ({ onClose, anchorEl }) => (
-  <Menu anchorEl={anchorEl} onClose={onClose} ariaControls="actions-menu">
-    <MenuItem>
-      <ListItemIcon>
-        <AlarmIcon color="primary" />
-      </ListItemIcon>
-      <ListItemText primary="set reminder" />
-    </MenuItem>
-    <MenuItem>
-      <ListItemIcon>
-        <UpdateIcon color="primary" />
-      </ListItemIcon>
-      <ListItemText primary="repeat" />
-    </MenuItem>
-    <MenuItem>
-      <ListItemIcon>
-        <PriorityHighIcon color="primary" />
-      </ListItemIcon>
-      <ListItemText primary="set priority" />
-    </MenuItem>
-    <MenuItem>
-      <ListItemIcon>
-        <DateRangeIcon color="primary" />
-      </ListItemIcon>
-      <ListItemText primary="due" />
-    </MenuItem>
-  </Menu>
-);
+const ActionsMenu = ({ anchorEl, onClose }) => {
+  const dispatch = useDispatch();
+
+  const onDue = () => {
+    dispatch(setDueAnchorEl(anchorEl));
+  };
+
+  return (
+    <Menu anchorEl={!!anchorEl && document.getElementById(anchorEl)} onClose={onClose} ariaControls="actions-menu">
+      <MenuItem>
+        <ListItemIcon>
+          <AlarmIcon color="primary" />
+        </ListItemIcon>
+        <ListItemText primary="set reminder" />
+      </MenuItem>
+      <MenuItem>
+        <ListItemIcon>
+          <UpdateIcon color="primary" />
+        </ListItemIcon>
+        <ListItemText primary="repeat" />
+      </MenuItem>
+      <MenuItem>
+        <ListItemIcon>
+          <PriorityHighIcon color="primary" />
+        </ListItemIcon>
+        <ListItemText primary="set priority" />
+      </MenuItem>
+      <MenuItem onClick={onDue}>
+        <ListItemIcon>
+          <DateRangeIcon color="primary" />
+        </ListItemIcon>
+        <ListItemText primary="due" />
+      </MenuItem>
+    </Menu>
+  );
+};
 
 export default ActionsMenu;
 
@@ -45,6 +55,6 @@ ActionsMenu.defaultProps = {
 };
 
 ActionsMenu.propTypes = {
-  onClose: PropTypes.func.isRequired,
   anchorEl: PropTypes.node,
+  onClose: PropTypes.func.isRequired,
 };

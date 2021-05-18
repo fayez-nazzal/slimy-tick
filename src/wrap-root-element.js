@@ -5,7 +5,16 @@ import ReduxProvider from './redux/provider';
 import ApolloProvider from './apollo/provider';
 import MuiPickersUtilsProvider from './MuiPickerUtilsProvider';
 
-const baseTheme = createMuiTheme();
+const baseTheme = createMuiTheme({
+  palette: {
+    primary: {
+      main: '#80b640',
+    },
+    info: {
+      main: '#ff6622',
+    },
+  },
+});
 
 export const wrapRootElement = ({ element }) => (
   <ReduxProvider>

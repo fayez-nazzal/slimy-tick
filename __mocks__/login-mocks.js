@@ -1,5 +1,6 @@
-import { LOGIN_USER } from '../src/apollo/queries';
 import { UserInputError } from 'apollo-server-core';
+import { LOGIN_USER } from '../src/apollo/queries';
+
 const mocks = [
   {
     request: {

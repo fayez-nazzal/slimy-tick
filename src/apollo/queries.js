@@ -40,7 +40,37 @@ export const CREATE_TASK = gql`
       dueDate: $dueDate
       dueTime: $dueTime
     ) {
-      id
+      _id
+      checked
+      body
+      priority
+      remind
+      repeat
+      dueDate
+      dueTime
+      created
+    }
+  }
+`;
+
+export const EDIT_TASK = gql`
+  mutation editTask(
+    $taskId: ID! 
+    $groupName: String!
+    $body: String!
+    $priority: Int!
+    $dueDate: String
+    $dueTime: String
+  ) {
+    editTask(
+      taskId: $taskId
+      groupName: $groupName
+      body: $body
+      priority: $priority
+      dueDate: $dueDate
+      dueTime: $dueTime
+    ) {
+      _id
       checked
       body
       priority
@@ -64,16 +94,18 @@ export const REGISTER_USER = gql`
       password: $password
       confirmPassword: $confirmPassword
     ) {
-      id
+      _id
       email
-      token
       created
       groups {
-        id
+        _id
         name
         tasks {
           body
           priority
+          dueDate
+          dueTime
+          repeat
         }
       }
     }
@@ -84,15 +116,38 @@ export const LOGIN_USER = gql`
   mutation login($email: String!, $password: String!) {
     login(email: $email, password: $password) {
       email
-      token
       created
       groups {
-        id
+        _id
         name
         tasks {
-          id
+          _id
           body
           priority
+          dueDate
+          dueTime
+          repeat
+        }
+      }
+    }
+  }
+`;
+
+export const REFRESH_LOGIN_USER = gql`
+  mutation refreshLogin {
+    refreshLogin{
+      email
+      created
+      groups {
+        _id
+        name
+        tasks {
+         _id
+          body
+          priority
+          dueDate
+          dueTime
+          repeat
         }
       }
     }

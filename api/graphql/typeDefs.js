@@ -1,30 +1,29 @@
-const { gql } = require('apollo-server');
+const { gql } = require('apollo-server-express');
 
 module.exports = gql`
   type Task {
-    id: String!
+    _id: ID!
     body: String!
     checked: Boolean!
     created: String!
     remind: String
     repeat: String
-    priority: String!
+    priority: Int!
     dueDate: String
     dueTime: String
   }
 
   type Group {
-    id: String!
+    _id: ID!
     name: String!
     tasks: [Task]!
     created: String!
   }
 
   type User {
-    id: ID!
+    _id: ID!
     email: String!
     password: String!
-    token: String!
     created: String!
     groups: [Group]!
   }
@@ -46,9 +45,9 @@ module.exports = gql`
       dueTime: String
     ): Task!
     createGroup(name: String!): Group!
-    edittask(
-      groupId: String!
-      taskId: String!
+    editTask(
+      taskId: ID!
+      groupName: String!
       checked: Boolean
       body: String
       priority: Int
@@ -59,5 +58,6 @@ module.exports = gql`
     ): Task!
     register(email: String!, password: String!, confirmPassword: String!): User!
     login(email: String!, password: String!): User!
+    refreshLogin: User!
   }
 `;

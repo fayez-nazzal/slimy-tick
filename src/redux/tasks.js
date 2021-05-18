@@ -26,12 +26,12 @@ const tasksSlice = createSlice({
     },
     check: (state, { payload }) => {
       const { id } = payload;
-      const taskToCheck = state.find((task) => task.id === id);
+      const taskToCheck = state.find((task) => task._id === id);
       taskToCheck.checked = true;
     },
     edit: (state, { payload }) => {
       const { id, newValues } = payload;
-      const taskIndex = state.findIndex((task) => task.id === id);
+      const taskIndex = state.findIndex((task) => task._id === id);
       state[taskIndex] = {
         ...state[taskIndex],
         ...newValues,
@@ -39,7 +39,7 @@ const tasksSlice = createSlice({
     },
     reOrder: (state, { payload }) => {
       const { id, newOrder } = payload;
-      const taskToReOrder = state.findIndex((task) => task.id === id);
+      const taskToReOrder = state.findIndex((task) => task._id === id);
       moveInArray(state, taskToReOrder, newOrder);
     },
   },
@@ -50,7 +50,7 @@ const tasksSlice = createSlice({
 });
 
 export const {
-  add: addTask,
+  add: addNewTask,
   check: checkTask,
   edit: editTask,
   reOrder: reOrderTask,

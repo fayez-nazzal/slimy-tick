@@ -1,16 +1,15 @@
 import React from 'react';
 import {
   ApolloClient,
-  createHttpLink,
   ApolloProvider,
-  InMemoryCache,
 } from '@apollo/client';
-import fetch from 'isomorphic-fetch';
+import { InMemoryCache } from 'apollo-cache-inmemory';
+import { createHttpLink } from 'apollo-link-http';
 import { setContext } from '@apollo/client/link/context';
 
 const httpLink = createHttpLink({
-  uri: 'http://localhost:5000/',
-  fetch,
+  uri: 'http://localhost:5000/graphql',
+  credentials: 'include',
 });
 
 const authLink = setContext(() => {

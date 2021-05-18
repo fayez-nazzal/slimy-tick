@@ -15,7 +15,6 @@ const userSchema = new Schema({
     required: true,
   },
   groups: [groupSchema],
-  token: String,
 });
 
 module.exports = userSchema;

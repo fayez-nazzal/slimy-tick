@@ -16,12 +16,15 @@ const useStyles = makeStyles({
     color: 'transparent',
     marginTop: 'auto',
     textTransform: 'none',
-    border: 'none',
-    height: 10,
+    border: 0,
+    padding: 0,
+    fontSize: 14,
+    height: 12,
     borderRadius: 0,
+    transition: 'all ease-in-out 0.2s',
     '&:hover': {
       color: 'black',
-      height: 20,
+      height: 22,
     },
   },
   all: {
@@ -49,11 +52,10 @@ const PriorityTabs = () => {
       <ButtonGroup fullWidth>
         <Button className={[classes.button, classes.all]}>All</Button>
         <Button className={[classes.button, classes.veryHigh]}>
-          Very high
+          Very high !!!
         </Button>
-        <Button className={[classes.button, classes.high]}>High</Button>
-        <Button className={[classes.button, classes.medium]}>Medium</Button>
-        <Button className={[classes.button, classes.low]}>Low</Button>
+        <Button className={[classes.button, classes.high]}>High !!</Button>
+        <Button className={[classes.button, classes.medium]}>Medium !</Button>
       </ButtonGroup>
     </div>
   );

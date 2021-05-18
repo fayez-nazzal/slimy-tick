@@ -1,6 +1,6 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
+import { connect, useDispatch } from 'react-redux';
 import List from '@material-ui/core/List';
 import { makeStyles } from '@material-ui/core/styles';
 import Task from '../Task';
@@ -20,13 +20,10 @@ const TaskList = ({ tasks }) => {
     console.debug('task list rendered');
   });
 
-  const ontaskChange = () => {
-  };
-
   return (
     <List className={classes.root}>
-      { tasks.map((task) => (
-        <Task key={task.id} {...task} onChange={ontaskChange} />
+      {tasks.map((task) => (
+        <Task key={task._id} {...task} />
       ))}
     </List>
   );
@@ -42,9 +39,9 @@ TaskList.propTypes = {
   tasks: PropTypes.arrayOf(PropTypes.shape({
     checked: PropTypes.bool,
     body: PropTypes.string,
-    id: PropTypes.string,
+    _id: PropTypes.string,
     created: PropTypes.string,
-    priority: PropTypes.string,
+    priority: PropTypes.number,
     dueDate: PropTypes.string,
     dueTime: PropTypes.string,
     repeat: PropTypes.string,

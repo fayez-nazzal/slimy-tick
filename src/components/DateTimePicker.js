@@ -5,7 +5,7 @@ import createMuiTheme from '@material-ui/core/styles/createMuiTheme';
 import makeStyles from '@material-ui/core/styles/makeStyles';
 import { ThemeProvider } from '@material-ui/core/styles';
 import moment from 'moment';
-import 'moment-recur';
+import { connect, useDispatch } from 'react-redux';
 import { Button, Popover } from '@material-ui/core';
 import { minutes, hours, days } from 'time-convert';
 import {
@@ -13,6 +13,13 @@ import {
   findDueTimeOptions,
   findRepeatOptions,
 } from '../utils/regexAnalyzers';
+import { setNewTaskDueDate, setNewTaskDueTime } from '../redux/newTask';
+import {
+  dueAnchorElSelector,
+  dueTaskIdSelector, newTaskSelector, tasksSelector,
+} from '../redux/selectors';
+import { editTask } from '../redux/tasks';
+import { setDueAnchorEl } from '../redux/dueAnchorEl';
 
 const theme = createMuiTheme({
   palette: {
@@ -70,14 +77,15 @@ const useStyles = makeStyles({
 });
 
 const DateTimePicker = ({
-  anchorEl, onClose, taskRepeat, taskDueDate, taskDueTime, setTaskDueDate, setTaskDueTime,
+  anchorEl, dueTaskId, taskValues,
 }) => {
   const classes = useStyles();
+  const dispatch = useDispatch();
+
   const [selectedDate, setSelectedDate] = useState();
   const recurDates = useRef([]);
-
   useEffect(() => {
-    const analyzedRepeat = findRepeatOptions(taskRepeat);
+    const analyzedRepeat = findRepeatOptions(taskValues.repeat);
 
     const normalizedRepeat = repeatArrToDays(analyzedRepeat);
     // eslint-disable-next-line no-use-before-define
@@ -105,13 +113,27 @@ const DateTimePicker = ({
         recurDates.current.push(currClone.clone());
       }
     }
-  }, [taskRepeat, selectedDate]);
+  }, [taskValues.repeat, selectedDate]);
+
+  const setDueDate = (newDate) => {
+    const action = dueTaskId === 'new' ? setNewTaskDueDate(newDate) : editTask({ ...taskValues, dueDate: newDate });
+    dispatch(action);
+  };
+
+  const setDueTime = (newTime) => {
+    const action = dueTaskId === 'new' ? setNewTaskDueTime(newTime) : editTask({ ...taskValues, dueTime: newTime });
+    dispatch(action);
+  };
+
+  const onClose = () => {
+    dispatch(setDueAnchorEl(null));
+  };
 
   const handleOkButton = () => {
     const dateString = selectedDate.format('MMM DD, YYYY');
     const timeString = selectedDate.format('hh:mm a');
-    setTaskDueDate(dateString);
-    setTaskDueTime(timeString);
+    setDueDate(dateString);
+    setDueTime(timeString);
     onClose();
   };
 
@@ -120,8 +142,8 @@ const DateTimePicker = ({
   };
 
   const getDate = () => {
-    const taskMomentDate = findDueDateOptions(taskDueDate) || moment();
-    const taskMomentTime = findDueTimeOptions(taskDueTime) || moment();
+    const taskMomentDate = findDueDateOptions(taskValues.dueDate) || moment();
+    const taskMomentTime = findDueTimeOptions(taskValues.dueTime) || moment();
 
     return taskMomentDate.set({
       hour: taskMomentTime.get('hour'),
@@ -134,14 +156,10 @@ const DateTimePicker = ({
   };
 
   const renderDay = (day, selDate, _, DayComponent) => {
-    const analyzedRepeat = findRepeatOptions(taskRepeat);
+    const analyzedRepeat = findRepeatOptions(taskValues.repeat);
     const normalizedRepeat = repeatArrToDays(analyzedRepeat);
 
     const repeatToDays = selDate && timeToDays(normalizedRepeat);
-
-    useEffect(() => {
-      console.debug('date picker rendered');
-    });
 
     const renderCustom =
       normalizedRepeat &&
@@ -166,7 +184,7 @@ const DateTimePicker = ({
     <ThemeProvider theme={theme}>
       <Popover
         open={!!anchorEl}
-        anchorEl={anchorEl}
+        anchorEl={!!anchorEl && document.getElementById(anchorEl)}
         onClose={onClose}
         onEnter={handleOnEnter}
         elevation={0}
@@ -217,7 +235,19 @@ const DateTimePicker = ({
   );
 };
 
-export default DateTimePicker;
+const mapStateToProps = (state) => {
+  const dueTaskId = dueTaskIdSelector(state);
+  const taskValues = dueTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task.id === dueTaskId);
+  const anchorEl = dueAnchorElSelector(state);
+
+  return {
+    dueTaskId,
+    taskValues,
+    anchorEl,
+  };
+};
+
+export default connect(mapStateToProps, null, null)(DateTimePicker);
 
 const CustomDay = (props) => {
   const [hovered, setHovered] = useState(false);
@@ -234,18 +264,15 @@ const CustomDay = (props) => {
   });
 };
 
-DateTimePicker.defaultProps = {
-  anchorEl: null,
-};
-
 DateTimePicker.propTypes = {
-  onClose: PropTypes.func.isRequired,
-  anchorEl: PropTypes.node,
-  taskRepeat: PropTypes.string.isRequired,
-  taskDueDate: PropTypes.string.isRequired,
-  taskDueTime: PropTypes.string.isRequired,
-  setTaskDueDate: PropTypes.func.isRequired,
-  setTaskDueTime: PropTypes.func.isRequired,
+  anchorEl: PropTypes.node.isRequired,
+  dueTaskId: PropTypes.string.isRequired,
+  taskValues: PropTypes.shape({
+    body: PropTypes.string,
+    dueDate: PropTypes.string,
+    dueTime: PropTypes.string,
+    repeat: PropTypes.string,
+  }).isRequired,
 };
 
 CustomDay.propTypes = {

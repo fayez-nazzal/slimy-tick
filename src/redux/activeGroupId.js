@@ -5,10 +5,10 @@ const activeGroupIdSlice = createSlice({
   name: 'activeGroupId',
   initialState: null,
   reducers: {
-    set: (_, action) => action.payload.id,
+    set: (_, action) => action.payload._id,
   },
   extraReducers: {
-    [login]: (state, { payload }) => payload.groups[0].id,
+    [login]: (state, { payload }) => payload.groups[0]._id,
   },
 });
 
