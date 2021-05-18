@@ -9,17 +9,17 @@ import UpdateIcon from '@material-ui/icons/UpdateSharp';
 import MenuItem from '@material-ui/core/MenuItem';
 import { useDispatch } from 'react-redux';
 import Menu from '../general/Menu';
-import { setDueAnchorEl } from '../../redux/dueAnchorEl';
+import { setDueAnchorElId } from '../../redux/dueAnchorElId';
 
-const ActionsMenu = ({ anchorEl, onClose }) => {
+const ActionsMenu = ({ anchorElId, onClose }) => {
   const dispatch = useDispatch();
 
   const onDue = () => {
-    dispatch(setDueAnchorEl(anchorEl));
+    dispatch(setDueAnchorElId(anchorElId));
   };
 
   return (
-    <Menu anchorEl={!!anchorEl && document.getElementById(anchorEl)} onClose={onClose} ariaControls="actions-menu">
+    <Menu anchorEl={!!anchorElId && document.getElementById(anchorElId)} onClose={onClose} ariaControls="actions-menu">
       <MenuItem>
         <ListItemIcon>
           <AlarmIcon color="primary" />
@@ -51,10 +51,10 @@ const ActionsMenu = ({ anchorEl, onClose }) => {
 export default ActionsMenu;
 
 ActionsMenu.defaultProps = {
-  anchorEl: null,
+  anchorElId: '',
 };
 
 ActionsMenu.propTypes = {
-  anchorEl: PropTypes.node,
+  anchorElId: PropTypes.string,
   onClose: PropTypes.func.isRequired,
 };

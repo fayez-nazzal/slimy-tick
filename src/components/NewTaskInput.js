@@ -25,7 +25,7 @@ import RepeatMenu from './menus/RepeatMenu';
 import CustomRepeatPopover from './menus/CustomRepeatPopover';
 import PriorityMenu from './menus/PriorityMenu';
 import DraftTaskEditor from './DraftTaskEditor';
-import { setDueAnchorEl } from '../redux/dueAnchorEl';
+import { setDueAnchorElId } from '../redux/dueAnchorElId';
 
 const theme = createMuiTheme({
   palette: {
@@ -130,9 +130,8 @@ const newTaskInput = ({ newTask }) => {
 
   const handleDueClicked = (e) => {
     console.log(dueRef);
-    const target = e.currentTarget;
-    const { id } = target;
-    dispatch(setDueAnchorEl(id));
+    const { id } = e.currentTarget;
+    dispatch(setDueAnchorElId(id));
     disableEditorBlurTemporarily();
   };
 

@@ -43,7 +43,7 @@ const Task = ({
   checked, body, priority, groupName, _id, dueDate, dueTime, repeat,
 }) => {
   const classes = useStyles();
-  const [anchorEl, setAnchorEl] = useState(null);
+  const [editMenuAnchorElId, setEditMenuAnchorElId] = useState(null);
   const [dueAnchorEl, setDueAnchorEl] = useState(null);
   const [dueStr, setDueStr] = useState(null);
   const [priorityStr, setPriorityStr] = useState(null);
@@ -148,13 +148,13 @@ const Task = ({
           {dueStr}
         </Button>
         )}
-        <IconButton id={`editTaskButton${_id}`} onClick={(e) => setAnchorEl(e.currentTarget.id)}>
+        <IconButton id={`editTaskButton${_id}`} onClick={(e) => setEditMenuAnchorElId(e.currentTarget.id)}>
           <MoreHorizSharpIcon color="info" />
         </IconButton>
         <EditTaskMenu
           taskId={_id}
-          onClose={() => setAnchorEl(null)}
-          anchorEl={anchorEl}
+          onClose={() => setEditMenuAnchorElId(null)}
+          anchorElId={editMenuAnchorElId}
         />
       </ListItemSecondaryAction>
     </ListItem>

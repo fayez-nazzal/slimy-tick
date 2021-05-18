@@ -1,7 +1,7 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-const dueAnchorEl = createSlice({
-  name: 'dueAnchorEl',
+const dueAnchorElId = createSlice({
+  name: 'dueAnchorElId',
   initialState: null,
   reducers: {
     set: (state, { payload }) => payload,
@@ -9,7 +9,7 @@ const dueAnchorEl = createSlice({
 });
 
 export const {
-  set: setDueAnchorEl,
-} = dueAnchorEl.actions;
+  set: setDueAnchorElId,
+} = dueAnchorElId.actions;
 
-export default dueAnchorEl.reducer;
+export default dueAnchorElId.reducer;

@@ -5,7 +5,7 @@ import activeGroupIdReducer from './activeGroupId';
 import tasksReucer from './tasks';
 import newTaskReducer from './newTask';
 import dueTaskIdReducer from './dueTaskId';
-import dueAnchorElReducer from './dueAnchorEl';
+import dueAnchorElIdReducer from './dueAnchorElId';
 
 const store = configureStore({
   reducer: {
@@ -15,7 +15,7 @@ const store = configureStore({
     tasks: tasksReucer,
     newTask: newTaskReducer,
     dueTaskId: dueTaskIdReducer,
-    dueAnchorEl: dueAnchorElReducer,
+    dueAnchorELId: dueAnchorElIdReducer,
   },
   devTools: true,
 });

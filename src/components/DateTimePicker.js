@@ -15,11 +15,13 @@ import {
 } from '../utils/regexAnalyzers';
 import { setNewTaskDueDate, setNewTaskDueTime } from '../redux/newTask';
 import {
-  dueAnchorElSelector,
-  dueTaskIdSelector, newTaskSelector, tasksSelector,
+  dueAnchorElIdSelector,
+  dueTaskIdSelector,
+  newTaskSelector,
+  tasksSelector,
 } from '../redux/selectors';
 import { editTask } from '../redux/tasks';
-import { setDueAnchorEl } from '../redux/dueAnchorEl';
+import { setDueAnchorElId } from '../redux/dueAnchorElId';
 
 const theme = createMuiTheme({
   palette: {
@@ -77,7 +79,7 @@ const useStyles = makeStyles({
 });
 
 const DateTimePicker = ({
-  anchorEl, dueTaskId, taskValues,
+  anchorElId, dueTaskId, taskValues,
 }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
@@ -126,7 +128,7 @@ const DateTimePicker = ({
   };
 
   const onClose = () => {
-    dispatch(setDueAnchorEl(null));
+    dispatch(setDueAnchorElId(null));
   };
 
   const handleOkButton = () => {
@@ -183,8 +185,8 @@ const DateTimePicker = ({
   return (
     <ThemeProvider theme={theme}>
       <Popover
-        open={!!anchorEl}
-        anchorEl={!!anchorEl && document.getElementById(anchorEl)}
+        open={!!anchorElId}
+        anchorEl={!!anchorElId && document.getElementById(anchorElId)}
         onClose={onClose}
         onEnter={handleOnEnter}
         elevation={0}
@@ -238,12 +240,12 @@ const DateTimePicker = ({
 const mapStateToProps = (state) => {
   const dueTaskId = dueTaskIdSelector(state);
   const taskValues = dueTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task.id === dueTaskId);
-  const anchorEl = dueAnchorElSelector(state);
+  const anchorElId = dueAnchorElIdSelector(state);
 
   return {
     dueTaskId,
     taskValues,
-    anchorEl,
+    anchorElId,
   };
 };
 
@@ -265,7 +267,7 @@ const CustomDay = (props) => {
 };
 
 DateTimePicker.propTypes = {
-  anchorEl: PropTypes.node.isRequired,
+  anchorElId: PropTypes.string.isRequired,
   dueTaskId: PropTypes.string.isRequired,
   taskValues: PropTypes.shape({
     body: PropTypes.string,
