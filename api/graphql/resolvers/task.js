@@ -68,8 +68,7 @@ module.exports = {
       const usr = await User.findOne({ email });
 
       const group = usr.groups.find((group) => group.name === groupName);
-      console.log(group.tasks)
-      console.log(taskId)
+      
       if (!group) throw new UserInputError('Group not found');
 
       const task = group.tasks.find((task) => task._id.toString() === taskId.toString());
@@ -89,5 +88,33 @@ module.exports = {
 
       return task;
     },
+    async removeTask(
+      _,
+      {
+        taskId,
+        groupName
+      },
+      { req }
+    ) {
+      const token = req.cookies['slimytick-jwt'];
+
+      const { email } = checkAuth(token);
+
+      const usr = await User.findOne({ email });
+
+      const group = usr.groups.find((group) => group.name === groupName);
+
+      if (!group) throw new UserInputError('Group not found');
+
+      const taskIndex = group.tasks.findIndex((task) => task._id.toString() === taskId.toString());
+
+      if (taskIndex === -1) throw new UserInputError('Task not found');
+      
+      group.tasks.splice(taskIndex, 1);
+
+      await usr.save();
+
+      return true
+    }
   },
 };

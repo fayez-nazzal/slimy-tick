@@ -77,7 +77,7 @@ const CustomRepeatPopover = ({
   const [weekdays, setWeekdays] = useState([]);
 
   useEffect(() => {
-    if (taskValues.repeat) {
+    if (taskValues && taskValues.repeat) {
       const analyzedRepeat = findRepeatOptions(taskValues.repeat);
       setWeekdays((prev) => (analyzedRepeat[0] === 'weekdays' ? analyzedRepeat[1] : prev));
       setStepOption({
@@ -85,7 +85,7 @@ const CustomRepeatPopover = ({
         value: analyzedRepeat[1],
       });
     }
-  }, [taskValues.repeat]);
+  }, [taskValues && taskValues.repeat]);
 
   const onWeekdaysChange = (_, newWeekdays) => {
     setStepOption({

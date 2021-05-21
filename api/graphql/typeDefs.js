@@ -56,6 +56,10 @@ module.exports = gql`
       dueDate: String
       dueTime: String
     ): Task!
+    removeTask(
+      taskId: ID!
+      groupName: String
+    ): Boolean!
     register(email: String!, password: String!, confirmPassword: String!): User!
     login(email: String!, password: String!): User!
     refreshLogin: User!

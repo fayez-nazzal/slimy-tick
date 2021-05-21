@@ -85,6 +85,18 @@ export const EDIT_TASK = gql`
   }
 `;
 
+export const REMOVE_TASK = gql`
+  mutation removeTask(
+    $taskId: ID!
+    $groupName: String
+  ) {
+    removeTask(
+      taskId: $taskId
+      groupName: $groupName
+    )
+  }
+`;
+
 export const REGISTER_USER = gql`
   mutation register(
     $email: String!

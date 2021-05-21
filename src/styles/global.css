@@ -33,19 +33,27 @@ body {
 .priority-veryhigh {
   color: #ed5f00 !important;
   fill: #ed5f00 !important;
+  text-transform: none !important;
+  word-spacing: 2px;
 }
 
 .priority-high {
   color: #f48c00 !important;
   fill: #f48c00 !important;
+  text-transform: none !important;
+  word-spacing: 2px;
 }
 
 .priority-medium {
   color: #f5b900 !important;
   fill: #f5b900 !important;
+  text-transform: none !important;
+  word-spacing: 2px;
 }
 
 .priority-low {
   color: #7dbc00 !important;
   fill: #7dbc00 !important;
+  text-transform: none !important;
+  word-spacing: 2px;
 }

@@ -78,52 +78,58 @@ const useStyles = makeStyles({
   },
 });
 
-const DateTimePicker = ({
-  anchorId, activeTaskId, taskValues,
-}) => {
+const DateTimePicker = ({ anchorId, activeTaskId, taskValues }) => {
   const classes = useStyles();
   const dispatch = useDispatch();
 
   const [selectedDate, setSelectedDate] = useState();
   const recurDates = useRef([]);
   useEffect(() => {
-    const analyzedRepeat = findRepeatOptions(taskValues.repeat);
+    if (taskValues && taskValues.repeat) {
+      const analyzedRepeat = findRepeatOptions(taskValues.repeat);
 
-    const normalizedRepeat = repeatArrToDays(analyzedRepeat);
-    // eslint-disable-next-line no-use-before-define
-    setSelectedDate((prev) => (!selectedDate ? getDate() : prev));
-    const eqDays = timeToDays(normalizedRepeat);
+      const normalizedRepeat = repeatArrToDays(analyzedRepeat);
+      // eslint-disable-next-line no-use-before-define
+      setSelectedDate((prev) => (!selectedDate ? getDate() : prev));
+      const eqDays = timeToDays(normalizedRepeat);
 
-    if (
-      normalizedRepeat &&
-      !normalizedRepeat.weekdays &&
-      selectedDate &&
-      (!eqDays || eqDays > 1)
-    ) {
-      const currClone = selectedDate.clone();
-      recurDates.current = [];
+      if (
+        normalizedRepeat &&
+        !normalizedRepeat.weekdays &&
+        selectedDate &&
+        (!eqDays || eqDays > 1)
+      ) {
+        const currClone = selectedDate.clone();
+        recurDates.current = [];
 
-      // maximum generated dates = 800
-      // as the number of days increases, the interval between each two dates increases
-      // which means that the last date can be long after (may not bee seen by user)
-      // generate less dates --> higher performance
-      const dateCount = Math.floor(800 - eqDays * 100);
+        // maximum generated dates = 800
+        // as the number of days increases, the interval between each two dates increases
+        // which means that the last date can be long after (may not bee seen by user)
+        // generate less dates --> higher performance
+        const dateCount = Math.floor(800 - eqDays * 100);
 
-      for (let i = 0; i < dateCount; i += 1) {
-        currClone.add(normalizedRepeat[1], normalizedRepeat[0]);
+        for (let i = 0; i < dateCount; i += 1) {
+          currClone.add(normalizedRepeat[1], normalizedRepeat[0]);
 
-        recurDates.current.push(currClone.clone());
+          recurDates.current.push(currClone.clone());
+        }
       }
     }
-  }, [taskValues.repeat, selectedDate]);
+  }, [taskValues && taskValues.repeat, selectedDate]);
 
   const setDueDate = (newDueDate) => {
-    const action = activeTaskId === 'new' ? setNewTaskDueDate(newDueDate) : setTaskDueDate({ id: activeTaskId, newDueDate });
+    const action =
+      activeTaskId === 'new'
+        ? setNewTaskDueDate(newDueDate)
+        : setTaskDueDate({ id: activeTaskId, newDueDate });
     dispatch(action);
   };
 
   const setDueTime = (newDueTime) => {
-    const action = activeTaskId === 'new' ? setNewTaskDueTime(newDueTime) : setTaskDueTime({ id: activeTaskId, newDueTime });
+    const action =
+      activeTaskId === 'new'
+        ? setNewTaskDueTime(newDueTime)
+        : setTaskDueTime({ id: activeTaskId, newDueTime });
     dispatch(action);
   };
 
@@ -165,7 +171,9 @@ const DateTimePicker = ({
 
     const renderCustom =
       normalizedRepeat &&
-      ((repeatToDays && repeatToDays <= 1) ||
+      ((repeatToDays &&
+        repeatToDays <= 1 &&
+        day.isAfter(findDueDateOptions(taskValues.dueDate))) ||
         recurDates.current.find((date) => date.isSame(day, 'day')) ||
         (normalizedRepeat[0] === 'weekdays' &&
           normalizedRepeat[1].find(
@@ -239,7 +247,10 @@ const DateTimePicker = ({
 
 const mapStateToProps = (state) => {
   const activeTaskId = activeTaskIdSelector(state);
-  const taskValues = activeTaskId === 'new' ? newTaskSelector(state) : tasksSelector(state).find((task) => task._id === activeTaskId);
+  const taskValues =
+    activeTaskId === 'new'
+      ? newTaskSelector(state)
+      : tasksSelector(state).find((task) => task._id === activeTaskId);
   const anchorId = anchorIdsSelector(state).dueId;
 
   return {

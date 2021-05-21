@@ -18,7 +18,7 @@ import clsx from 'clsx';
 import EditTaskMenu from './menus/EditTaskMenu';
 import { findDueDateOptions, findDueTimeOptions } from '../utils/regexAnalyzers';
 import { activeGroupSelector } from '../redux/selectors';
-import { setTaskBody } from '../redux/tasks';
+import { setTaskBody, removeTask } from '../redux/tasks';
 import { setActiveTaskId } from '../redux/activeTaskId';
 import { setPriorityAnchorId, setDueAnchorId } from '../redux/anchorIds';
 
@@ -32,7 +32,7 @@ const useStyles = makeStyles({
     width: '100%',
   },
   dueStr: {
-    color: '#e9c46a',
+    color: '#2ec4b6',
     textTransform: 'none',
   },
 });
@@ -80,7 +80,7 @@ const Task = ({
   }, [dueDate, dueTime]);
 
   useEffect(() => {
-    setPriorityStr('!'.repeat(4 - priority));
+    setPriorityStr((priority === 1 && '!!! Very high') || (priority === 2 && '!! High') || (priority === 3 && '! Medium'));
   }, [priority]);
 
   const onBodyChange = (e) => {
@@ -109,6 +109,10 @@ const Task = ({
     setAsActiveTask();
   };
 
+  const remove = () => {
+    dispatch(removeTask({ groupName, taskId: _id }));
+  };
+
   return (
     <ListItem dense divider>
       <ListItemIcon>
@@ -129,7 +133,8 @@ const Task = ({
       <ListItemSecondaryAction>
         {priorityStr && (
         <Button
-          size="large"
+          size="small"
+          id={`taskPriority${_id}`}
           className={clsx({
             'priority-veryhigh': priority === 1,
             'priority-high': priority === 2,
@@ -152,6 +157,7 @@ const Task = ({
           taskId={_id}
           onClose={() => setEditMenuAnchorId(null)}
           anchorId={editMenuAnchorId}
+          removeTask={remove}
         />
       </ListItemSecondaryAction>
     </ListItem>

@@ -37,6 +37,11 @@ module.exports = {
       },
     },
     'gatsby-plugin-gatsby-cloud',
-    'gatsby-plugin-offline',
+    {
+      resolve: 'gatsby-plugin-offline',
+      options: {
+        precachePages: ['/index/'],
+      },
+    },
   ],
 };
